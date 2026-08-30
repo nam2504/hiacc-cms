@@ -1,8 +1,21 @@
 # Hướng dẫn sử dụng trang quản trị website HiACC
 
 Tài liệu này dành cho người trực tiếp cập nhật nội dung website (không cần
-biết lập trình). Nếu gặp việc ngoài phạm vi hướng dẫn dưới đây, xem mục 7
+biết lập trình). Nếu gặp việc ngoài phạm vi hướng dẫn dưới đây, xem mục 8
 "Việc cần gọi dev".
+
+**Tìm nhanh việc cần làm:**
+
+| Bạn muốn | Xem mục |
+|---|---|
+| Đăng nhập lần đầu, đổi mật khẩu | 1 |
+| Sửa hotline, email, địa chỉ, link Facebook/TikTok | 2.1 |
+| Sửa địa chỉ 5 chi nhánh, thêm link bản đồ | 2.2 |
+| Viết bài mới, sửa bài đã đăng | 3 |
+| Sửa trang Giới thiệu, sửa mô tả dịch vụ | 4 |
+| Xem khách để lại số điện thoại trên website | 5 |
+| Tải ảnh lên, thay ảnh, xoá ảnh | 6 |
+| Cấp tài khoản cho nhân viên mới | 7 |
 
 ---
 
@@ -15,7 +28,7 @@ biết lập trình). Nếu gặp việc ngoài phạm vi hướng dẫn dưới
    góc trên bên phải → chọn hồ sơ tài khoản → đổi mật khẩu.
 
 > Nếu quên mật khẩu, liên hệ dev — chức năng "quên mật khẩu qua email" hiện
-> chưa bật, xem mục 7.
+> chưa bật, xem mục 8.
 
 ---
 
@@ -99,7 +112,54 @@ liên hệ lại** ở khung bên phải rồi Save — để đồng nghiệp k
 
 ---
 
-## 6. Phân biệt tài khoản Quản trị viên vs Biên tập viên
+## 6. Quản lý ảnh
+
+Tất cả ảnh dùng trên website nằm ở menu bên trái → **Thư viện ảnh**. Ngoài
+ảnh, chỗ này còn nhận **tệp PDF** (ví dụ báo giá, hồ sơ năng lực) để chèn link
+tải về trong bài viết.
+
+### 6.1 Tải ảnh lên
+
+Có 2 cách, kết quả như nhau:
+- Vào **Thư viện ảnh** → **Create New** → chọn tệp từ máy.
+- Hoặc ngay lúc đang viết bài / sửa dịch vụ: bấm vào ô ảnh → **Upload** →
+  chọn tệp. Ảnh tải theo cách này cũng tự vào Thư viện ảnh, lần sau dùng lại
+  được.
+
+### 6.2 Ô "Mô tả ảnh" — đừng bỏ trống
+
+Mỗi ảnh có ô **Mô tả ảnh** (alt). Hãy viết một câu ngắn tả đúng nội dung ảnh,
+ví dụ "Nhân viên HiACC tư vấn cho khách tại văn phòng". Ô này dùng để:
+- Google hiểu ảnh nói về gì → website dễ được tìm thấy hơn.
+- Người khiếm thị dùng phần mềm đọc màn hình nghe được ảnh là ảnh gì.
+
+Bỏ trống không gây lỗi, nhưng mất cả hai lợi ích trên.
+
+### 6.3 Ảnh nên chuẩn bị thế nào
+
+- **Ảnh đại diện bài viết**: ảnh ngang, khoảng 1200×800 px là đẹp.
+- **Ảnh dịch vụ**: cũng ảnh ngang. Cả 7 dịch vụ nên dùng ảnh cùng kiểu (cùng
+  tông màu, cùng cách chụp) để trang Dịch vụ nhìn đồng bộ.
+- **Dung lượng**: nên dưới 1 MB mỗi ảnh. Ảnh chụp từ điện thoại thường 3-5 MB,
+  nếu tải thẳng lên sẽ làm website tải chậm. Hệ thống tự tạo thêm các bản nhỏ
+  để hiển thị nhanh, nhưng ảnh gốc nhẹ vẫn tốt hơn.
+
+### 6.4 Thay ảnh, xoá ảnh
+
+Muốn **đổi ảnh** của một bài: mở bài đó, bấm vào ô ảnh, chọn ảnh khác. Ảnh cũ
+vẫn nằm trong Thư viện ảnh, không mất.
+
+⚠️ **Xoá ảnh trong Thư viện ảnh là xoá vĩnh viễn** và chỉ Quản trị viên làm
+được. Nếu ảnh đó đang được một bài viết dùng, chỗ ảnh trên website sẽ trống.
+Trước khi xoá, hãy chắc chắn không bài nào đang dùng ảnh đó.
+
+> Ảnh hiện có trên website là **ảnh mẫu** tải từ ngân hàng ảnh miễn phí, dùng
+> để xem thử bố cục. Khi có ảnh thật của công ty, hãy thay dần — xem nguồn ảnh
+> mẫu ở tệp `MEDIA-CREDITS.md`.
+
+---
+
+## 7. Phân biệt tài khoản Quản trị viên vs Biên tập viên
 
 | Việc | Quản trị viên | Biên tập viên |
 |---|---|---|
@@ -118,7 +178,7 @@ tin công ty. Cần xoá gì hoặc đổi cấu hình chung thì nhờ Quản t
 
 ---
 
-## 7. Việc không tự làm được, phải gọi dev
+## 8. Việc không tự làm được, phải gọi dev
 
 - Đổi domain (tên miền) website.
 - Cài đặt HTTPS / chứng chỉ bảo mật.
