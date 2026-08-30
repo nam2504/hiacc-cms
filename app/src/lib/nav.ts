@@ -18,10 +18,11 @@ export const MAIN_NAV: NavItem[] = [
   { labelKey: 'nav.home', label: 'Trang chủ', href: '/' },
   { labelKey: 'nav.about', label: 'Giới thiệu', href: '/gioi-thieu' },
   { labelKey: 'nav.services', label: 'Dịch vụ chuyên ngành', href: '/dich-vu' },
-  // [B4] Mục "Công cụ" (/cong-cu và /cong-cu/tinh-luong) đã GỠ khỏi menu: route
-  // chưa tồn tại nên link trả 404 (REVIEW-ux P0 #4). Trang tính lương thuộc gói W5,
-  // đang hoãn vì chưa chốt mốc luật thuế. Khoá i18n `nav.tools` / `nav.tools.payroll`
-  // trong src/lib/i18n.ts GIỮ NGUYÊN để W5 gắn lại mục này mà không phải dịch lại.
+  // [W5 30/08] Gắn lại mục "Công cụ" sau khi W5 land và route trả 200.
+  // Trỏ THẲNG tới /cong-cu/tinh-luong, KHÔNG tạo mục cha trỏ /cong-cu — trang danh
+  // sách công cụ đó không tồn tại, trỏ vào là tái lập đúng lỗi REVIEW-ux P0 #4 mà B4 đã vá.
+  // Khi có công cụ thứ hai: dựng /cong-cu rồi mới chuyển mục này thành cha + children.
+  { labelKey: 'nav.tools.payroll', label: 'Tính lương Gross ↔ Net', href: '/cong-cu/tinh-luong' },
   { labelKey: 'nav.contact', label: 'Liên hệ', href: '/lien-he' },
   { labelKey: 'nav.news', label: 'Tin tức', href: '/tin-tuc' },
 ]
@@ -32,7 +33,7 @@ export const FOOTER_NAV: NavItem[] = [
   { labelKey: 'nav.services', label: 'Dịch vụ chuyên ngành', href: '/dich-vu' },
   { labelKey: 'nav.news', label: 'Tin tức', href: '/tin-tuc' },
   { labelKey: 'nav.contact', label: 'Liên hệ', href: '/lien-he' },
-  // [B4] "Tính lương Gross ↔ Net" (/cong-cu/tinh-luong) đã GỠ — cùng lý do như MAIN_NAV ở trên.
+  { labelKey: 'nav.tools.payroll', label: 'Tính lương Gross ↔ Net', href: '/cong-cu/tinh-luong' },
 ]
 
 /** Đường dẫn không có locale prefix ở giai đoạn 1 (chỉ tiếng Việt). */

@@ -9,7 +9,8 @@
     "start": "next start",
     "generate:types": "payload generate:types",
     "payload": "payload",
-    "seed": "payload run src/seed/index.ts"
+    "seed": "payload run src/seed/index.ts",
+    "test:payroll": "node --import tsx --test src/lib/payroll/calc.test.ts"
   },
   "dependencies": {
     "@payloadcms/db-sqlite": "^3.88.0",

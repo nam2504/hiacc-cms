@@ -101,9 +101,11 @@ export interface Config {
   fallbackLocale: ('false' | 'none' | 'null') | false | null | 'vi' | 'vi'[];
   globals: {
     settings: Setting;
+    'payroll-config': PayrollConfig;
   };
   globalsSelect: {
     settings: SettingsSelect<false> | SettingsSelect<true>;
+    'payroll-config': PayrollConfigSelect<false> | PayrollConfigSelect<true>;
   };
   locale: 'vi';
   widgets: {
@@ -902,6 +904,86 @@ export interface Setting {
   createdAt?: string | null;
 }
 /**
+ * Số liệu luật dùng cho công cụ tính lương Gross ↔ Net tại /cong-cu/tinh-luong: giảm trừ gia cảnh, biểu thuế TNCN, tỷ lệ và trần bảo hiểm, lương tối thiểu vùng. Sửa ở đây là trang tính lương đổi theo ngay, không cần lập trình viên. Chỉ Quản trị viên sửa được.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payroll-config".
+ */
+export interface PayrollConfig {
+  id: number;
+  /**
+   * Mức giảm trừ cho chính người nộp thuế, trừ khỏi thu nhập trước khi tính thuế. Mặc định 15.500.000 đ/tháng (186 triệu/năm) theo Nghị quyết 110/2025/UBTVQH15, áp dụng từ kỳ tính thuế 2026.
+   */
+  personalDeduction: number;
+  /**
+   * Mức giảm trừ cho MỖI người phụ thuộc đã đăng ký (con nhỏ, cha mẹ già…). Mặc định 6.200.000 đ/tháng theo Nghị quyết 110/2025/UBTVQH15.
+   */
+  dependentDeduction: number;
+  /**
+   * Biểu thuế 5 bậc theo Luật Thuế thu nhập cá nhân 2025 (Luật 109/2025/QH15), hiệu lực 01/01/2026 cho thu nhập từ tiền lương. Tính LŨY TIẾN TỪNG PHẦN: mỗi bậc chỉ áp thuế suất cho phần thu nhập nằm trong bậc đó, không áp một thuế suất cho toàn bộ. Các dòng phải xếp tăng dần theo ngưỡng; dòng cuối bỏ trống ngưỡng nghĩa là bậc cao nhất không giới hạn.
+   */
+  taxBrackets: {
+    /**
+     * Ngưỡng TRÊN của bậc này, tính trên thu nhập TÍNH THUẾ (đã trừ bảo hiểm và giảm trừ gia cảnh). BỎ TRỐNG ở dòng cuối cùng = bậc cao nhất, không có trần.
+     */
+    upTo?: number | null;
+    /**
+     * Nhập theo đơn vị phần trăm: gõ 5 nghĩa là 5%, không gõ 0.05. Phải trong khoảng 0–100.
+     */
+    rate: number;
+    id?: string | null;
+  }[];
+  /**
+   * CHỈ phần NGƯỜI LAO ĐỘNG chịu, tổng 10,5% — đây là phần trừ vào lương. Phần doanh nghiệp đóng (21,5%) KHÔNG trừ vào lương nên không khai ở đây. Căn cứ: Luật Bảo hiểm xã hội 2024 (số 41/2024/QH15), Nghị định 158/2025/NĐ-CP, Nghị định 188/2025/NĐ-CP, từ 01/01/2026.
+   */
+  insuranceRates: {
+    /**
+     * Phần người lao động đóng, mặc định 8%. Nhập 8 nghĩa là 8%. Áp trên lương đóng bảo hiểm nhưng không vượt "Trần đóng BHXH và BHYT" bên dưới.
+     */
+    social: number;
+    /**
+     * Phần người lao động đóng, mặc định 1,5%. Nhập 1.5 (dùng dấu chấm thập phân). Dùng chung trần với BHXH.
+     */
+    health: number;
+    /**
+     * Phần người lao động đóng, mặc định 1%. Lưu ý BHTN dùng TRẦN RIÊNG, tính theo lương tối thiểu vùng — xem tab "Vùng lương" chứ không dùng trần BHXH/BHYT.
+     */
+    unemployment: number;
+  };
+  /**
+   * ⚠️ SỐ NÀY CHƯA ĐƯỢC XÁC MINH — cần kế toán của khách xác nhận trước khi công bố trang. Lương cao hơn mức này thì BHXH và BHYT DỪNG ở mức này, không đóng thêm. Mặc định 46.800.000 đ = 20 × mức tham chiếu 2.340.000 đ. Có nguồn khác nêu 50.600.000 đ (từ 01/07/2026); dự án chọn 46.800.000 đ vì căn cứ "20 lần mức tham chiếu" rõ ràng hơn. Xác nhận xong thì sửa lại ô này.
+   */
+  insuranceCap: number;
+  /**
+   * Trần đóng BHTN = số này × lương tối thiểu của VÙNG người dùng chọn (căn cứ khác với trần BHXH/BHYT ở trên). Mặc định 20. Ví dụ Vùng I: 20 × 5.310.000 = 106.200.000 đ/tháng.
+   */
+  unemploymentCapMultiplier: number;
+  /**
+   * Lương tối thiểu 4 vùng theo Nghị định 293/2025/NĐ-CP, áp dụng 2026. Dùng để tính TRẦN đóng bảo hiểm thất nghiệp theo vùng người dùng chọn trên trang tính lương.
+   */
+  regions: {
+    /**
+     * Vùng theo phân loại của Nghị định lương tối thiểu vùng. Mỗi vùng chỉ khai một dòng.
+     */
+    code: 'I' | 'II' | 'III' | 'IV';
+    /**
+     * Mặc định: Vùng I 5.310.000 đ · Vùng II 4.730.000 đ · Vùng III 4.140.000 đ · Vùng IV 3.700.000 đ.
+     */
+    minWage: number;
+    id?: string | null;
+  }[];
+  /**
+   * Mốc hiệu lực của bộ số ở trên. Hiện công khai trên trang tính lương để người dùng biết đang áp luật mốc nào. Nên viết dạng 2026-01-01.
+   */
+  effectiveFrom: string;
+  /**
+   * Danh sách văn bản pháp luật làm căn cứ cho các số ở trên. Hiện công khai trên trang tính lương để người dùng tự đối chiếu. Mỗi căn cứ một dòng. Sửa số ở các tab khác thì nhớ cập nhật lại dòng căn cứ tương ứng ở đây.
+   */
+  legalBasis: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "settings_select".
  */
@@ -923,6 +1005,42 @@ export interface SettingsSelect<T extends boolean = true> {
   zaloQr?: T;
   aboutShort?: T;
   copyright?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payroll-config_select".
+ */
+export interface PayrollConfigSelect<T extends boolean = true> {
+  personalDeduction?: T;
+  dependentDeduction?: T;
+  taxBrackets?:
+    | T
+    | {
+        upTo?: T;
+        rate?: T;
+        id?: T;
+      };
+  insuranceRates?:
+    | T
+    | {
+        social?: T;
+        health?: T;
+        unemployment?: T;
+      };
+  insuranceCap?: T;
+  unemploymentCapMultiplier?: T;
+  regions?:
+    | T
+    | {
+        code?: T;
+        minWage?: T;
+        id?: T;
+      };
+  effectiveFrom?: T;
+  legalBasis?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

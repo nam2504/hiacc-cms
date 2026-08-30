@@ -26,6 +26,7 @@ import { Services } from './collections/Services'
 import { Branches } from './collections/Branches'
 import { ContactSubmissions } from './collections/ContactSubmissions'
 import { Settings } from './globals/Settings'
+import { PayrollConfig } from './globals/PayrollConfig'
 import { ALL_LOCALES, ENABLED_LOCALES, DEFAULT_LOCALE } from './lib/locales'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -65,7 +66,9 @@ export default buildConfig({
     ContactSubmissions,
     Users,
   ],
-  globals: [Settings],
+  // PayrollConfig (W5): số liệu luật của công cụ tính lương Gross ↔ Net.
+  // Cùng nhóm "Cấu hình" với Settings trong menu /admin.
+  globals: [Settings, PayrollConfig],
   // [A1] Bộ soạn thảo cho nhân viên kế toán, không phải dev — chỉ giữ những nút
   // họ thật sự cần, để toolbar ngắn và không phải đoán bấm gì.
   // Toolbar cố định (FixedToolbarFeature) thay cho toolbar nổi mặc định: luôn

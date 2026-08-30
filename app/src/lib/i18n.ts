@@ -192,6 +192,72 @@ const vi: Dict = {
   // Seed điền chuỗi này vào field bắt buộc `branches.address` khi khách chưa cấp
   // địa chỉ thật. JSON-LD phải nhận ra để LOẠI, không gửi địa chỉ giả cho Google.
   'seo.placeholder.pending': 'Đang cập nhật',
+
+  // --- Công cụ tính lương Gross ↔ Net (W5) ---
+  // Số liệu luật KHÔNG nằm ở đây — nó nằm trong global `payroll-config` (/admin),
+  // vì khách phải sửa được mà không cần deploy lại. Đây chỉ là nhãn giao diện.
+  'payroll.title': 'Công cụ tính lương Gross ↔ Net',
+  'payroll.subtitle':
+    'Nhập lương Gross để xem lương Net thực nhận, hoặc nhập lương Net để suy ra lương Gross cần thoả thuận.',
+  'payroll.seo.description':
+    'Tính lương Gross sang Net và Net sang Gross theo biểu thuế thu nhập cá nhân và tỷ lệ bảo hiểm áp dụng từ 01/01/2026.',
+
+  'payroll.direction.legend': 'Chiều tính',
+  'payroll.direction.grossToNet': 'Gross → Net',
+  'payroll.direction.netToGross': 'Net → Gross',
+
+  'payroll.field.amount.gross': 'Lương Gross (đồng/tháng)',
+  'payroll.field.amount.net': 'Lương Net (đồng/tháng)',
+  'payroll.field.amount.hint': 'Nhập số tiền, ví dụ 30000000.',
+  'payroll.field.dependents': 'Số người phụ thuộc',
+  'payroll.field.dependents.hint': 'Số người phụ thuộc đã đăng ký giảm trừ gia cảnh. Không có thì để 0.',
+  'payroll.field.region': 'Vùng lương tối thiểu',
+  'payroll.field.region.hint':
+    'Quyết định trần đóng bảo hiểm thất nghiệp. Không rõ thì để Vùng I (các thành phố lớn).',
+  'payroll.field.region.option': 'Vùng',
+  'payroll.field.customBase': 'Công ty đóng bảo hiểm trên mức lương khác',
+  'payroll.field.customBase.hint':
+    'Chỉ tích khi công ty đóng bảo hiểm trên mức thấp hơn lương thoả thuận. Bỏ trống thì đóng trên đúng lương Gross.',
+  'payroll.field.insuranceBase': 'Mức lương đóng bảo hiểm (đồng/tháng)',
+
+  'payroll.result.title': 'Kết quả bóc tách',
+  'payroll.result.empty': 'Nhập số tiền để xem kết quả.',
+  'payroll.result.item': 'Khoản mục',
+  'payroll.result.amount': 'Số tiền',
+  'payroll.result.gross': 'Lương Gross',
+  'payroll.result.social': 'Bảo hiểm xã hội (BHXH)',
+  'payroll.result.health': 'Bảo hiểm y tế (BHYT)',
+  'payroll.result.unemployment': 'Bảo hiểm thất nghiệp (BHTN)',
+  'payroll.result.totalInsurance': 'Tổng bảo hiểm người lao động đóng',
+  'payroll.result.incomeBeforeTax': 'Thu nhập trước thuế',
+  'payroll.result.deduction': 'Giảm trừ gia cảnh',
+  'payroll.result.deduction.personal': 'bản thân',
+  'payroll.result.deduction.dependents': 'người phụ thuộc',
+  'payroll.result.taxableIncome': 'Thu nhập tính thuế',
+  'payroll.result.tax': 'Thuế thu nhập cá nhân',
+  'payroll.result.net': 'Lương Net thực nhận',
+  'payroll.result.capped': 'đã chạm trần đóng bảo hiểm',
+
+  'payroll.brackets.title': 'Thuế đã tính theo từng bậc',
+  'payroll.brackets.hint':
+    'Mỗi bậc chỉ áp thuế suất cho phần thu nhập nằm trong bậc đó. Cộng cột cuối ra đúng số thuế ở bảng trên.',
+  'payroll.brackets.level': 'Bậc',
+  'payroll.brackets.range': 'Phần thu nhập tính thuế',
+  'payroll.brackets.rate': 'Thuế suất',
+  'payroll.brackets.portion': 'Số tiền trong bậc',
+  'payroll.brackets.tax': 'Thuế của bậc',
+  'payroll.brackets.none': 'Thu nhập tính thuế bằng 0 nên không phát sinh thuế.',
+  'payroll.brackets.above': 'trở lên',
+
+  'payroll.legal.title': 'Số liệu đang áp dụng',
+  'payroll.legal.effectiveFrom': 'Áp dụng từ',
+  'payroll.legal.basis': 'Căn cứ pháp lý',
+
+  'payroll.disclaimer.title': 'Lưu ý quan trọng',
+  'payroll.disclaimer.body':
+    'Kết quả trên chỉ mang tính tham khảo, không thay thế tư vấn thuế hay kế toán chuyên nghiệp. Số liệu áp dụng theo quy định có hiệu lực từ 01/01/2026 và có thể thay đổi. Vui lòng đối chiếu với hợp đồng lao động và cơ quan thuế trước khi sử dụng cho mục đích chính thức.',
+  'payroll.privacy':
+    'Toàn bộ phép tính chạy ngay trên trình duyệt của bạn. Số lương bạn nhập không được gửi đi đâu và không được lưu lại.',
 }
 
 /**

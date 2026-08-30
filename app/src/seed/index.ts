@@ -23,6 +23,7 @@ import {
   SERVICES,
   SETTINGS,
 } from './data'
+import { seedPayrollConfig } from './payrollConfig'
 
 /**
  * Thư mục chứa file ảnh stock nguồn để nạp qua Local API (gói M1, đợt 6).
@@ -205,6 +206,12 @@ async function seed() {
     if (value !== null && value !== undefined && value !== '') merged[key] = value
   }
   await payload.updateGlobal({ slug: 'settings', data: merged })
+
+  // payroll-config (W5) cũng là global, cùng nguyên tắc: chỉ điền ô còn trống.
+  const payrollFilled = await seedPayrollConfig(payload)
+  if (payrollFilled > 0) {
+    payload.logger.info(`Cấu hình tính lương: điền ${payrollFilled} field còn trống.`)
+  }
 
   payload.logger.info(
     `Seed xong: tạo mới ${created}, bỏ qua ${skipped} (đã có), điền content còn rỗng ${filled}, ảnh nạp mới ${mediaLinked}.`,
