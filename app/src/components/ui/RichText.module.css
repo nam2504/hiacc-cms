@@ -1,0 +1,58 @@
+/* Kiểu chữ cho nội dung khách tự nhập. Giới hạn bề ngang dòng cho dễ đọc. */
+.prose {
+  max-width: 72ch;
+  color: var(--color-text);
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  margin-top: var(--space-6);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: var(--space-5);
+}
+
+.prose li {
+  margin-bottom: var(--space-2);
+}
+
+.prose blockquote {
+  margin: var(--space-5) 0;
+  padding-left: var(--space-4);
+  border-left: 3px solid var(--color-brand);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.prose img {
+  border-radius: var(--radius-md);
+  margin-block: var(--space-5);
+}
+
+.prose table {
+  margin-block: var(--space-5);
+  font-size: var(--text-sm);
+}
+
+.prose th {
+  background: var(--color-bg-soft);
+  font-weight: var(--weight-semibold);
+}
+
+.prose code {
+  padding: 0.15em 0.4em;
+  background: var(--color-bg-soft);
+  border-radius: var(--radius-sm);
+  font-size: 0.9em;
+}

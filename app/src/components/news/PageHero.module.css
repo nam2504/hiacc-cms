@@ -1,0 +1,62 @@
+.hero {
+  padding: var(--space-7) 0 var(--space-6);
+  background: var(--color-bg-soft);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Chỉ có breadcrumb (trang chi tiết bài viết): dải mỏng, không chiếm chỗ */
+.hero:has(.breadcrumb:last-child) {
+  padding: var(--space-4) 0;
+}
+
+.breadcrumb:not(:last-child) {
+  margin-bottom: var(--space-4);
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  list-style: none;
+}
+
+.crumbs > li + li::before {
+  content: '/';
+  margin-right: var(--space-2);
+  color: var(--color-border);
+}
+
+.crumbLink {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.crumbLink:hover,
+.crumbLink:focus-visible {
+  color: var(--color-brand);
+}
+
+.crumbCurrent {
+  color: var(--color-ink);
+  font-weight: var(--weight-medium);
+}
+
+.title {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
+}
+
+.description {
+  max-width: var(--container-narrow);
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}

@@ -1,0 +1,10 @@
+/* Ô giữ chỗ khi khách chưa nhập nội dung — có viền để rõ là trạng thái tạm */
+.empty {
+  margin: 0;
+  padding: var(--space-6);
+  background: var(--color-bg-soft);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  text-align: center;
+}

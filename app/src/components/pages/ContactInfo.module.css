@@ -1,0 +1,47 @@
+.card {
+  padding: var(--space-6);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--color-brand);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.company {
+  margin: 0 0 var(--space-5);
+  color: var(--color-ink);
+  font-size: var(--text-xl);
+}
+
+.list {
+  margin: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.row {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.term {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.desc {
+  margin: 0;
+  color: var(--color-text);
+  line-height: var(--leading-normal);
+  white-space: pre-line;
+}
+
+/* Hai hotline nằm cạnh nhau, xuống dòng khi màn hẹp */
+.phone {
+  display: inline-block;
+  margin-right: var(--space-4);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}

@@ -1,0 +1,70 @@
+.hero {
+  padding-block: var(--space-7);
+  background: linear-gradient(180deg, var(--color-brand-tint), var(--color-bg));
+  border-bottom: 1px solid var(--color-border);
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding-block: var(--space-8) var(--space-7);
+  }
+}
+
+/* Ảnh đầu trang nằm trên chữ, cắt theo tỉ lệ ngang để không đẩy tiêu đề xuống quá sâu */
+.media {
+  max-width: var(--container-max);
+  margin: 0 auto var(--space-6);
+  padding-inline: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .media {
+    padding-inline: var(--space-5);
+  }
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.icon {
+  font-size: var(--text-4xl);
+  line-height: 1;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-ink);
+}
+
+/* Gạch đỏ dưới tiêu đề — giữ đúng dấu nhận diện của Section (W0) */
+.title::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin: var(--space-4) auto 0;
+  background: var(--color-brand);
+  border-radius: var(--radius-full);
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  line-height: var(--leading-normal);
+}

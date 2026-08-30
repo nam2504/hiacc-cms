@@ -1,0 +1,35 @@
+.wrap {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  /* Khoảng cách với phần trên nằm ở đây, không ở thẻ bọc: chi nhánh thiếu
+     mapUrl thì component trả null và không để lại khoảng trắng thừa. */
+  margin-top: var(--space-2);
+}
+
+/*
+ * Khung responsive bằng aspect-ratio — KHÔNG fixed height, để bản đồ co theo
+ * bề rộng thẻ chi nhánh trên mọi breakpoint.
+ */
+.frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+@media (min-width: 768px) {
+  .frame {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

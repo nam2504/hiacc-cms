@@ -1,0 +1,115 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.card:hover,
+.card:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.cover {
+  display: block;
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--color-bg-soft);
+}
+
+.coverImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Bài chưa có ảnh bìa: ô giữ chỗ chữ cái đầu, giữ nhịp lưới không bị thủng */
+.coverFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: var(--color-brand-tint);
+  color: var(--color-brand);
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-5);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+}
+
+.category {
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-brand-tint);
+  border-radius: var(--radius-full);
+  color: var(--color-brand);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition: background var(--transition), color var(--transition);
+}
+
+.category:hover,
+.category:focus-visible {
+  background: var(--color-brand);
+  color: var(--color-text-invert);
+}
+
+.date {
+  color: var(--color-text-muted);
+}
+
+.title {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--text-lg);
+  line-height: var(--leading-tight);
+}
+
+.titleLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.titleLink:hover,
+.titleLink:focus-visible {
+  color: var(--color-brand);
+}
+
+.excerpt {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.more {
+  margin-top: auto;
+  padding-top: var(--space-3);
+  color: var(--color-brand);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}

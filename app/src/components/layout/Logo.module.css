@@ -1,0 +1,18 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.image {
+  width: auto;
+  height: 44px;
+  object-fit: contain;
+}
+
+.text {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-brand);
+  letter-spacing: -0.02em;
+}

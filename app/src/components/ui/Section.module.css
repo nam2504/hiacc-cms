@@ -1,0 +1,69 @@
+.section {
+  padding-block: var(--space-7);
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding-block: var(--space-8);
+  }
+}
+
+.default {
+  background: var(--color-bg);
+}
+
+.soft {
+  background: var(--color-bg-soft);
+}
+
+.brand {
+  background: var(--color-brand);
+  color: var(--color-text-invert);
+}
+
+.brand .title,
+.dark .title {
+  color: var(--color-text-invert);
+}
+
+.brand .subtitle,
+.dark .subtitle {
+  color: rgb(255 255 255 / 0.85);
+}
+
+.dark {
+  background: var(--color-bg-dark);
+  color: var(--color-text-invert);
+}
+
+.header {
+  margin-bottom: var(--space-6);
+  text-align: center;
+}
+
+.title {
+  margin-bottom: var(--space-3);
+}
+
+/* Gạch đỏ dưới tiêu đề — dấu nhận diện thương hiệu lặp lại toàn site */
+.title::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin: var(--space-3) auto 0;
+  background: var(--color-brand);
+  border-radius: var(--radius-full);
+}
+
+.brand .title::after,
+.dark .title::after {
+  background: var(--color-text-invert);
+}
+
+.subtitle {
+  max-width: 640px;
+  margin: 0 auto;
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+}

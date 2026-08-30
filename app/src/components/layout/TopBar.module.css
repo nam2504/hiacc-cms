@@ -1,0 +1,43 @@
+.topbar {
+  background: var(--color-ink);
+  color: var(--color-text-invert);
+  font-size: var(--text-xs);
+}
+
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  padding-block: var(--space-2);
+}
+
+.contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.item {
+  color: inherit;
+}
+
+a.item:hover {
+  color: var(--color-brand-light);
+}
+
+.label {
+  opacity: 0.7;
+}
+
+/* Trên mobile chỉ giữ hotline/email — địa chỉ dài làm vỡ dải */
+@media (max-width: 768px) {
+  .inner > .item {
+    display: none;
+  }
+
+  .inner {
+    justify-content: center;
+  }
+}

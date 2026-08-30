@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# build
+.next/
+*.tsbuildinfo
+
+# database (SQLite local + backup)
+*.db
+*.db-journal
+*.db.bak-*
+
+# secrets
+.env
+.env.local
+
+# media upload (do khách/CMS sinh ra)
+app/public/media/
+
+# payload generated
+app/src/app/(payload)/admin/importMap.js
+
+# OS
+.DS_Store

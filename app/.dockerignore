@@ -1,0 +1,11 @@
+node_modules
+.next
+hiacc.db
+.env
+.env.*
+!.env.example
+public/media
+.git
+.gitignore
+*.log
+npm-debug.log*

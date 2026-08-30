@@ -1,0 +1,51 @@
+.stats {
+  padding-block: var(--space-6);
+  background: var(--color-brand);
+  color: var(--color-text-invert);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Vạch ngăn giữa 3 cột, chỉ hiện khi nằm ngang */
+  .item + .item {
+    border-left: 1px solid rgb(255 255 255 / 0.25);
+    padding-left: var(--space-5);
+  }
+}
+
+.item {
+  text-align: center;
+}
+
+.value {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+@media (min-width: 1024px) {
+  .value {
+    font-size: var(--text-3xl);
+  }
+}
+
+.label {
+  margin: 0;
+  color: rgb(255 255 255 / 0.85);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}

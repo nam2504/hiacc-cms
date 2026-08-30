@@ -1,0 +1,56 @@
+# docker-compose cho HiACC CMS.
+# Chạy từ thư mục gốc hiacc-cms/: `docker compose up -d --build`
+#
+# Dữ liệu (SQLite + media) nằm ở bind mount ngoài image — build lại image
+# không mất nội dung khách. Copy `app/.env.example` thành `app/.env` rồi điền
+# giá trị thật trước khi chạy (xem docs/DEPLOY.md).
+
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    image: hiacc-cms:latest
+    restart: unless-stopped
+    ports:
+      # Đổi cổng host bằng biến môi trường HOST_PORT nếu 3000 đã bị chiếm,
+      # ví dụ: HOST_PORT=3300 docker compose up -d
+      - '${HOST_PORT:-3000}:3000'
+    env_file:
+      - ./app/.env
+    environment:
+      # DATABASE_URI trỏ vào đường dẫn BÊN TRONG container, khớp bind mount /data bên dưới.
+      # Ghi đè giá trị trong .env (vốn dùng cho chạy `npm run dev` ngoài container)
+      # để tránh nhầm ổ đĩa dev vs container.
+      DATABASE_URI: file:/data/hiacc.db
+    volumes:
+      # SQLite: 1 file, bind mount ra thư mục ./data ở host để backup/restore dễ (xem scripts/).
+      - ./data:/data
+      # Media do Payload upload (Media.upload.staticDir = public/media trong app payload.config).
+      - ./media:/app/public/media
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # ---- Đường ẩn sang Postgres (chưa bật) ----
+  # Bản đầu dùng SQLite (quyết định 30/08, xem contract §1.2). Muốn đổi sang
+  # Postgres khi cần scale: bỏ comment khối dưới, đổi `db: sqliteAdapter(...)`
+  # thành `db: postgresAdapter(...)` trong app/src/payload.config.ts (1 file),
+  # cài thêm `@payloadcms/db-postgres`, đổi DATABASE_URI trong app/.env thành
+  # chuỗi kết nối Postgres, rồi bỏ comment `depends_on` ở service `app`.
+  # Chi tiết: docs/DEPLOY.md mục 5.
+  #
+  # postgres:
+  #   image: postgres:16-alpine
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: hiacc
+  #     POSTGRES_PASSWORD: doi-mat-khau-nay
+  #     POSTGRES_DB: hiacc_cms
+  #   volumes:
+  #     - ./pgdata:/var/lib/postgresql/data
+  #   ports:
+  #     - '5432:5432'
