@@ -33,7 +33,17 @@ export default async function PayrollToolPage() {
   const config = await getPayrollConfig()
 
   return (
-    <Section title={t('payroll.title')} subtitle={t('payroll.subtitle')}>
+    <Section>
+      {/* P1-4: trang này từng không có <h1> nào (Section render tiêu đề thành <h2>).
+          User chốt cách KHÔNG đụng W0: không truyền `title`/`subtitle` cho <Section>
+          nữa, trang tự dựng <h1> và mô tả, sao chép đúng nhịp của Section.module.css
+          (căn giữa, gạch đỏ dưới tiêu đề, subtitle 640px) để nhìn giống hệt trang khác.
+          Cây heading sau khi sửa: h1 → h2 "Kết quả bóc tách" → h2 "Số liệu đang áp dụng". */}
+      <header className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>{t('payroll.title')}</h1>
+        <p className={styles.pageSubtitle}>{t('payroll.subtitle')}</p>
+      </header>
+
       <PayrollCalculator config={config} />
 
       {/* Verify được (contract §2.6 mục 1): mốc hiệu lực + căn cứ pháp lý hiện công

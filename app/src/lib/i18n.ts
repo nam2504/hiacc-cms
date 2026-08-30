@@ -258,6 +258,17 @@ const vi: Dict = {
     'Kết quả trên chỉ mang tính tham khảo, không thay thế tư vấn thuế hay kế toán chuyên nghiệp. Số liệu áp dụng theo quy định có hiệu lực từ 01/01/2026 và có thể thay đổi. Vui lòng đối chiếu với hợp đồng lao động và cơ quan thuế trước khi sử dụng cho mục đích chính thức.',
   'payroll.privacy':
     'Toàn bộ phép tính chạy ngay trên trình duyệt của bạn. Số lương bạn nhập không được gửi đi đâu và không được lưu lại.',
+
+  /* Thông báo lỗi ô nhập + tóm tắt cho screen reader (gói F3 — chỉ THÊM khoá mới). */
+  'payroll.error.amount.invalid':
+    'Không đọc được số tiền này. Bạn có thể nhập 30000000 hoặc 30.000.000.',
+  'payroll.error.amount.negative': 'Số tiền không thể là số âm. Hãy nhập một số lớn hơn 0.',
+  'payroll.error.dependents.invalid':
+    'Số người phụ thuộc phải là số nguyên từ 0 trở lên. Không có thì nhập 0.',
+  'payroll.error.dependents.rounded': 'Đang tính với số người phụ thuộc làm tròn xuống:',
+  'payroll.result.summary.net': 'Lương Net thực nhận',
+  'payroll.result.summary.gross': 'Lương Gross cần thoả thuận',
+  'payroll.brackets.card.level': 'Bậc',
 }
 
 /**

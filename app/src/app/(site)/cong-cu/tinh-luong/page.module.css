@@ -1,5 +1,38 @@
 /* Khối "Số liệu đang áp dụng" dưới công cụ tính lương (W5). Chỉ dùng token W0. */
 
+/* --- P1-4: tiêu đề trang tự dựng ---
+   Trang này KHÔNG truyền `title` cho <Section> nữa (để có <h1> thật mà không phải
+   đụng Section.tsx — file W0). Ba khối dưới đây sao chép đúng nhịp của
+   `src/components/ui/Section.module.css` (.header/.title/.subtitle) để tiêu đề nhìn
+   giống hệt mọi trang khác: căn giữa, gạch đỏ 56×3px dưới tiêu đề, subtitle rộng 640px.
+   Cỡ chữ ép về --text-3xl vì globals.css cho h1 = --text-4xl, còn tiêu đề Section là h2. */
+.pageHeader {
+  margin-bottom: var(--space-6);
+  text-align: center;
+}
+
+.pageTitle {
+  margin-bottom: var(--space-3);
+  font-size: var(--text-3xl);
+}
+
+.pageTitle::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin: var(--space-3) auto 0;
+  background: var(--color-brand);
+  border-radius: var(--radius-full);
+}
+
+.pageSubtitle {
+  max-width: 640px;
+  margin: 0 auto;
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+}
+
 .legal {
   margin-top: var(--space-7);
   padding: var(--space-5);

@@ -6,11 +6,11 @@ import {
   calculatePayroll,
   formatVnd,
   sanitizeAmount,
-  sanitizeDependents,
   type Direction,
   type PayrollBreakdown,
 } from '@/lib/payroll/calc'
 import type { PayrollConfig, RegionCode } from '@/lib/payroll/config'
+import { parseDependentsInput, parseVndInput } from '@/lib/payroll/parseInput'
 import styles from './PayrollCalculator.module.css'
 
 /**
@@ -33,23 +33,43 @@ export function PayrollCalculator({ config }: { config: PayrollConfig }) {
   const [useCustomBase, setUseCustomBase] = useState(false)
   const [customBaseText, setCustomBaseText] = useState('')
 
-  const amount = sanitizeAmount(amountText)
-  const dependents = sanitizeDependents(dependentsText)
+  // TẦNG INPUT (F3 §2): hiểu định dạng số Việt Nam TRƯỚC khi đưa xuống tầng tính.
+  // `parseVndInput` trả null cho chuỗi không hiểu được, nên ở đây phân biệt được ba
+  // trạng thái mà bản cũ gộp làm một: ô trống · gõ bậy · số hợp lệ.
+  const amountRaw = amountText.trim()
+  const amountParsed = parseVndInput(amountText)
+  const amountIsEmpty = amountRaw === ''
+  const amountInvalid = !amountIsEmpty && amountParsed === null
+  const amountNegative = amountParsed !== null && amountParsed < 0
+  const amountHasError = amountInvalid || amountNegative
+
+  const dependentsParsed = parseDependentsInput(dependentsText)
+  const dependentsInvalid = dependentsParsed.kind === 'invalid'
+  const dependents = dependentsParsed.kind === 'ok' ? dependentsParsed.value : 0
+  const dependentsRounded = dependentsParsed.kind === 'ok' && dependentsParsed.rounded
+
+  // Chỉ đưa xuống tầng tính con số đã hiểu được. `sanitizeAmount` giữ nguyên vai trò
+  // lưới an toàn của TẦNG TÍNH (calc.ts không đổi một dòng, 60 test cũ còn nguyên).
+  const amount = amountParsed !== null && amountParsed > 0 ? sanitizeAmount(amountParsed) : 0
+
+  const customBaseParsed = parseVndInput(customBaseText)
 
   const result: PayrollBreakdown | null = useMemo(() => {
-    // Chưa nhập gì / nhập rác / nhập 0 → không hiện bảng số 0 trông như kết quả thật.
-    if (amount <= 0) return null
+    // Ô trống / gõ bậy / số âm / 0 → không hiện bảng số 0 trông như kết quả thật.
+    // Khác bản cũ: các ca lỗi giờ có thông báo riêng bên dưới, không im lặng nữa.
+    if (amount <= 0 || dependentsInvalid) return null
     return calculatePayroll(
       direction,
       {
         amount,
         dependents,
         region,
-        insuranceBase: useCustomBase ? sanitizeAmount(customBaseText) : null,
+        insuranceBase:
+          useCustomBase && customBaseParsed !== null ? sanitizeAmount(customBaseParsed) : null,
       },
       config,
     )
-  }, [direction, amount, dependents, region, useCustomBase, customBaseText, config])
+  }, [direction, amount, dependents, dependentsInvalid, region, useCustomBase, customBaseParsed, config])
 
   const amountLabel =
     direction === 'grossToNet' ? t('payroll.field.amount.gross') : t('payroll.field.amount.net')
@@ -92,7 +112,7 @@ export function PayrollCalculator({ config }: { config: PayrollConfig }) {
           </label>
           <input
             id="payroll-amount"
-            className={styles.input}
+            className={`${styles.input} ${amountHasError ? styles.inputError : ''}`}
             // `inputMode numeric` cho bàn phím số trên điện thoại; type text để chữ
             // người dùng lỡ gõ không bị trình duyệt nuốt im lặng thành rỗng.
             type="text"
@@ -100,8 +120,19 @@ export function PayrollCalculator({ config }: { config: PayrollConfig }) {
             autoComplete="off"
             value={amountText}
             onChange={(e) => setAmountText(e.target.value)}
-            aria-describedby="payroll-amount-hint"
+            aria-invalid={amountHasError || undefined}
+            aria-describedby={
+              amountHasError ? 'payroll-amount-error payroll-amount-hint' : 'payroll-amount-hint'
+            }
           />
+          {/* P0-2: dán "30.000.000" không còn im lặng biến mất — sai thì nói rõ sai gì. */}
+          {amountHasError && (
+            <p className={styles.error} id="payroll-amount-error" role="alert">
+              {amountNegative
+                ? t('payroll.error.amount.negative')
+                : t('payroll.error.amount.invalid')}
+            </p>
+          )}
           <p className={styles.hint} id="payroll-amount-hint">
             {t('payroll.field.amount.hint')}
           </p>
@@ -114,14 +145,32 @@ export function PayrollCalculator({ config }: { config: PayrollConfig }) {
             </label>
             <input
               id="payroll-dependents"
-              className={styles.input}
+              className={`${styles.input} ${dependentsInvalid ? styles.inputError : ''}`}
               type="text"
               inputMode="numeric"
               autoComplete="off"
               value={dependentsText}
               onChange={(e) => setDependentsText(e.target.value)}
-              aria-describedby="payroll-dependents-hint"
+              aria-invalid={dependentsInvalid || undefined}
+              aria-describedby={
+                dependentsInvalid
+                  ? 'payroll-dependents-error payroll-dependents-hint'
+                  : 'payroll-dependents-hint'
+              }
             />
+            {/* P1-2: `abc` / `-1` từng âm thầm thành 0 → kết quả SAI mà trông đúng.
+                Giờ chặn hẳn kết quả và nói rõ, thay vì tính như không có người phụ thuộc. */}
+            {dependentsInvalid && (
+              <p className={styles.error} id="payroll-dependents-error" role="alert">
+                {t('payroll.error.dependents.invalid')}
+              </p>
+            )}
+            {/* `2.7` vẫn tính được nhưng phải cho thấy con số THẬT SỰ dùng (F3 §4). */}
+            {dependentsRounded && (
+              <p className={styles.notice} id="payroll-dependents-rounded">
+                {`${t('payroll.error.dependents.rounded')} ${dependents}`}
+              </p>
+            )}
             <p className={styles.hint} id="payroll-dependents-hint">
               {t('payroll.field.dependents.hint')}
             </p>
@@ -152,8 +201,10 @@ export function PayrollCalculator({ config }: { config: PayrollConfig }) {
 
         <div className={styles.field}>
           <label className={styles.checkboxRow}>
+            {/* P1-3: ô vuông mặc định của trình duyệt chỉ 13×13px, dưới ngưỡng chạm. */}
             <input
               type="checkbox"
+              className={styles.checkbox}
               checked={useCustomBase}
               onChange={(e) => setUseCustomBase(e.target.checked)}
             />
@@ -183,6 +234,17 @@ export function PayrollCalculator({ config }: { config: PayrollConfig }) {
 
       <div className={styles.results}>
         <h2 className={styles.resultTitle}>{t('payroll.result.title')}</h2>
+
+        {/* P1-1: MỘT câu tóm tắt, đặt NGOÀI bảng chi tiết. Bọc live region quanh cả
+            bảng sẽ khiến screen reader đọc lại 15 dòng số mỗi phím gõ — tệ hơn không có.
+            `aria-atomic` để câu được đọc trọn vẹn, không chỉ phần chữ vừa đổi. */}
+        <p className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
+          {result === null
+            ? ''
+            : direction === 'grossToNet'
+              ? `${t('payroll.result.summary.net')} ${formatVnd(result.net)}`
+              : `${t('payroll.result.summary.gross')} ${formatVnd(result.gross)}`}
+        </p>
 
         {result === null ? (
           <p className={styles.empty}>{t('payroll.result.empty')}</p>
@@ -276,7 +338,49 @@ export function PayrollCalculator({ config }: { config: PayrollConfig }) {
               <p className={styles.empty}>{t('payroll.brackets.none')}</p>
             ) : (
               <>
-                <table className={styles.table}>
+                {/* P0-1: dưới 768px bảng 5 cột phải cuộn ngang, giấu mất 210px và cột
+                    "Thuế của bậc" hiện 0% — một con số tiền cắt cụt trông y như một con
+                    số hoàn chỉnh nhỏ hơn. Cách sửa (a) của báo cáo: mobile đọc danh sách
+                    thẻ dọc (không còn cuộn ngang), desktop giữ nguyên bảng.
+                    Hai khối cùng dữ liệu, CSS chọn hiện đúng một khối, khối kia
+                    `display:none` nên screen reader cũng chỉ gặp một bản. */}
+                <ul className={styles.bracketCards}>
+                  {result.appliedBrackets.map((b) => (
+                    <li key={b.order} className={styles.bracketCard}>
+                      <p className={styles.bracketCardHead}>
+                        {`${t('payroll.brackets.card.level')} ${b.order} · ${b.rate}%`}
+                      </p>
+                      <dl className={styles.bracketCardList}>
+                        <div className={styles.bracketCardRow}>
+                          <dt className={styles.bracketCardTerm}>
+                            {t('payroll.brackets.range')}
+                          </dt>
+                          <dd className={styles.bracketCardDesc}>
+                            {b.to === null
+                              ? `${formatVnd(b.from)} ${t('payroll.brackets.above')}`
+                              : `${formatVnd(b.from)} – ${formatVnd(b.to)}`}
+                          </dd>
+                        </div>
+                        <div className={styles.bracketCardRow}>
+                          <dt className={styles.bracketCardTerm}>
+                            {t('payroll.brackets.portion')}
+                          </dt>
+                          <dd className={`${styles.bracketCardDesc} ${styles.num}`}>
+                            {formatVnd(b.taxableInBracket)}
+                          </dd>
+                        </div>
+                        <div className={`${styles.bracketCardRow} ${styles.bracketCardTotal}`}>
+                          <dt className={styles.bracketCardTerm}>{t('payroll.brackets.tax')}</dt>
+                          <dd className={`${styles.bracketCardDesc} ${styles.num}`}>
+                            {formatVnd(b.tax)}
+                          </dd>
+                        </div>
+                      </dl>
+                    </li>
+                  ))}
+                </ul>
+
+                <table className={`${styles.table} ${styles.bracketTable}`}>
                   <thead>
                     <tr>
                       <th scope="col">{t('payroll.brackets.level')}</th>
