@@ -42,30 +42,33 @@ const vi: Dict = {
   'footer.followUs': 'Theo dõi chúng tôi',
 
   // --- Trang chủ (W1) — AUDIT §3, khối 2–8 ---
-  // Số liệu marketing lấy từ site tham chiếu hiacc.com.vn, chờ khách xác nhận.
-  'home.hero.tagline': "You're in good hands",
+  // Mọi số liệu marketing chép từ site tham chiếu hiacc.com.vn (điểm sao, số lượng
+  // khách hàng, các mức phần trăm ở khối Stats) đã bị GỠ: không có nguồn nào kiểm
+  // chứng được, mà tuyên bố định lượng của một công ty kế toán sai là rủi ro pháp lý.
+  // Chỉ đưa lại khi khách tự cung cấp số thật kèm nguồn và chịu trách nhiệm về số đó.
+  'home.hero.tagline': 'Đồng hành cùng doanh nghiệp Việt',
+  // Không lặp lại cụm của tagline ("đồng hành cùng doanh nghiệp Việt") — hai dòng
+  // đứng sát nhau trong hero, lặp nguyên cụm đọc rất lộ.
   'home.hero.lead':
-    'Dịch vụ kế toán, thuế và tư vấn doanh nghiệp trọn gói — đồng hành cùng doanh nghiệp Việt.',
-  'home.hero.ratingValue': '4.9',
-  'home.hero.ratingLabel': 'Từ 6879 khách hàng',
-  'home.hero.ratingAria': 'Đánh giá 4.9 trên 5 sao',
+    'Dịch vụ kế toán, thuế và tư vấn doanh nghiệp trọn gói cho doanh nghiệp vừa và nhỏ.',
   'home.hero.cta': 'Nhận tư vấn miễn phí',
   'home.hero.ctaSecondary': 'Xem dịch vụ',
 
-  'home.stats.risk.value': 'Giảm 98%',
+  'home.stats.risk.value': 'Giảm thiểu',
   'home.stats.risk.label': 'rủi ro về thuế và sổ sách',
-  'home.stats.efficiency.value': 'Tăng 85%',
+  'home.stats.efficiency.value': 'Nâng cao',
   'home.stats.efficiency.label': 'hiệu quả vận hành bộ máy kế toán',
-  'home.stats.cost.value': 'Tiết kiệm 75%',
-  'home.stats.cost.label': 'chi phí so với kế toán nội bộ',
+  'home.stats.cost.value': 'Tối ưu',
+  'home.stats.cost.label': 'chi phí vận hành so với kế toán nội bộ',
 
-  'home.about.title': 'Về HIACC',
+  'home.about.title': 'Về HiACC',
   'home.about.subtitle': 'Bốn lý do doanh nghiệp chọn HiACC làm đối tác kế toán.',
-  'home.about.certification.title': 'Chứng nhận quốc tế',
+  'home.about.certification.title': 'Quy trình chuẩn hoá',
   'home.about.certification.body':
-    'Top 10 đơn vị tư vấn kế toán châu Á – Thái Bình Dương liên tục từ năm 2019.',
+    'Quy trình làm việc chuẩn hoá theo thông lệ hành nghề kế toán, kiểm toán.',
   'home.about.team.title': 'Đội ngũ hành nghề',
-  'home.about.team.body': '100% nhân sự có chứng chỉ hành nghề kế toán, thuế.',
+  'home.about.team.body':
+    'Đội ngũ chuyên viên kế toán, thuế đồng hành theo từng doanh nghiệp.',
   'home.about.legal.title': 'Pháp lý đầy đủ',
   'home.about.legal.body':
     'Hồ sơ pháp lý, giấy phép hành nghề và bảo hiểm trách nhiệm nghề nghiệp đầy đủ.',

@@ -7,7 +7,10 @@ import type { Setting } from '@/payload-types'
 import styles from './Hero.module.css'
 
 /**
- * Khối 2 — AUDIT §3.2: logo/tên site, tagline, rating 4.9★, nút CTA về /lien-he.
+ * Khối 2 — AUDIT §3.2: logo/tên site, tagline, nút CTA về /lien-he.
+ *
+ * Khối rating (điểm sao + số lượng khách hàng) đã gỡ: số chép từ site tham chiếu,
+ * không kiểm chứng được. Chỉ dựng lại khi khách cung cấp số thật và chịu trách nhiệm.
  *
  * Logo lấy từ Settings; chưa upload hoặc settings null thì hiện tên site dạng chữ
  * (giống Logo của W0) — trang vẫn dựng được khi DB rỗng.
@@ -37,15 +40,6 @@ export function Hero({ settings }: { settings: Setting | null }) {
 
           <h1 className={styles.tagline}>{tagline}</h1>
           <p className={styles.lead}>{t('home.hero.lead')}</p>
-
-          <div className={styles.rating} aria-label={t('home.hero.ratingAria')}>
-            <span className={styles.ratingValue}>{t('home.hero.ratingValue')}</span>
-            {/* Sao trang trí — nội dung đã có ở aria-label của khối cha */}
-            <span className={styles.stars} aria-hidden="true">
-              ★★★★★
-            </span>
-            <span className={styles.ratingLabel}>{t('home.hero.ratingLabel')}</span>
-          </div>
 
           <div className={styles.actions}>
             <Button href="/lien-he" size="lg">

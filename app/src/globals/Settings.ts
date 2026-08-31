@@ -26,7 +26,7 @@ export const Settings: GlobalConfig = {
               name: 'siteName',
               type: 'text',
               label: 'Tên website',
-              defaultValue: 'Kế toán Hiacc',
+              defaultValue: 'Kế toán HiACC',
               admin: { description: 'Hiện ở tiêu đề trình duyệt và kết quả Google.' },
             },
             {

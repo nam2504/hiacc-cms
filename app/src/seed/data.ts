@@ -732,7 +732,7 @@ export const PAGE_IMAGES: Record<string, { filename: string; alt: string }> = {
 
 export const SETTINGS = {
   siteName: 'Kế toán HiACC',
-  tagline: "You're in good hands",
+  tagline: 'Đồng hành cùng doanh nghiệp Việt',
   primaryColor: '#CC1420',
   companyName: 'Công ty TNHH HiACC',
   taxCode: '0110387991',
