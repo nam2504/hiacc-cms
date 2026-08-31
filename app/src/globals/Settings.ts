@@ -37,6 +37,17 @@ export const Settings: GlobalConfig = {
               admin: { description: 'Nên dùng file PNG nền trong suốt, cao tối thiểu 120 px.' },
             },
             {
+              name: 'heroImage',
+              type: 'upload',
+              relationTo: 'media',
+              label: 'Ảnh trang chủ',
+              admin: {
+                description:
+                  'Ảnh lớn cạnh slogan ở đầu trang chủ. Nên dùng ảnh ngang (tỉ lệ 3:2), ' +
+                  'rộng tối thiểu 1200 px. Để trống thì phần chữ tự giãn kín chiều ngang.',
+              },
+            },
+            {
               name: 'tagline',
               type: 'text',
               label: 'Slogan',

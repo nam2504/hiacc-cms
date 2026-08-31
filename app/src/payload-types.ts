@@ -847,6 +847,10 @@ export interface Setting {
    */
   logo?: (number | null) | Media;
   /**
+   * Ảnh lớn cạnh slogan ở đầu trang chủ. Nên dùng ảnh ngang (tỉ lệ 3:2), rộng tối thiểu 1200 px. Để trống thì phần chữ tự giãn kín chiều ngang.
+   */
+  heroImage?: (number | null) | Media;
+  /**
    * Câu ngắn dưới logo, ví dụ "Dịch vụ kế toán trọn gói".
    */
   tagline?: string | null;
@@ -990,6 +994,7 @@ export interface PayrollConfig {
 export interface SettingsSelect<T extends boolean = true> {
   siteName?: T;
   logo?: T;
+  heroImage?: T;
   tagline?: T;
   primaryColor?: T;
   hotline?: T;

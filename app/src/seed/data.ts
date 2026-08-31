@@ -730,6 +730,12 @@ export const PAGE_IMAGES: Record<string, { filename: string; alt: string }> = {
   },
 }
 
+/** Ảnh hero mặc định — ẢNH MẪU (Unsplash), khách sẽ thay bằng ảnh thật trong /admin. */
+export const SETTINGS_HERO_IMAGE = {
+  filename: 'hiacc-stock-desk-window.jpg',
+  alt: 'Góc làm việc bên cửa sổ văn phòng, có laptop và cây xanh [Ảnh mẫu]',
+}
+
 export const SETTINGS = {
   siteName: 'Kế toán HiACC',
   tagline: 'Đồng hành cùng doanh nghiệp Việt',

@@ -22,6 +22,7 @@ import {
   SERVICE_IMAGES,
   SERVICES,
   SETTINGS,
+  SETTINGS_HERO_IMAGE,
 } from './data'
 import { seedPayrollConfig } from './payrollConfig'
 
@@ -204,6 +205,11 @@ async function seed() {
   const merged: Record<string, unknown> = { ...SETTINGS }
   for (const [key, value] of Object.entries(current ?? {})) {
     if (value !== null && value !== undefined && value !== '') merged[key] = value
+  }
+  // Ảnh hero: chỉ nạp khi khách CHƯA chọn ảnh nào, để seed không đè ảnh thật.
+  if (!current?.heroImage && SETTINGS_HERO_IMAGE) {
+    const heroId = await ensureMedia(SETTINGS_HERO_IMAGE.filename, SETTINGS_HERO_IMAGE.alt)
+    if (heroId) merged.heroImage = heroId
   }
   await payload.updateGlobal({ slug: 'settings', data: merged })
 

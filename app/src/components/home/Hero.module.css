@@ -18,6 +18,49 @@
   text-align: center;
 }
 
+/* Có ảnh: 2 cột từ 768px. Dưới ngưỡng đó vẫn xếp dọc, chữ TRƯỚC ảnh SAU —
+   thứ tự DOM đã đúng nên không cần order, và người dùng màn hình nhỏ đọc
+   được nội dung trước khi phải cuộn qua ảnh. */
+.innerSplit {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .innerSplit {
+    grid-template-columns: 1.05fr 1fr;
+    gap: var(--space-6);
+  }
+
+  /* Chỉ đổi sang căn trái khi thật sự có cột ảnh bên cạnh: căn giữa một cột
+     chữ hẹp bên trái trông như lỗi bố cục. */
+  .innerSplit .copy {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* width/height ở <Image> là 1200x800 (3:2). Khai báo lại tỉ lệ ở CSS để trình
+   duyệt dành sẵn chỗ trước khi ảnh tải xong — cùng lý do như .logo bên dưới,
+   tránh CLS. */
+.image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+}
+
 .logo {
   /* Đặt chỗ trước khi ảnh tải: Hero.tsx truyền <Image width={220} height={80}>
      (tỉ lệ 11/4) — width:auto/height:auto trước đây bỏ qua tỉ lệ đó nên trình
@@ -48,6 +91,11 @@
 @media (min-width: 768px) {
   .tagline {
     font-size: var(--text-4xl);
+  }
+
+  /* Cột chữ đã hẹp sẵn, giới hạn 18ch nữa sẽ ngắt dòng quá vụn. */
+  .innerSplit .tagline {
+    max-width: 100%;
   }
 }
 
