@@ -1,7 +1,0 @@
-node_modules
-.next
-*.db
-*.db-journal
-.env
-public/media
-src/app/(payload)/admin/importMap.js

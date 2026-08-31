@@ -1,9 +1,11 @@
 # dependencies
 node_modules/
 
-# build
+# build + file do công cụ tự sinh (KHÔNG sửa tay, KHÔNG commit).
+# Vị trí do npm/Next quy định cứng, không gom vào 1 thư mục được.
 .next/
 *.tsbuildinfo
+next-env.d.ts
 
 # database (SQLite local + backup)
 *.db
