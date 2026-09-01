@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
     "payload": "payload",
     "seed": "payload run src/seed/index.ts",
     "test:payroll": "node --import tsx --test src/lib/payroll/calc.test.ts"

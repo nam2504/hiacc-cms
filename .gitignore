@@ -20,7 +20,12 @@ next-env.d.ts
 app/public/media/
 
 # payload generated
-app/src/app/(payload)/admin/importMap.js
+# ⚠️ KHÔNG ignore importMap.js. Payload sinh ra nó, nhưng 4 file import CỨNG
+# (payload.config.ts, (payload)/layout.tsx, admin/[[...segments]]/page.tsx +
+# not-found.tsx). Ignore nó => clone sạch KHÔNG build được: máy nào đang có
+# file trên đĩa thì build qua, máy mới thì chết ở bước resolve import.
+# Đã đo thật: `git clone` ra thư mục khác => 0 file importMap.js.
+# Sinh lại bằng `npm run generate:importmap` khi thêm/bớt component admin.
 
 # OS
 .DS_Store

@@ -6,6 +6,11 @@
 # khởi động lại sau khi restore xong.
 #
 # Dùng: ./scripts/restore.sh <đường_dẫn_file.tar.gz>
+#
+# ⚠️ Script này restore vào ./data/ + ./media/ của docker-compose LOCAL.
+# Production trên Fly.io có DB ở /data/ TRONG máy ảo — restore lên Fly phải làm
+# thủ công (flyctl ssh sftp put) và nên dừng máy trước. Chưa tự động hoá vì
+# ghi đè nhầm DB production là mất dữ liệu khách, cần người xác nhận từng bước.
 
 set -euo pipefail
 
@@ -42,10 +47,17 @@ mkdir -p "$ROOT_DIR/data" "$ROOT_DIR/media"
 echo "[restore] Ghi đè ./data/hiacc.db ..."
 cp "$WORKDIR/hiacc.db" "$ROOT_DIR/data/hiacc.db"
 
-echo "[restore] Ghi đè ./media/ ..."
-rm -rf "${ROOT_DIR:?}/media"/*
+# ⚠️ KIỂM TRA TRƯỚC KHI XOÁ, không phải ngược lại.
+# Bản cũ chạy `rm -rf media/*` rồi MỚI hỏi archive có media không: restore từ
+# một archive thiếu media sẽ xoá sạch ảnh đang có mà không phục hồi được gì —
+# mất dữ liệu vĩnh viễn, đúng vào lúc người dùng đang cố cứu dữ liệu.
 if [ -d "$WORKDIR/media" ]; then
+  echo "[restore] Ghi đè ./media/ ..."
+  rm -rf "${ROOT_DIR:?}/media"/*
   cp -r "$WORKDIR/media/." "$ROOT_DIR/media/" 2>/dev/null || true
+else
+  echo "[restore] Archive KHÔNG có thư mục media — giữ nguyên ./media/ hiện tại." >&2
+  echo "          (chỉ DB được phục hồi; ảnh cũ không bị đụng tới)" >&2
 fi
 
 echo "[restore] Khởi động lại app..."
