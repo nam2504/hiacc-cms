@@ -1,0 +1,65 @@
+# fly.toml — bản STAGING cho khách duyệt nội dung.
+#
+# Vì sao Fly.io mà không phải Vercel/Netlify/Render:
+# stack là Next + Payload + SQLite, cần máy chạy liên tục và ĐĨA GHI ĐƯỢC, BỀN.
+# Vercel/Netlify serverless không có volume → file SQLite biến mất mỗi lần deploy.
+# Render free thì đĩa tạm và ngủ sau 15 phút. Fly free có volume bền 3GB.
+#
+# ⚠️ Đây KHÔNG phải cấu hình production. Production còn phải chốt với khách:
+# ai đứng tên trả tiền, đặt máy ở đâu, backup định kỳ ra ngoài. Xem docs/DEPLOY.md.
+#
+# Khoá chặt vào Fly? Không. Dockerfile và docker-compose.yml vẫn là đường chính
+# (contract W8: trung lập nhà cung cấp). File này chỉ là một cách chạy cái image đó.
+
+app = 'hiacc-cms-staging'
+primary_region = 'sin'          # Singapore — gần Việt Nam nhất trong các region của Fly
+
+[build]
+  dockerfile = 'app/Dockerfile'
+
+[env]
+  # Cổng app lắng nghe bên trong máy ảo, khớp EXPOSE trong Dockerfile.
+  PORT = '3000'
+
+  # SQLite nằm trên volume bền, KHÔNG nằm trong image. Deploy bản mới không mất
+  # dữ liệu khách đã nhập trong /admin.
+  DATABASE_URI = 'file:/data/hiacc.db'
+
+  # Bật nhãn "bản dùng thử" + chặn Google đánh chỉ mục. Bản production PHẢI bỏ
+  # biến này (hoặc để 'false'), nếu không site thật sẽ vô hình trên tìm kiếm.
+  NEXT_PUBLIC_IS_STAGING = 'true'
+
+  # Đổi hai dòng dưới nếu đặt tên app khác — chúng phải khớp tên miền thật,
+  # vì canonical/OG/sitemap đều lấy từ đây.
+  NEXT_PUBLIC_SERVER_URL = 'https://hiacc-cms-staging.fly.dev'
+  NEXT_PUBLIC_SITE_URL = 'https://hiacc-cms-staging.fly.dev'
+
+# PAYLOAD_SECRET KHÔNG nằm trong file này (file này được commit).
+# Đặt một lần bằng:  fly secrets set PAYLOAD_SECRET=$(openssl rand -hex 32)
+
+[[mounts]]
+  source = 'hiacc_data'
+  destination = '/data'
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+
+  # ⚠️ KHÔNG cho máy tự tắt khi rảnh.
+  # Payload chạy migration lúc khởi động và SQLite mở lại file trên volume;
+  # để máy ngủ thì khách bấm vào link phải chờ ~10–20s màn hình trắng, rất dễ
+  # bị hiểu là "web hỏng". Máy free của Fly chạy 24/7 vẫn trong hạn mức.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  # ⚠️ ĐÚNG MỘT máy. Hai lý do bắt buộc, không phải để tiết kiệm:
+  #  1. SQLite trên volume: mỗi máy Fly có volume RIÊNG, không chia sẻ. Hai máy
+  #     = hai cơ sở dữ liệu khác nhau, khách sửa bài lúc thấy lúc không.
+  #  2. Chống spam form đang đếm trong bộ nhớ tiến trình (quyết định 30/08),
+  #     scale ra là thủng.
+  #  Muốn nhiều máy thì phải chuyển Postgres + store chung TRƯỚC.
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '512mb'              # sharp (xử lý ảnh) hay chết OOM ở 256mb

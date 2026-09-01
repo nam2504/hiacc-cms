@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { absoluteUrl } from '@/lib/seo'
+import { IS_STAGING } from '@/lib/staging'
 
 /**
  * /robots.txt — site tham chiếu không có file này (AUDIT §5.2), mà site dịch vụ
@@ -15,6 +16,16 @@ import { absoluteUrl } from '@/lib/seo'
  * đã đo thật bằng curl. `sitemap.ts` không dính bẫy này nên vẫn ở `(site)`.
  */
 export default function robots(): MetadataRoute.Robots {
+  /**
+   * Bản staging cho khách duyệt: cấm mọi bot, và KHÔNG khai sitemap — khai
+   * sitemap ở bản nháp là tự mời bot vào đúng những URL vừa cấm.
+   * `robots.txt` chỉ ngăn bò trang, không gỡ được trang đã nằm trong chỉ mục,
+   * nên `noindex` ở layout mới là lớp chặn thật. Giữ cả hai.
+   */
+  if (IS_STAGING) {
+    return { rules: { userAgent: '*', disallow: '/' } }
+  }
+
   return {
     rules: {
       userAgent: '*',

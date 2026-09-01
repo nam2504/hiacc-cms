@@ -2,9 +2,11 @@ import type { Metadata } from 'next'
 import { Be_Vietnam_Pro } from 'next/font/google'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
+import { StagingBanner } from '@/components/layout/StagingBanner'
 import { t } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { ogImages, SITE_URL } from '@/lib/seo'
+import { IS_STAGING } from '@/lib/staging'
 import { getRecentPosts, getSettings } from '@/lib/site'
 import '@/styles/tokens.css'
 import '@/styles/globals.css'
@@ -39,6 +41,13 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: siteName, template: `%s | ${siteName}` },
     description,
     alternates: { canonical: '/' },
+    /**
+     * Bản nháp: cấm đánh chỉ mục ở tầng thẻ meta. Đây là lớp chặn thật —
+     * robots.txt chỉ xin bot đừng bò, còn `noindex` mới giữ trang khỏi kết quả
+     * tìm kiếm kể cả khi bot đã vào qua link người khác chia sẻ.
+     * Bản production không đặt field này, để Next giữ mặc định (cho index).
+     */
+    ...(IS_STAGING ? { robots: { index: false, follow: false } } : {}),
     openGraph: {
       type: 'website',
       siteName,
@@ -67,6 +76,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <a className="skip-link" href="#main-content">
           {t('nav.skipToContent')}
         </a>
+        <StagingBanner />
         <Header settings={settings} />
         <main id="main-content">{children}</main>
         <Footer settings={settings} recentPosts={recentPosts} />
