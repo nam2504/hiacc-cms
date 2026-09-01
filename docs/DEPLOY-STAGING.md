@@ -64,31 +64,32 @@ fly deploy
 Lần đầu mất ~5–8 phút (build image). Xong thì mở:
 `https://hiacc-cms-staging.fly.dev`
 
-### 5. Tạo tài khoản admin và nạp nội dung mẫu
+### 5. Nạp nội dung mẫu
 
-Vào `https://hiacc-cms-staging.fly.dev/admin` → màn hình đầu tiên cho tạo
-tài khoản quản trị. **Tạo ngay**: trang này để trống nghĩa là ai vào trước
-người đó thành admin.
-
-Nạp nội dung mẫu (chạy một lần, không đè nội dung khách đã sửa):
+Image đã đóng sẵn công cụ seed (payload CLI + mã nguồn + 17 ảnh mẫu), nên chạy
+thẳng trên máy Fly:
 
 ```bash
-fly ssh console -C "node -e \"process.exit(0)\""   # kiểm tra vào được máy
+fly ssh console -C "npm run seed"
 ```
 
-Bản standalone không kèm `payload` CLI nên chạy seed trực tiếp trên máy Fly
-không tiện. Cách gọn hơn: seed ở máy local rồi đẩy file DB lên.
+Nạp: 9 bài viết, 7 dịch vụ, 4 trang, 12 chuyên mục, 5 chi nhánh, Settings và
+cấu hình tính lương — kèm ảnh bìa.
 
-```bash
-# ở máy local, tạo DB đã có nội dung mẫu
-cd app && npm run seed
+**Chạy lại bao nhiêu lần cũng được.** Seed idempotent: gặp bản ghi đã có cùng
+slug thì bỏ qua, KHÔNG ghi đè. Nội dung khách đã sửa trong `/admin` an toàn.
+Ngoại lệ hẹp: bản ghi đã có nhưng field nội dung còn rỗng thì seed điền vào.
 
-# đẩy lên volume của Fly
-fly ssh sftp shell
-# trong shell sftp:  put app/hiacc.db /data/hiacc.db
-```
+### 6. Tạo tài khoản admin
 
-Sau khi thay file DB, khởi động lại: `fly apps restart hiacc-cms-staging`
+Vào `https://hiacc-cms-staging.fly.dev/admin` — màn hình đầu cho tạo tài khoản
+quản trị.
+
+⚠️ **Làm ngay sau khi deploy.** Trang này để trống nghĩa là ai vào trước người
+đó thành admin. Đừng gửi link cho khách trước khi tạo xong tài khoản của bạn.
+
+Thứ tự không quan trọng giữa bước 5 và 6 — seed không đụng tới tài khoản người
+dùng, và tạo admin không ảnh hưởng nội dung.
 
 ## Gửi cho khách
 
@@ -128,3 +129,7 @@ nhưng khi khách đã ngồi nhập nội dung thật vào đây thì phải ba
 - **Không tự tắt khi rảnh** (`auto_stop_machines = false`). Để ngủ thì khách bấm
   link phải chờ màn hình trắng ~10–20s, dễ tưởng web hỏng.
 - **Free tier không có SLA.** Đây là lý do bản production nên trả tiền.
+- **Image staging to hơn bản production** vì kèm node_modules dev + mã nguồn +
+  ảnh mẫu để seed được. Lên production build bằng `docker build --target
+  runner-slim .` — bỏ hết phần đó, và không mang mã nguồn lẫn ảnh mẫu lên máy
+  chủ của khách.

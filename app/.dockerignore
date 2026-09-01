@@ -5,6 +5,9 @@ hiacc.db
 .env.*
 !.env.example
 public/media
+# seed-assets KHÔNG bị loại: đó là ảnh nguồn cho `npm run seed` chạy trong
+# container (xem Dockerfile stage runner). Khác với public/media — thư mục kia
+# là dữ liệu chạy, sống trên volume, không thuộc về image.
 .git
 .gitignore
 *.log
