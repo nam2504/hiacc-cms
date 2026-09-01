@@ -7,6 +7,20 @@ import { t } from '@/lib/i18n'
 import { getPageBySlug, getServices } from '@/lib/site'
 
 /**
+ * Trang này đọc dữ liệu từ DB → PHẢI dynamic.
+ *
+ * Next mặc định prerender trang không có searchParams/params thành HTML tĩnh ngay
+ * trong `next build`. Lúc đó DB còn TRỐNG (image build trước khi có volume), nên
+ * mọi truy vấn trả rỗng và kết quả rỗng đó bị nướng cứng vào image — chạy thật
+ * vẫn phục vụ lại file đó chứ không gọi lại code. Đã đo trên staging: /dich-vu
+ * trả HTTP 200 nhưng 0 bài viết, 0 dịch vụ, 0 ảnh; riêng trang gọi notFound()
+ * còn bị đóng băng luôn HTTP 404 và ISR cũng không gỡ được.
+ *
+ * Nguồn dữ liệu ở đây là danh sách dịch vụ.
+ */
+export const dynamic = 'force-dynamic'
+
+/**
  * /dich-vu — danh sách dịch vụ.
  *
  * Phần đầu trang lấy từ trang tĩnh slug 'dich-vu' (khách sửa tiêu đề/mô tả trong

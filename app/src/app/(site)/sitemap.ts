@@ -9,6 +9,14 @@ import {
 } from '@/lib/site'
 
 /**
+ * Sitemap đọc slug từ DB → PHẢI dynamic, cùng lý do như các trang khác:
+ * prerender lúc build (DB trống) sẽ đóng băng sitemap chỉ còn 6 route cố định,
+ * mất sạch slug dịch vụ / chuyên mục / bài viết / trang tĩnh. Trên staging
+ * không lộ ra vì isStaging() trả mảng rỗng, nhưng production thì hỏng thật.
+ */
+export const dynamic = 'force-dynamic'
+
+/**
  * /sitemap.xml — AUDIT §5.2. Liệt kê 6 route cố định + mọi slug động
  * (dịch vụ, chuyên mục, bài viết, trang tĩnh) theo bảng route INTERFACE §6.2.
  *

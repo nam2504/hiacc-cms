@@ -1,8 +1,11 @@
-# Nguồn ảnh stock — dữ liệu test (gói M1)
+# Nguồn ảnh stock — dữ liệu test (17 ảnh: 10 gói M1 + 7 ảnh dịch vụ gói M2)
 
 Toàn bộ ảnh dưới đây là **ảnh mẫu** dùng để dựng giao diện/demo, KHÔNG phải ảnh chính thức
 của HiACC. Trường `alt` của mỗi ảnh kết thúc bằng ` [Ảnh mẫu]` để nhận ra trong admin.
 Khi bàn giao nội dung thật, xoá theo danh sách filename dưới đây.
+
+Bảng gồm 17 ảnh: 10 ảnh gói M1 (bài viết, trang) và 7 ảnh `hiacc-stock-svc-*` minh hoạ
+cho 7 dịch vụ, thêm 30/08 khi bổ sung field `services.image`. Cùng một quy tắc cho cả hai nhóm.
 
 Tất cả ảnh lấy từ **Unsplash** (unsplash.com) — giấy phép Unsplash License: miễn phí cho
 mục đích thương mại và phi thương mại, không bắt buộc ghi công. Bảng dưới vẫn ghi tác giả
@@ -23,14 +26,6 @@ Không ảnh nào trong danh sách có mặt người ở vị trí gợi ý là
 | hiacc-stock-glasses-notebook.jpg  | https://unsplash.com/photos/photo-1551434678-e076c223a692      | Tim van der Kuip      | Unsplash License   |
 | hiacc-stock-office-cubicles.jpg   | https://unsplash.com/photos/photo-1571624436279-b272aff752b5   | S O C I A L . C U T   | Unsplash License   |
 | hiacc-stock-finance-chart.jpg     | https://unsplash.com/photos/photo-1618044733300-9472054094ee   | Markus Spiske         | Unsplash License   |
-
-Xem cách gắn từng ảnh vào bản ghi nào (bài viết / trang) trong `app/src/seed/data.ts`
-(mảng `POST_IMAGES`) và `app/src/seed/index.ts` (bước nạp media qua Payload Local API).
-
-## Ảnh rác đã phát hiện (không thuộc danh sách trên)
-
-`Screenshot from 2026-08-30 05-49-29.png` (media id=1) là ảnh chụp màn hình lẫn vào, không
-phải ảnh stock hợp lệ — xem báo cáo gói M1 để biết đề xuất xử lý (chờ PM quyết, không tự xoá).
 | hiacc-stock-svc-ledger.jpg        | https://unsplash.com/photos/photo-1554224155-6726b3ff858f   | Scott Graham          | Unsplash License   |
 | hiacc-stock-svc-folders.jpg       | https://unsplash.com/photos/photo-1568667256549-094345857637 | Maksym Kaharlytskyi   | Unsplash License   |
 | hiacc-stock-svc-magnifier.jpg     | https://unsplash.com/photos/photo-1450101499163-c8848c66ca85 | Bench Accounting      | Unsplash License   |
@@ -39,7 +34,11 @@ phải ảnh stock hợp lệ — xem báo cáo gói M1 để biết đề xuấ
 | hiacc-stock-svc-archive.jpg       | https://unsplash.com/photos/photo-1541746972996-4e0b0f43e02a | Alex Kotliarskyi      | Unsplash License   |
 | hiacc-stock-svc-report.jpg        | https://unsplash.com/photos/photo-1543286386-713bdd548da4   | Carlos Muza           | Unsplash License   |
 
-## Ảnh dịch vụ (7 ảnh, thêm 30/08 khi bổ sung field `services.image`)
+Xem cách gắn từng ảnh vào bản ghi nào (bài viết / trang) trong `app/src/seed/data.ts`
+(mảng `POST_IMAGES`) và `app/src/seed/index.ts` (bước nạp media qua Payload Local API).
 
-Bảy dòng cuối bảng trên là ảnh minh hoạ cho 7 dịch vụ. Cùng quy tắc: Unsplash License,
-`alt` kết thúc ` [Ảnh mẫu]`, không ảnh chân dung.
+## Ảnh rác đã phát hiện (không thuộc danh sách trên)
+
+`Screenshot from 2026-08-30 05-49-29.png` (media id=1) là ảnh chụp màn hình lẫn vào, không
+phải ảnh stock hợp lệ — xem báo cáo gói M1 để biết đề xuất xử lý (chờ PM quyết, không tự xoá).
+

@@ -7,6 +7,20 @@ import { t } from '@/lib/i18n'
 import { getCategories } from '@/lib/site'
 import styles from './page.module.css'
 
+/**
+ * Trang này đọc dữ liệu từ DB → PHẢI dynamic.
+ *
+ * Next mặc định prerender trang không có searchParams/params thành HTML tĩnh ngay
+ * trong `next build`. Lúc đó DB còn TRỐNG (image build trước khi có volume), nên
+ * mọi truy vấn trả rỗng và kết quả rỗng đó bị nướng cứng vào image — chạy thật
+ * vẫn phục vụ lại file đó chứ không gọi lại code. Đã đo trên staging: /chuyen-muc
+ * trả HTTP 200 nhưng 0 bài viết, 0 dịch vụ, 0 ảnh; riêng trang gọi notFound()
+ * còn bị đóng băng luôn HTTP 404 và ISR cũng không gỡ được.
+ *
+ * Nguồn dữ liệu ở đây là danh sách chuyên mục.
+ */
+export const dynamic = 'force-dynamic'
+
 export function generateMetadata(): Metadata {
   return {
     title: t('news.categories.title'),
