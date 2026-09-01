@@ -6,7 +6,7 @@ import { StagingBanner } from '@/components/layout/StagingBanner'
 import { t } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { ogImages, SITE_URL } from '@/lib/seo'
-import { IS_STAGING } from '@/lib/staging'
+import { isStaging } from '@/lib/staging'
 import { getRecentPosts, getSettings } from '@/lib/site'
 import '@/styles/tokens.css'
 import '@/styles/globals.css'
@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
      * tìm kiếm kể cả khi bot đã vào qua link người khác chia sẻ.
      * Bản production không đặt field này, để Next giữ mặc định (cho index).
      */
-    ...(IS_STAGING ? { robots: { index: false, follow: false } } : {}),
+    ...(isStaging() ? { robots: { index: false, follow: false } } : {}),
     openGraph: {
       type: 'website',
       siteName,

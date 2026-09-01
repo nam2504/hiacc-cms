@@ -1,4 +1,4 @@
-import { IS_STAGING } from '@/lib/staging'
+import { isStaging } from '@/lib/staging'
 
 /**
  * Dải báo "bản dùng thử" trên đầu mọi trang public.
@@ -15,7 +15,7 @@ import { IS_STAGING } from '@/lib/staging'
  * là quy ước ai cũng đọc được mà không cần chú thích.
  */
 export function StagingBanner() {
-  if (!IS_STAGING) return null
+  if (!isStaging()) return null
 
   return (
     <div

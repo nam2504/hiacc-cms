@@ -17,7 +17,17 @@ export const Media: CollectionConfig = {
   labels: { singular: 'Tệp ảnh', plural: 'Thư viện ảnh' },
   access: contentAccess,
   upload: {
-    staticDir: 'public/media',
+    /**
+     * Nơi lưu file ảnh trên đĩa. Mặc định `public/media` cho máy dev.
+     *
+     * ⚠️ Trên máy chủ, thư mục này PHẢI nằm trên ổ đĩa bền (volume/bind mount),
+     * KHÔNG để trong lớp ghi của container. Nếu để mặc định: deploy bản mới là
+     * container bị thay, ảnh mất sạch, nhưng bản ghi trong DB vẫn còn nên mọi
+     * <img> trả 404 mà không có lỗi nào báo ra. Chạy lại seed cũng không chữa
+     * được vì seed thấy bản ghi đã tồn tại thì bỏ qua.
+     * Đặt `MEDIA_DIR=/data/media` (Fly) hoặc bind mount (compose).
+     */
+    staticDir: process.env.MEDIA_DIR || 'public/media',
     mimeTypes: ['image/*', 'application/pdf'],
     imageSizes: [
       { name: 'thumbnail', width: 400, height: 300, position: 'centre' },

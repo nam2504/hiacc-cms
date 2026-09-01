@@ -2,6 +2,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { buildConfig } from 'payload'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { migrations } from './migrations'
 import {
   lexicalEditor,
   BoldFeature,
@@ -102,7 +103,22 @@ export default buildConfig({
     defaultLocale: DEFAULT_LOCALE,
     fallback: true,
   },
-  db: sqliteAdapter({ client: { url: process.env.DATABASE_URI || 'file:./hiacc.db' } }),
+  /**
+   * `prodMigrations` là thứ tạo bảng khi NODE_ENV=production.
+   *
+   * Payload chỉ tự đẩy schema (push) khi NODE_ENV !== 'production'. Image chạy
+   * production, nên KHÔNG có dòng này thì DB mới toanh sẽ không có bảng nào và
+   * mọi truy vấn chết với "no such table: categories" — trong khi container vẫn
+   * báo khởi động thành công.
+   *
+   * Đổi schema (thêm field, đổi collection) phải sinh migration mới:
+   *     npx payload migrate:create <tên>
+   * rồi commit file trong src/migrations/. Đừng sửa file migration đã chạy.
+   */
+  db: sqliteAdapter({
+    client: { url: process.env.DATABASE_URI || 'file:./hiacc.db' },
+    prodMigrations: migrations,
+  }),
   secret: payloadSecret,
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   sharp: (await import('sharp')).default,

@@ -86,29 +86,28 @@ của bạn. **Đổi ngay sau khi tạo xong**, đừng dùng mật khẩu mẫ
 
 ### 1.6 Nạp nội dung mẫu (tuỳ chọn, cho lần cài đầu trống dữ liệu)
 
-Seed chạy **trong container**, không chạy trên host (host không có
-`DATABASE_URI` trỏ đúng volume container):
+`docker compose` dựng bản **gọn** (`target: runner-slim`) — cố ý không mang mã
+nguồn TypeScript, node_modules dev và ảnh mẫu lên máy chủ. Bản gọn đó **không
+seed được**: `output: 'standalone'` của Next không gom CLI `payload`.
+
+Muốn seed trên máy chủ, dựng một lần bằng stage đầy đủ rồi chạy:
 
 ```bash
-docker compose exec app node -e "
-  process.env.DATABASE_URI = 'file:/data/hiacc.db'
-" # (tham khảo — xem ghi chú dưới)
+# từ thư mục gốc hiacc-cms/
+docker build --target runner -t hiacc-cms:seed ./app
+docker run --rm \
+  -v "$PWD/data:/data" -v "$PWD/media:/app/public/media" \
+  -e DATABASE_URI=file:/data/hiacc.db \
+  -e MEDIA_DIR=/app/public/media \
+  -e PAYLOAD_SECRET="$(grep '^PAYLOAD_SECRET=' app/.env | cut -d= -f2-)" \
+  hiacc-cms:seed npm run seed
 ```
 
-> ⚠️ **Chưa verify được lệnh seed-trong-container ở gói này.** Ảnh runner
-> dùng `output: 'standalone'` không có sẵn `node_modules/.bin/payload` hay
-> script `npm run seed` (standalone output chỉ gom phần cần cho `next start`,
-> không gom CLI `payload run`). Nếu cần seed trên VPS, cách chắc ăn nhất đã
-> thử được ở gói này là seed **trước khi build image** (chạy `npm run seed`
-> trên máy dev với `DATABASE_URI` trỏ vào `./data/hiacc.db` của server đích,
-> hoặc copy file `hiacc.db` đã seed sẵn từ máy dev vào `./data/hiacc.db` của
-> server qua `scp` trước lần `docker compose up -d` đầu tiên). Việc thêm một
-> stage/script seed chạy được bên trong container đứng ngoài phạm vi sở hữu
-> file của gói này (không được sửa `Dockerfile` để bundle thêm CLI của
-> Payload mà không có yêu cầu rõ) — ghi nhận làm nợ kỹ thuật, xem báo cáo W8
-> mục 7.
+Seed idempotent: chạy lại không đè nội dung khách đã sửa.
 
----
+⚠️ **Phải chạy `docker compose up -d` ít nhất một lần TRƯỚC khi seed.** Bảng
+trong DB được tạo bởi migration lúc container khởi động; seed vào DB chưa có
+bảng sẽ báo `no such table: categories`.
 
 ## 2. Đặt HTTPS trước app (reverse proxy)
 

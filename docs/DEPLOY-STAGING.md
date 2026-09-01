@@ -6,7 +6,8 @@ Production còn phải chốt riêng: đặt máy ở đâu, ai trả tiền, ba
 
 ## Bản staging khác bản thật ở chỗ nào
 
-Bật bằng đúng một biến: `NEXT_PUBLIC_IS_STAGING=true`. Khi bật:
+Bật bằng biến `IS_STAGING=true`, **đặt ở HAI chỗ** trong `app/fly.toml`:
+`[build.args]` (lúc build) và `[env]` (lúc chạy). Khi bật:
 
 | | Staging | Production |
 |---|---|---|
@@ -14,6 +15,18 @@ Bật bằng đúng một biến: `NEXT_PUBLIC_IS_STAGING=true`. Khi bật:
 | `robots.txt` | `Disallow: /` | cho bò, chặn `/admin` + `/api` |
 | Thẻ `<meta name="robots">` | `noindex, nofollow` | không đặt (cho index) |
 | `sitemap.xml` | rỗng | 35 URL |
+
+> ⚠️ **Vì sao phải đặt cả ở `[build.args]`, không chỉ `[env]`.**
+> Next dựng sẵn `robots.txt`, `sitemap.xml` và trang chủ thành file tĩnh ngay
+> lúc `npm run build`; khi chạy nó chỉ trả lại các file đó chứ không chạy lại
+> code. Thiếu ở `[build.args]` thì **cả bốn lớp chặn đều im lặng không hoạt
+> động** — `robots.txt` vẫn `Allow: /`, không banner, sitemap đủ URL — mà
+> `fly deploy` vẫn báo thành công. Đã đo thật, không phải suy đoán.
+>
+> Đổi cờ thì đổi cả hai chỗ, và phải **build lại** (`fly deploy`), đặt lại biến
+> môi trường thôi là không đủ.
+>
+> Bản production build KHÔNG truyền `IS_STAGING` → cờ rỗng → hành vi y như cũ.
 
 Vì sao phải chặn: bản nháp đang chạy **nội dung mẫu** (ảnh Unsplash, bài seed,
 địa chỉ "Đang cập nhật"). Để Google đánh chỉ mục nó thì khi lên bản thật, hai
@@ -32,19 +45,36 @@ fly auth signup                            # hoặc: fly auth login
 ```
 
 Thẻ tín dụng: Fly có hỏi để chống lạm dụng. Gói free vẫn 0đ nếu giữ đúng
-1 máy `shared-cpu-1x` 512MB + 3GB volume như `fly.toml` đã đặt sẵn.
+1 máy `shared-cpu-1x` 512MB + volume 1GB. (Hạn mức free là 3GB; 1GB đủ xa cho
+site nội dung.) Kích thước volume do lệnh `fly volumes create` quyết định, KHÔNG
+phải `fly.toml` — `[[mounts]]` chỉ khai tên và điểm gắn.
 
 ### 2. Tạo app + volume
 
-```bash
-cd ~/Documents/project/hiacc-cms
+⚠️ Mọi lệnh `fly` phải chạy từ thư mục **`app/`** — `fly.toml` nằm ở đó, và Fly
+lấy thư mục chứa `fly.toml` làm build context. Chạy từ thư mục gốc repo thì
+build chết ở `"tsconfig.json": not found`.
 
-fly apps create hiacc-cms-staging          # tên phải khớp dòng `app` trong fly.toml
+```bash
+cd ~/Documents/project/hiacc-cms/app
+
+fly apps create hiacc-cms-staging          # tên phải khớp dòng `app` trong app/fly.toml
 fly volumes create hiacc_data --region sin --size 1   # 1GB đủ xa cho site nội dung
 ```
 
 Volume là chỗ sống của `hiacc.db`. Không có nó thì mỗi lần deploy là mất sạch
 nội dung khách đã nhập.
+
+⚠️ **Nếu tên `hiacc-cms-staging` đã bị người khác lấy** (tên app là global trên
+Fly), bạn phải đổi tên — và khi đó phải sửa **5 chỗ**, không chỉ dòng `app`:
+
+| File | Chỗ cần sửa |
+|---|---|
+| `app/fly.toml` | dòng `app = `, 2 dòng trong `[build.args]`, 2 dòng `NEXT_PUBLIC_*` trong `[env]` |
+| `docs/DEPLOY-STAGING.md` | các URL ví dụ |
+
+Quên sửa `NEXT_PUBLIC_*` thì site vẫn chạy bình thường, nhưng thẻ canonical và
+ảnh chia sẻ trỏ về **tên miền của người khác**. Không có lỗi nào báo ra.
 
 ### 3. Đặt secret
 
@@ -63,6 +93,20 @@ fly deploy
 
 Lần đầu mất ~5–8 phút (build image). Xong thì mở:
 `https://hiacc-cms-staging.fly.dev`
+
+### 4b. Kiểm tra deploy đúng (làm ngay, trước khi gửi khách)
+
+```bash
+APP=https://hiacc-cms-staging.fly.dev
+
+curl -s $APP/robots.txt                      # phải là: Disallow: /
+curl -s $APP/ | grep -o '<meta name="robots"[^>]*>'   # phải có noindex
+curl -s $APP/ | grep -o 'canonical[^>]*'     # phải là domain fly.dev, KHÔNG localhost
+curl -s $APP/sitemap.xml | grep -c '<loc>'   # phải là 0
+```
+
+Thấy `localhost` ở dòng canonical nghĩa là `[build.args]` trong `fly.toml`
+không tới được lúc build — sửa rồi `fly deploy` lại.
 
 ### 5. Nạp nội dung mẫu
 

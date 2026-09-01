@@ -8,6 +8,7 @@
  * đang RỖNG, seed điền field rỗng đó bằng nội dung mẫu tương ứng trong data.ts
  * (gói C1). Field đã có nội dung (khách đã sửa tay) thì không đụng.
  */
+import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { getPayload } from 'payload'
 import config from '../payload.config'
@@ -78,7 +79,23 @@ async function seed() {
       where: { filename: { equals: filename } },
       limit: 1,
     })
-    if (existing.docs[0]) return existing.docs[0].id as number
+    /**
+     * Có bản ghi trong DB CHƯA CHẮC file còn trên đĩa: nếu thư mục media không
+     * nằm trên ổ bền, deploy bản mới làm mất file mà bản ghi vẫn ở lại. Trước
+     * đây seed thấy bản ghi là bỏ qua ngay, nên không bao giờ ghi lại được file
+     * — ảnh vỡ vĩnh viễn. Kiểm tra cả hai: bản ghi CÒN và file CÒN.
+     */
+    if (existing.docs[0]) {
+      const doc = existing.docs[0]
+      const mediaDir = process.env.MEDIA_DIR || path.resolve(process.cwd(), 'public/media')
+      const onDisk = doc.filename ? existsSync(path.join(mediaDir, doc.filename)) : false
+      if (onDisk) return doc.id as number
+
+      payload.logger.warn(
+        `Bản ghi ảnh "${filename}" còn trong DB nhưng file đã mất trên đĩa — nạp lại.`,
+      )
+      await payload.delete({ collection: 'media', id: doc.id })
+    }
 
     if (!STOCK_IMAGES_DIR) return null
     const filePath = path.join(STOCK_IMAGES_DIR, filename)

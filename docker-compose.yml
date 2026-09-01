@@ -10,6 +10,10 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
+      # Bản gọn cho tự host: KHÔNG kèm mã nguồn TypeScript, node_modules dev và
+      # ảnh mẫu. Bỏ dòng này thì Docker lấy stage CUỐI của Dockerfile (`runner`,
+      # bản staging kèm công cụ seed) và đẩy cả mã nguồn lên máy chủ của khách.
+      target: runner-slim
     image: hiacc-cms:latest
     restart: unless-stopped
     ports:
@@ -23,6 +27,10 @@ services:
       # Ghi đè giá trị trong .env (vốn dùng cho chạy `npm run dev` ngoài container)
       # để tránh nhầm ổ đĩa dev vs container.
       DATABASE_URI: file:/data/hiacc.db
+      # Ảnh upload ra bind mount ./media, không nằm trong lớp ghi container —
+      # nếu không, `docker compose up -d --build` là mất hết ảnh trong khi bản
+      # ghi DB vẫn còn, ảnh vỡ 404 im lặng.
+      MEDIA_DIR: /app/public/media
     volumes:
       # SQLite: 1 file, bind mount ra thư mục ./data ở host để backup/restore dễ (xem scripts/).
       - ./data:/data

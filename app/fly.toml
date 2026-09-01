@@ -14,8 +14,31 @@
 app = 'hiacc-cms-staging'
 primary_region = 'sin'          # Singapore — gần Việt Nam nhất trong các region của Fly
 
+# Không khai [build]: Fly tự dùng Dockerfile nằm cạnh file này, và lấy chính
+# thư mục này (app/) làm build context — đúng thứ Dockerfile cần, vì mọi lệnh
+# COPY trong đó viết tương đối với app/.
+#
+# ⚠️ ĐỪNG chuyển file này lên thư mục gốc repo. Ở đó Fly sẽ lấy gốc làm context,
+# mọi COPY trượt (build chết ở "tsconfig.json: not found"), và `.dockerignore`
+# của app/ không được áp dụng nên node_modules bị nuốt vào context (2GB upload
+# mỗi lần deploy thay vì ~5MB). flyctl KHÔNG có key `build-context` để chữa.
+
 [build]
-  dockerfile = 'app/Dockerfile'
+  # NEXT_PUBLIC_* phải có mặt lúc BUILD, không phải lúc chạy: Next đóng băng
+  # chúng vào HTML của các trang được prerender. Thiếu ở đây thì canonical và
+  # ảnh OG của những trang đó trỏ về http://localhost:3000 — dán link vào
+  # Zalo/Facebook sẽ không ra preview, mà deploy vẫn báo thành công.
+  #
+  # Vẫn phải giữ bản runtime dưới [env]: trang render động đọc lúc chạy.
+  [build.args]
+    NEXT_PUBLIC_SITE_URL = 'https://hiacc-cms-staging.fly.dev'
+    NEXT_PUBLIC_SERVER_URL = 'https://hiacc-cms-staging.fly.dev'
+
+    # Cùng lý do: robots.txt, sitemap.xml và trang chủ được prerender thành
+    # file tĩnh lúc build. Thiếu dòng này thì cả 4 lớp chặn index (robots,
+    # meta noindex, sitemap rỗng, banner) đều KHÔNG hoạt động, dù [env] bên
+    # dưới có đặt IS_STAGING — đã đo thật.
+    IS_STAGING = 'true'
 
 [env]
   # Cổng app lắng nghe bên trong máy ảo, khớp EXPOSE trong Dockerfile.
@@ -27,7 +50,21 @@ primary_region = 'sin'          # Singapore — gần Việt Nam nhất trong c�
 
   # Bật nhãn "bản dùng thử" + chặn Google đánh chỉ mục. Bản production PHẢI bỏ
   # biến này (hoặc để 'false'), nếu không site thật sẽ vô hình trên tìm kiếm.
-  NEXT_PUBLIC_IS_STAGING = 'true'
+  #
+  # ⚠️ KHÔNG thêm tiền tố NEXT_PUBLIC_ vào tên biến này (Next sẽ đóng băng nó
+  # thành giá trị cứng lúc build và biến này thành vô nghĩa).
+  #
+  # ⚠️ Dòng dưới đây MỘT MÌNH là KHÔNG ĐỦ — phải có cả IS_STAGING ở
+  # [build.args] bên trên. Ở đây nó chỉ phục vụ các trang render động; các
+  # trang tĩnh (robots.txt, sitemap.xml, trang chủ) đã cố định từ lúc build.
+  # Giữ cả hai chỗ, và khi đổi thì đổi cả hai.
+  IS_STAGING = 'true'
+
+  # Ảnh upload nằm trên volume, KHÔNG trong lớp ghi của container.
+  # Để mặc định (public/media) thì mỗi lần `fly deploy` là mất hết ảnh, mà bản
+  # ghi trong DB vẫn còn nên ảnh vỡ 404 im lặng. Dùng chung volume hiacc_data
+  # với SQLite — Fly free chỉ cho hạn mức volume nhỏ, không tách ra ổ thứ hai.
+  MEDIA_DIR = '/data/media'
 
   # Đổi hai dòng dưới nếu đặt tên app khác — chúng phải khớp tên miền thật,
   # vì canonical/OG/sitemap đều lấy từ đây.

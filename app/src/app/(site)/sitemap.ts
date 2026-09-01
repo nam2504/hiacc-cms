@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { absoluteUrl } from '@/lib/seo'
-import { IS_STAGING } from '@/lib/staging'
+import { isStaging } from '@/lib/staging'
 import {
   getAllPageSlugs,
   getAllPostSlugs,
@@ -39,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * còn liệt kê URL thì bất kỳ ai (hay bot) đoán đúng đường dẫn vẫn cầm được
    * danh sách đầy đủ trang của bản nháp. Rỗng là dứt điểm.
    */
-  if (IS_STAGING) return []
+  if (isStaging()) return []
 
   const [services, categories, posts, pages] = await Promise.all([
     getServices(),

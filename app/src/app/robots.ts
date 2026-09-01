@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { absoluteUrl } from '@/lib/seo'
-import { IS_STAGING } from '@/lib/staging'
+import { isStaging } from '@/lib/staging'
 
 /**
  * /robots.txt — site tham chiếu không có file này (AUDIT §5.2), mà site dịch vụ
@@ -22,7 +22,7 @@ export default function robots(): MetadataRoute.Robots {
    * `robots.txt` chỉ ngăn bò trang, không gỡ được trang đã nằm trong chỉ mục,
    * nên `noindex` ở layout mới là lớp chặn thật. Giữ cả hai.
    */
-  if (IS_STAGING) {
+  if (isStaging()) {
     return { rules: { userAgent: '*', disallow: '/' } }
   }
 
