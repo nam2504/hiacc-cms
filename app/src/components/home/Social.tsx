@@ -19,7 +19,7 @@ export function Social({ settings }: { settings: Setting | null }) {
   if (channels.length === 0) return null
 
   return (
-    <Section title={t('home.social.title')} subtitle={t('home.social.subtitle')}>
+    <Section tone="soft" title={t('home.social.title')} subtitle={t('home.social.subtitle')}>
       <ul className={styles.list}>
         {channels.map((channel) => (
           <li key={channel.key}>

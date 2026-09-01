@@ -17,7 +17,7 @@ export function Knowledge({ categories }: { categories: Category[] }) {
   if (categories.length === 0) return null
 
   return (
-    <Section tone="soft" title={t('home.knowledge.title')} subtitle={t('home.knowledge.subtitle')}>
+    <Section title={t('home.knowledge.title')} subtitle={t('home.knowledge.subtitle')}>
       <div className={styles.groups}>
         {GROUPS.map((group) => {
           const items = categories.filter((category) => category.group === group.value)

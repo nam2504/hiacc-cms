@@ -94,6 +94,15 @@ const vi: Dict = {
   'home.knowledge.group.accounting': 'Kế toán & Doanh nghiệp',
   'home.knowledge.group.legal-hr': 'Pháp lý & Nhân sự',
 
+  'home.services.viewAll': 'Xem tất cả dịch vụ',
+
+  // Khối CTA cuối trang: trước đây toàn bộ trang chủ chỉ có 2 nút, cả hai nằm
+  // trong Hero — 88% chiều dài trang không có điểm hành động nào.
+  'home.cta.title': 'Cần tư vấn cho doanh nghiệp của bạn?',
+  'home.cta.subtitle':
+    'Gửi yêu cầu hoặc gọi trực tiếp, chúng tôi phản hồi trong ngày làm việc.',
+  'home.cta.button': 'Nhận tư vấn miễn phí',
+
   // --- Trang Giới thiệu / Dịch vụ / Liên hệ (W2) ---
   // Seed để field `content` trống chờ khách tự viết, nên cần chuỗi giữ chỗ.
   'page.contentComingSoon': 'Nội dung đang được cập nhật. Vui lòng quay lại sau.',

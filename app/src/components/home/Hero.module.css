@@ -1,13 +1,9 @@
+/* Padding đồng nhất mọi khổ (64/48). Trước đây desktop dùng 96/64, đẩy CTA
+   xuống y≈509 — rơi khỏi màn hình đầu ở laptop 1366x768 rất phổ biến ở VN. */
 .hero {
   padding-block: var(--space-8) var(--space-7);
   background: linear-gradient(180deg, var(--color-brand-tint), var(--color-bg));
   border-bottom: 1px solid var(--color-border);
-}
-
-@media (min-width: 768px) {
-  .hero {
-    padding-block: var(--space-9) var(--space-8);
-  }
 }
 
 .inner {
@@ -18,7 +14,7 @@
   text-align: center;
 }
 
-/* Có ảnh: 2 cột từ 768px. Dưới ngưỡng đó vẫn xếp dọc, chữ TRƯỚC ảnh SAU —
+/* Có ảnh: 2 cột từ 900px. Dưới ngưỡng đó vẫn xếp dọc, chữ TRƯỚC ảnh SAU —
    thứ tự DOM đã đúng nên không cần order, và người dùng màn hình nhỏ đọc
    được nội dung trước khi phải cuộn qua ảnh. */
 .innerSplit {
@@ -36,7 +32,7 @@
   text-align: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 900px) {
   .innerSplit {
     grid-template-columns: 1.05fr 1fr;
     gap: var(--space-6);
@@ -88,7 +84,7 @@
   line-height: var(--leading-tight);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 900px) {
   .tagline {
     font-size: var(--text-4xl);
   }

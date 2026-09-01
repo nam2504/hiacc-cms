@@ -45,6 +45,18 @@
   color: var(--color-text-invert);
 }
 
+/* Dùng trên nền tone="brand"/"dark": nút primary màu đỏ đặt trên nền đỏ sẽ
+   tàng hình, nên đảo lại — nền trắng, chữ đỏ. */
+.invert {
+  background: var(--color-bg);
+  color: var(--color-brand);
+}
+
+.invert:hover {
+  background: var(--color-brand-tint);
+  color: var(--color-brand);
+}
+
 .ghost {
   background: transparent;
   color: var(--color-ink);

@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { Section } from '@/components/ui/Section'
 import { t } from '@/lib/i18n'
@@ -44,6 +45,13 @@ export function Services({ services }: { services: Service[] }) {
           )
         })}
       </ul>
+      {/* 7 dịch vụ trên lưới 3 cột để trống 2 ô hàng cuối; nút đặt ở đây vừa
+          đóng khoảng trắng đó vừa thêm một điểm hành động giữa trang. */}
+      <div className={styles.footer}>
+        <Button href="/dich-vu" variant="outline">
+          {t('home.services.viewAll')}
+        </Button>
+      </div>
     </Section>
   )
 }

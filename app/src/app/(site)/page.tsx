@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { About } from '@/components/home/About'
 import { Branches } from '@/components/home/Branches'
+import { CallToAction } from '@/components/home/CallToAction'
 import { Hero } from '@/components/home/Hero'
 import { Knowledge } from '@/components/home/Knowledge'
 import { Services } from '@/components/home/Services'
@@ -98,8 +99,11 @@ export default async function HomePage() {
       <About settings={settings} />
       <Services services={services} />
       <Branches branches={branches} />
-      <Social settings={settings} />
       <Knowledge categories={categories} />
+      {/* Social đứng sau Knowledge: Branches và Knowledge là hai khối chứng minh
+          năng lực, chèn dải mạng xã hội vào giữa cắt ngang mạch đó. */}
+      <Social settings={settings} />
+      <CallToAction settings={settings} />
     </>
   )
 }

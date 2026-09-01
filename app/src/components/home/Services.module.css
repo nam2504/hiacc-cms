@@ -81,3 +81,9 @@
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
 }
+
+.footer {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-6);
+}

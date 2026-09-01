@@ -1,0 +1,21 @@
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.hotline {
+  color: var(--color-text-invert);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  border-bottom: 1px solid rgb(255 255 255 / 0.5);
+}
+
+.hotline:hover,
+.hotline:focus-visible {
+  color: var(--color-text-invert);
+  border-bottom-color: var(--color-text-invert);
+}
