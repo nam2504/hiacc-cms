@@ -20,7 +20,9 @@
   background: var(--color-brand-tint);
 }
 
-@media (max-width: 1024px) {
+/* Khớp ngưỡng với MainNav: lệch nhau thì label ngôn ngữ ẩn kiểu mobile trong khi
+   nav đã chuyển desktop. */
+@media (max-width: 1103.98px) {
   .label {
     display: none;
   }

@@ -64,7 +64,7 @@ export function Hero({ settings }: { settings: Setting | null }) {
               alt={mediaAlt(settings?.heroImage, "")}
               width={1200}
               height={800}
-              sizes="(min-width: 768px) 50vw, 100vw"
+              sizes="(min-width: 900px) 50vw, 100vw"
               priority
             />
           ) : null}

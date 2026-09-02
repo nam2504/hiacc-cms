@@ -101,7 +101,9 @@
   align-items: center;
 }
 
-@media (max-width: 1023.98px) {
+/* Nav desktop cần ~1089px mới chứa đủ logo + 6 mục + language switcher. Bật nó
+   sớm hơn ngưỡng đó làm tràn ngang dải 1009-1088px (mục "Tin tức" ra ngoài mép). */
+@media (max-width: 1103.98px) {
   .toggle {
     display: flex;
   }
