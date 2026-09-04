@@ -16,6 +16,17 @@ import {
   BlockquoteFeature,
   UploadFeature,
   FixedToolbarFeature,
+  InlineToolbarFeature,
+  AlignFeature,
+  IndentFeature,
+  StrikethroughFeature,
+  SubscriptFeature,
+  SuperscriptFeature,
+  InlineCodeFeature,
+  HorizontalRuleFeature,
+  ChecklistFeature,
+  TextStateFeature,
+  defaultColors,
 } from '@payloadcms/richtext-lexical'
 
 import { Users } from './collections/Users'
@@ -70,28 +81,51 @@ export default buildConfig({
   // PayrollConfig (W5): số liệu luật của công cụ tính lương Gross ↔ Net.
   // Cùng nhóm "Cấu hình" với Settings trong menu /admin.
   globals: [Settings, PayrollConfig],
-  // [A1] Bộ soạn thảo cho nhân viên kế toán, không phải dev — chỉ giữ những nút
-  // họ thật sự cần, để toolbar ngắn và không phải đoán bấm gì.
-  // Toolbar cố định (FixedToolbarFeature) thay cho toolbar nổi mặc định: luôn
-  // hiện sẵn phía trên, không cần bôi đen chữ mới thấy nút — dễ nhận ra hơn.
-  // Bỏ có chủ đích: gạch ngang, chỉ số trên/dưới, code inline, căn lề, thụt lề,
-  // checklist, relationship (nhúng bản ghi khác), đường kẻ ngang, toolbar nổi
-  // — đều là việc kỹ thuật/blog, khách kế toán không dùng, để lại chỉ rối thêm.
-  // H1 KHÔNG bật: h1 đã là tiêu đề bài (field `title`), thêm h1 trong nội dung
-  // là hỏng cấu trúc SEO/a11y (§1.1 hợp đồng A1).
+  /**
+   * Bộ soạn thảo bài viết.
+   *
+   * V3: khách yêu cầu đủ tính năng như CMS tham chiếu — căn lề, màu chữ, tô nền,
+   * bảng, ảnh, chỉ số trên/dưới. Bản A1 trước đây cố tình rút gọn toolbar cho
+   * nhân viên kế toán; yêu cầu mới thắng, nên mở lại. Toolbar dài hơn nhưng
+   * FixedToolbarFeature xuống dòng tự động nên không tràn.
+   *
+   * H1 vẫn KHÔNG bật: h1 đã là tiêu đề bài (field `title`), thêm h1 trong nội
+   * dung là hỏng cấu trúc SEO/a11y (§1.1 hợp đồng A1) — đây là ràng buộc kỹ
+   * thuật, không phải lựa chọn giao diện, nên giữ nguyên.
+   *
+   * Bảng dùng EXPERIMENTAL_TableFeature: Payload đánh dấu experimental nên
+   * KHÔNG bật mặc định — bật sau khi khách xác nhận cần, tránh dữ liệu bài viết
+   * phụ thuộc vào một node format còn có thể đổi.
+   */
   editor: lexicalEditor({
     features: () => [
       ParagraphFeature(),
-      HeadingFeature({ enabledHeadingSizes: ['h2', 'h3'] }),
+      HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
       BoldFeature(),
       ItalicFeature(),
       UnderlineFeature(),
+      StrikethroughFeature(),
+      SubscriptFeature(),
+      SuperscriptFeature(),
+      InlineCodeFeature(),
+      // Màu chữ + tô nền: dùng bảng màu dựng sẵn của Payload thay vì tự định
+      // nghĩa, để màu lưu trong bài luôn có tên trong mọi phiên bản admin.
+      TextStateFeature({
+        state: {
+          color: { ...defaultColors.text, ...defaultColors.background },
+        },
+      }),
+      AlignFeature(),
+      IndentFeature(),
       UnorderedListFeature(),
       OrderedListFeature(),
+      ChecklistFeature(),
       LinkFeature(),
       BlockquoteFeature(),
+      HorizontalRuleFeature(),
       UploadFeature(),
       FixedToolbarFeature(),
+      InlineToolbarFeature(),
     ],
   }),
   // i18n dựng sẵn 4 ngôn ngữ: bật thêm chỉ cần sửa ENABLED_LOCALES, không đụng code.
