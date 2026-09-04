@@ -14,6 +14,25 @@ export const Posts: CollectionConfig = {
   labels: { singular: 'Bài viết', plural: 'Bài viết' },
   versions: { drafts: true },
   access: contentAccess,
+  hooks: {
+    /**
+     * Bấm "Xuất bản" mà quên điền Ngày đăng thì bài KHÔNG hiện ở /tin-tuc: mọi
+     * truy vấn đều `sort: '-publishedAt'`, và SQLite xếp NULL xuống cuối, nên bài
+     * rơi khỏi trang đầu của phân trang. Biên tập viên thấy trạng thái "Đã xuất
+     * bản" trong admin nên không có lý do gì nghi ngờ (P1-04).
+     *
+     * Điền ngày lúc xuất bản là hành vi mặc định hợp lý. Vẫn cho sửa tay sau đó
+     * (đăng lùi ngày), và KHÔNG đụng tới bài đã có ngày.
+     */
+    beforeChange: [
+      ({ data }) => {
+        if (data._status === 'published' && !data.publishedAt) {
+          return { ...data, publishedAt: new Date().toISOString() }
+        }
+        return data
+      },
+    ],
+  },
   fields: [
     { name: 'title', type: 'text', label: 'Tiêu đề', required: true, localized: true },
     slugField,
@@ -24,7 +43,7 @@ export const Posts: CollectionConfig = {
       admin: {
         position: 'sidebar',
         date: { pickerAppearance: 'dayAndTime' },
-        description: 'Ngày hiển thị trên bài và dùng để sắp xếp. Bỏ trống thì bài xếp cuối danh sách.',
+        description: 'Ngày hiển thị trên bài và dùng để sắp xếp. Bỏ trống thì tự lấy thời điểm xuất bản.',
       },
     },
     {

@@ -149,7 +149,7 @@ export interface Post {
    */
   slug: string;
   /**
-   * Ngày hiển thị trên bài và dùng để sắp xếp. Bỏ trống thì bài xếp cuối danh sách.
+   * Ngày hiển thị trên bài và dùng để sắp xếp. Bỏ trống thì tự lấy thời điểm xuất bản.
    */
   publishedAt?: string | null;
   /**
