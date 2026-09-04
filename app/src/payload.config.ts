@@ -26,7 +26,6 @@ import {
   HorizontalRuleFeature,
   ChecklistFeature,
   TextStateFeature,
-  defaultColors,
 } from '@payloadcms/richtext-lexical'
 
 import { Users } from './collections/Users'
@@ -40,6 +39,7 @@ import { ContactSubmissions } from './collections/ContactSubmissions'
 import { Settings } from './globals/Settings'
 import { PayrollConfig } from './globals/PayrollConfig'
 import { ALL_LOCALES, ENABLED_LOCALES, DEFAULT_LOCALE } from './lib/locales'
+import { RICH_TEXT_STATE } from './lib/richTextColors'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -108,13 +108,10 @@ export default buildConfig({
       SubscriptFeature(),
       SuperscriptFeature(),
       InlineCodeFeature(),
-      // Màu chữ + tô nền: dùng bảng màu dựng sẵn của Payload thay vì tự định
-      // nghĩa, để màu lưu trong bài luôn có tên trong mọi phiên bản admin.
-      TextStateFeature({
-        state: {
-          color: { ...defaultColors.text, ...defaultColors.background },
-        },
-      }),
+      // Bảng màu nằm ở `lib/richTextColors.ts` — dùng CHUNG với RichText.tsx bên
+      // trang public. Định nghĩa ở hai nơi thì lệch nhau, và triệu chứng là admin
+      // thấy màu còn trang ngoài mất màu (P1-03).
+      TextStateFeature({ state: RICH_TEXT_STATE }),
       AlignFeature(),
       IndentFeature(),
       UnorderedListFeature(),
