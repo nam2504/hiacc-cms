@@ -17,12 +17,17 @@ import styles from './CallToAction.module.css'
  */
 export function CallToAction({ settings }: { settings: Setting | null }) {
   const hotline = settings?.hotline
+  const home = settings?.home
 
   return (
-    <Section tone="brand" title={t('home.cta.title')} subtitle={t('home.cta.subtitle')}>
+    <Section
+      tone="brand"
+      title={home?.ctaTitle || t('home.cta.title')}
+      subtitle={home?.ctaSubtitle || t('home.cta.subtitle')}
+    >
       <div className={styles.actions}>
         <Button href="/lien-he" variant="invert" size="lg">
-          {t('home.cta.button')}
+          {home?.ctaButton || t('home.cta.button')}
         </Button>
         {hotline && (
           <a className={styles.hotline} href={`tel:${hotline.replace(/[^\d+]/g, '')}`}>

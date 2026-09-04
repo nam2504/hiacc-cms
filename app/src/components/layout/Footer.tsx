@@ -24,13 +24,15 @@ export function Footer({
   ].filter((s): s is { href: string; label: string } => Boolean(s.href))
 
   const year = new Date().getFullYear()
+  // Tiêu đề cột: ô trống trong admin thì dùng nhãn mặc định của cột đó.
+  const headings = settings?.footerHeadings
 
   return (
     <footer className={styles.footer}>
       <Container>
         <div className={styles.grid}>
           <div className={styles.col}>
-            <h3 className={styles.heading}>{t('footer.about')}</h3>
+            <h3 className={styles.heading}>{headings?.about || t('footer.about')}</h3>
             {settings?.aboutShort && <p className={styles.text}>{settings.aboutShort}</p>}
             {settings?.companyName && <p className={styles.text}>{settings.companyName}</p>}
             {settings?.taxCode && (
@@ -41,7 +43,7 @@ export function Footer({
           </div>
 
           <div className={styles.col}>
-            <h3 className={styles.heading}>{t('footer.quickLinks')}</h3>
+            <h3 className={styles.heading}>{headings?.quickLinks || t('footer.quickLinks')}</h3>
             <ul className={styles.list}>
               {FOOTER_NAV.map((item) => (
                 <li key={item.href}>
@@ -54,7 +56,7 @@ export function Footer({
           </div>
 
           <div className={styles.col}>
-            <h3 className={styles.heading}>{t('footer.contact')}</h3>
+            <h3 className={styles.heading}>{headings?.contact || t('footer.contact')}</h3>
             {settings?.headOfficeAddress && (
               <p className={styles.text}>{settings.headOfficeAddress}</p>
             )}
@@ -74,6 +76,9 @@ export function Footer({
             )}
             {socials.length > 0 && (
               <div className={styles.socials}>
+                <h3 className={styles.heading}>
+                  {headings?.followUs || t('footer.followUs')}
+                </h3>
                 {socials.map((s) => (
                   <a
                     key={s.label}
@@ -91,7 +96,9 @@ export function Footer({
 
           {recentPosts.length > 0 && (
             <div className={styles.col}>
-              <h3 className={styles.heading}>{t('footer.recentPosts')}</h3>
+              <h3 className={styles.heading}>
+                {headings?.recentPosts || t('footer.recentPosts')}
+              </h3>
               <ul className={styles.list}>
                 {recentPosts.map((post) => (
                   <li key={post.id}>

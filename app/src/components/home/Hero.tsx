@@ -25,6 +25,12 @@ export function Hero({ settings }: { settings: Setting | null }) {
   const siteName = settings?.siteName || "HiACC";
   // Tagline ưu tiên nội dung khách sửa trong admin, không có thì rơi về khoá dịch.
   const tagline = settings?.tagline || t("home.hero.tagline");
+  // Cùng quy tắc cho phần chữ còn lại: ô trống trong admin = dùng bản mặc định,
+  // nên xoá nhầm một ô không làm mất chữ trên trang.
+  const home = settings?.home;
+  const lead = home?.heroLead || t("home.hero.lead");
+  const cta = home?.heroCta || t("home.hero.cta");
+  const ctaSecondary = home?.heroCtaSecondary || t("home.hero.ctaSecondary");
 
   return (
     <section className={styles.hero}>
@@ -45,14 +51,14 @@ export function Hero({ settings }: { settings: Setting | null }) {
             )}
 
             <h1 className={styles.tagline}>{tagline}</h1>
-            <p className={styles.lead}>{t("home.hero.lead")}</p>
+            <p className={styles.lead}>{lead}</p>
 
             <div className={styles.actions}>
               <Button href="/lien-he" size="lg">
-                {t("home.hero.cta")}
+                {cta}
               </Button>
               <Button href="/dich-vu" variant="outline" size="lg">
-                {t("home.hero.ctaSecondary")}
+                {ctaSecondary}
               </Button>
             </div>
           </div>

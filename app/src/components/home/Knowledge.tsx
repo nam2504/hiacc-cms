@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
 import { t } from '@/lib/i18n'
-import type { Category } from '@/payload-types'
+import type { Category, Setting } from '@/payload-types'
 import styles from './Knowledge.module.css'
 
 /**
@@ -13,11 +13,22 @@ const GROUPS = [
   { value: 'legal-hr', title: 'home.knowledge.group.legal-hr' },
 ] as const
 
-export function Knowledge({ categories }: { categories: Category[] }) {
+export function Knowledge({
+  categories,
+  settings,
+}: {
+  categories: Category[]
+  settings?: Setting | null
+}) {
   if (categories.length === 0) return null
 
+  const home = settings?.home
+
   return (
-    <Section title={t('home.knowledge.title')} subtitle={t('home.knowledge.subtitle')}>
+    <Section
+      title={home?.knowledgeTitle || t('home.knowledge.title')}
+      subtitle={home?.knowledgeSubtitle || t('home.knowledge.subtitle')}
+    >
       <div className={styles.groups}>
         {GROUPS.map((group) => {
           const items = categories.filter((category) => category.group === group.value)

@@ -116,6 +116,250 @@ export const Settings: GlobalConfig = {
           ],
         },
         {
+          /**
+           * Nội dung các khối trang chủ.
+           *
+           * Nguyên tắc: MỌI field ở tab này đều được phép bỏ trống. Trống thì
+           * trang chủ dùng lại chuỗi mặc định trong `lib/i18n.ts` như trước —
+           * nên bật thêm ngôn ngữ vẫn không cần sửa component, và khách xoá
+           * nhầm một ô cũng không làm trang trắng.
+           *
+           * Vì vậy KHÔNG đặt `required: true` ở bất kỳ field nào bên dưới.
+           */
+          label: 'Trang chủ',
+          description:
+            'Bỏ trống ô nào thì trang chủ tự dùng nội dung mặc định của ô đó. Không ô nào bắt buộc.',
+          fields: [
+            {
+              name: 'home',
+              type: 'group',
+              label: false,
+              fields: [
+                {
+                  type: 'collapsible',
+                  label: 'Khối đầu trang (Hero)',
+                  admin: { initCollapsed: true },
+                  fields: [
+                    {
+                      name: 'heroLead',
+                      type: 'textarea',
+                      label: 'Đoạn mô tả',
+                      localized: true,
+                      admin: {
+                        description:
+                          'Đoạn văn dưới slogan. Mặc định: "Dịch vụ kế toán trọn gói…". Slogan sửa ở tab Thương hiệu.',
+                      },
+                    },
+                    {
+                      name: 'heroCta',
+                      type: 'text',
+                      label: 'Chữ trên nút chính',
+                      localized: true,
+                      admin: { description: 'Mặc định: Nhận tư vấn miễn phí' },
+                    },
+                    {
+                      name: 'heroCtaSecondary',
+                      type: 'text',
+                      label: 'Chữ trên nút phụ',
+                      localized: true,
+                      admin: { description: 'Mặc định: Xem dịch vụ' },
+                    },
+                  ],
+                },
+                {
+                  type: 'collapsible',
+                  label: 'Dải cam kết (3 ô)',
+                  admin: { initCollapsed: true },
+                  fields: [
+                    {
+                      name: 'stats',
+                      type: 'array',
+                      label: 'Các ô cam kết',
+                      localized: true,
+                      maxRows: 4,
+                      admin: {
+                        description:
+                          'Để trống cả mảng thì dùng 3 ô mặc định (Giảm thiểu / Nâng cao / Tối ưu). Thêm ô thứ 4 sẽ làm hàng bị lệch trên màn hình hẹp.',
+                        initCollapsed: true,
+                      },
+                      fields: [
+                        {
+                          name: 'value',
+                          type: 'text',
+                          label: 'Dòng lớn',
+                          admin: { description: 'Ví dụ: Giảm thiểu' },
+                        },
+                        {
+                          name: 'label',
+                          type: 'text',
+                          label: 'Dòng mô tả',
+                          admin: { description: 'Ví dụ: rủi ro về thuế và sổ sách' },
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  type: 'collapsible',
+                  label: 'Khối giới thiệu (4 điểm tin cậy)',
+                  admin: { initCollapsed: true },
+                  fields: [
+                    {
+                      name: 'aboutTitle',
+                      type: 'text',
+                      label: 'Tiêu đề khối',
+                      localized: true,
+                      admin: { description: 'Mặc định: Về HiACC' },
+                    },
+                    {
+                      name: 'aboutPoints',
+                      type: 'array',
+                      label: '4 điểm tin cậy',
+                      localized: true,
+                      maxRows: 4,
+                      admin: {
+                        description:
+                          'Để trống cả mảng thì dùng 4 điểm mặc định. Biểu tượng chọn theo danh sách có sẵn.',
+                        initCollapsed: true,
+                      },
+                      fields: [
+                        {
+                          name: 'icon',
+                          type: 'select',
+                          label: 'Biểu tượng',
+                          defaultValue: 'award',
+                          options: [
+                            { label: 'Chứng nhận', value: 'award' },
+                            { label: 'Đào tạo', value: 'education' },
+                            { label: 'Pháp lý', value: 'legal' },
+                            { label: 'Điện thoại', value: 'phone' },
+                          ],
+                        },
+                        { name: 'title', type: 'text', label: 'Tiêu đề' },
+                        { name: 'body', type: 'textarea', label: 'Mô tả' },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  type: 'collapsible',
+                  label: 'Tiêu đề các khối còn lại',
+                  admin: { initCollapsed: true },
+                  fields: [
+                    {
+                      type: 'row',
+                      fields: [
+                        {
+                          name: 'servicesTitle',
+                          type: 'text',
+                          label: 'Dịch vụ — tiêu đề',
+                          localized: true,
+                          admin: { width: '50%', description: 'Mặc định: Dịch vụ chuyên ngành' },
+                        },
+                        {
+                          name: 'servicesSubtitle',
+                          type: 'text',
+                          label: 'Dịch vụ — mô tả',
+                          localized: true,
+                          admin: { width: '50%' },
+                        },
+                      ],
+                    },
+                    {
+                      type: 'row',
+                      fields: [
+                        {
+                          name: 'branchesTitle',
+                          type: 'text',
+                          label: 'Chi nhánh — tiêu đề',
+                          localized: true,
+                          admin: { width: '50%', description: 'Mặc định: Mạng lưới chi nhánh' },
+                        },
+                        {
+                          name: 'branchesSubtitle',
+                          type: 'text',
+                          label: 'Chi nhánh — mô tả',
+                          localized: true,
+                          admin: { width: '50%' },
+                        },
+                      ],
+                    },
+                    {
+                      type: 'row',
+                      fields: [
+                        {
+                          name: 'knowledgeTitle',
+                          type: 'text',
+                          label: 'Kiến thức — tiêu đề',
+                          localized: true,
+                          admin: { width: '50%', description: 'Mặc định: Trung tâm kiến thức' },
+                        },
+                        {
+                          name: 'knowledgeSubtitle',
+                          type: 'text',
+                          label: 'Kiến thức — mô tả',
+                          localized: true,
+                          admin: { width: '50%' },
+                        },
+                      ],
+                    },
+                    {
+                      type: 'row',
+                      fields: [
+                        {
+                          name: 'socialTitle',
+                          type: 'text',
+                          label: 'Mạng xã hội — tiêu đề',
+                          localized: true,
+                          admin: { width: '50%', description: 'Mặc định: Kết nối với HiACC' },
+                        },
+                        {
+                          name: 'socialSubtitle',
+                          type: 'text',
+                          label: 'Mạng xã hội — mô tả',
+                          localized: true,
+                          admin: { width: '50%' },
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  type: 'collapsible',
+                  label: 'Khối kêu gọi cuối trang (CTA)',
+                  admin: { initCollapsed: true },
+                  fields: [
+                    {
+                      name: 'ctaTitle',
+                      type: 'text',
+                      label: 'Tiêu đề',
+                      localized: true,
+                      admin: { description: 'Mặc định: Cần tư vấn cho doanh nghiệp của bạn?' },
+                    },
+                    {
+                      name: 'ctaSubtitle',
+                      type: 'textarea',
+                      label: 'Mô tả',
+                      localized: true,
+                      admin: {
+                        description:
+                          'Mặc định có nhắc "gọi trực tiếp" — nếu chưa điền Hotline ở tab Liên hệ thì nên sửa lại câu này cho khớp.',
+                      },
+                    },
+                    {
+                      name: 'ctaButton',
+                      type: 'text',
+                      label: 'Chữ trên nút',
+                      localized: true,
+                      admin: { description: 'Mặc định: Nhận tư vấn miễn phí' },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
           label: 'Footer',
           fields: [
             {
@@ -131,6 +375,61 @@ export const Settings: GlobalConfig = {
               label: 'Dòng bản quyền',
               localized: true,
               admin: { description: 'Ví dụ: © 2026 Công ty TNHH HiACC. Bảo lưu mọi quyền.' },
+            },
+            {
+              name: 'footerHeadings',
+              type: 'group',
+              label: 'Tiêu đề các cột',
+              admin: {
+                description: 'Bỏ trống thì dùng tiêu đề mặc định của cột đó.',
+              },
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'about',
+                      type: 'text',
+                      label: 'Cột giới thiệu',
+                      localized: true,
+                      admin: { width: '50%', description: 'Mặc định: Về chúng tôi' },
+                    },
+                    {
+                      name: 'quickLinks',
+                      type: 'text',
+                      label: 'Cột liên kết',
+                      localized: true,
+                      admin: { width: '50%', description: 'Mặc định: Liên kết nhanh' },
+                    },
+                  ],
+                },
+                {
+                  type: 'row',
+                  fields: [
+                    {
+                      name: 'recentPosts',
+                      type: 'text',
+                      label: 'Cột bài viết',
+                      localized: true,
+                      admin: { width: '50%', description: 'Mặc định: Bài viết gần đây' },
+                    },
+                    {
+                      name: 'contact',
+                      type: 'text',
+                      label: 'Cột liên hệ',
+                      localized: true,
+                      admin: { width: '50%', description: 'Mặc định: Liên hệ' },
+                    },
+                  ],
+                },
+                {
+                  name: 'followUs',
+                  type: 'text',
+                  label: 'Tiêu đề khối mạng xã hội',
+                  localized: true,
+                  admin: { description: 'Mặc định: Theo dõi chúng tôi' },
+                },
+              ],
             },
           ],
         },

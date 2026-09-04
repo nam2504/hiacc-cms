@@ -896,6 +896,83 @@ export interface Setting {
    * Ảnh mã QR để khách quét kết bạn Zalo. Ảnh vuông, nền trắng.
    */
   zaloQr?: (number | null) | Media;
+  home?: {
+    /**
+     * Đoạn văn dưới slogan. Mặc định: "Dịch vụ kế toán trọn gói…". Slogan sửa ở tab Thương hiệu.
+     */
+    heroLead?: string | null;
+    /**
+     * Mặc định: Nhận tư vấn miễn phí
+     */
+    heroCta?: string | null;
+    /**
+     * Mặc định: Xem dịch vụ
+     */
+    heroCtaSecondary?: string | null;
+    /**
+     * Để trống cả mảng thì dùng 3 ô mặc định (Giảm thiểu / Nâng cao / Tối ưu). Thêm ô thứ 4 sẽ làm hàng bị lệch trên màn hình hẹp.
+     */
+    stats?:
+      | {
+          /**
+           * Ví dụ: Giảm thiểu
+           */
+          value?: string | null;
+          /**
+           * Ví dụ: rủi ro về thuế và sổ sách
+           */
+          label?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Mặc định: Về HiACC
+     */
+    aboutTitle?: string | null;
+    /**
+     * Để trống cả mảng thì dùng 4 điểm mặc định. Biểu tượng chọn theo danh sách có sẵn.
+     */
+    aboutPoints?:
+      | {
+          icon?: ('award' | 'education' | 'legal' | 'phone') | null;
+          title?: string | null;
+          body?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Mặc định: Dịch vụ chuyên ngành
+     */
+    servicesTitle?: string | null;
+    servicesSubtitle?: string | null;
+    /**
+     * Mặc định: Mạng lưới chi nhánh
+     */
+    branchesTitle?: string | null;
+    branchesSubtitle?: string | null;
+    /**
+     * Mặc định: Trung tâm kiến thức
+     */
+    knowledgeTitle?: string | null;
+    knowledgeSubtitle?: string | null;
+    /**
+     * Mặc định: Kết nối với HiACC
+     */
+    socialTitle?: string | null;
+    socialSubtitle?: string | null;
+    /**
+     * Mặc định: Cần tư vấn cho doanh nghiệp của bạn?
+     */
+    ctaTitle?: string | null;
+    /**
+     * Mặc định có nhắc "gọi trực tiếp" — nếu chưa điền Hotline ở tab Liên hệ thì nên sửa lại câu này cho khớp.
+     */
+    ctaSubtitle?: string | null;
+    /**
+     * Mặc định: Nhận tư vấn miễn phí
+     */
+    ctaButton?: string | null;
+  };
   /**
    * 2–3 câu về công ty, hiện ở cột đầu chân trang.
    */
@@ -904,6 +981,31 @@ export interface Setting {
    * Ví dụ: © 2026 Công ty TNHH HiACC. Bảo lưu mọi quyền.
    */
   copyright?: string | null;
+  /**
+   * Bỏ trống thì dùng tiêu đề mặc định của cột đó.
+   */
+  footerHeadings?: {
+    /**
+     * Mặc định: Về chúng tôi
+     */
+    about?: string | null;
+    /**
+     * Mặc định: Liên kết nhanh
+     */
+    quickLinks?: string | null;
+    /**
+     * Mặc định: Bài viết gần đây
+     */
+    recentPosts?: string | null;
+    /**
+     * Mặc định: Liên hệ
+     */
+    contact?: string | null;
+    /**
+     * Mặc định: Theo dõi chúng tôi
+     */
+    followUs?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1008,8 +1110,51 @@ export interface SettingsSelect<T extends boolean = true> {
   youtube?: T;
   twitter?: T;
   zaloQr?: T;
+  home?:
+    | T
+    | {
+        heroLead?: T;
+        heroCta?: T;
+        heroCtaSecondary?: T;
+        stats?:
+          | T
+          | {
+              value?: T;
+              label?: T;
+              id?: T;
+            };
+        aboutTitle?: T;
+        aboutPoints?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              body?: T;
+              id?: T;
+            };
+        servicesTitle?: T;
+        servicesSubtitle?: T;
+        branchesTitle?: T;
+        branchesSubtitle?: T;
+        knowledgeTitle?: T;
+        knowledgeSubtitle?: T;
+        socialTitle?: T;
+        socialSubtitle?: T;
+        ctaTitle?: T;
+        ctaSubtitle?: T;
+        ctaButton?: T;
+      };
   aboutShort?: T;
   copyright?: T;
+  footerHeadings?:
+    | T
+    | {
+        about?: T;
+        quickLinks?: T;
+        recentPosts?: T;
+        contact?: T;
+        followUs?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

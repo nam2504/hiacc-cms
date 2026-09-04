@@ -5,7 +5,7 @@ import { Icon } from '@/components/ui/Icon'
 import { Section } from '@/components/ui/Section'
 import { t } from '@/lib/i18n'
 import { mediaAlt, mediaUrl } from '@/lib/site'
-import type { Service } from '@/payload-types'
+import type { Service, Setting } from '@/payload-types'
 import styles from './Services.module.css'
 
 /**
@@ -15,11 +15,22 @@ import styles from './Services.module.css'
  * V2 (REVIEW-visual.md §7①): `service.icon` là khoá icon (xem `Icon.tsx`),
  * không còn emoji. Khoá lạ/rỗng tự rơi về fallback an toàn trong `<Icon>`.
  */
-export function Services({ services }: { services: Service[] }) {
+export function Services({
+  services,
+  settings,
+}: {
+  services: Service[]
+  settings?: Setting | null
+}) {
   if (services.length === 0) return null
 
+  const home = settings?.home
+
   return (
-    <Section title={t('home.services.title')} subtitle={t('home.services.subtitle')}>
+    <Section
+      title={home?.servicesTitle || t('home.services.title')}
+      subtitle={home?.servicesSubtitle || t('home.services.subtitle')}
+    >
       <ul className={styles.grid}>
         {services.map((service) => {
           const cover = mediaUrl(service.image)

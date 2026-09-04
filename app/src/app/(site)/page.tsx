@@ -95,11 +95,11 @@ export default async function HomePage() {
     <>
       <JsonLd data={jsonLd} />
       <Hero settings={settings} />
-      <Stats />
+      <Stats settings={settings} />
       <About settings={settings} />
-      <Services services={services} />
-      <Branches branches={branches} />
-      <Knowledge categories={categories} />
+      <Services services={services} settings={settings} />
+      <Branches branches={branches} settings={settings} />
+      <Knowledge categories={categories} settings={settings} />
       {/* Social đứng sau Knowledge: Branches và Knowledge là hai khối chứng minh
           năng lực, chèn dải mạng xã hội vào giữa cắt ngang mạch đó. */}
       <Social settings={settings} />

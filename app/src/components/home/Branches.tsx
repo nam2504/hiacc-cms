@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button'
 import { Section } from '@/components/ui/Section'
 import { t } from '@/lib/i18n'
-import type { Branch } from '@/payload-types'
+import type { Branch, Setting } from '@/payload-types'
 import styles from './Branches.module.css'
 
 /**
@@ -9,11 +9,23 @@ import styles from './Branches.module.css'
  * phone/email/mapUrl là field tuỳ chọn (seed đang để trống chờ khách xác nhận)
  * → từng dòng tự ẩn khi thiếu, nút "Xem bản đồ" chỉ hiện khi có mapUrl.
  */
-export function Branches({ branches }: { branches: Branch[] }) {
+export function Branches({
+  branches,
+  settings,
+}: {
+  branches: Branch[]
+  settings?: Setting | null
+}) {
   if (branches.length === 0) return null
 
+  const home = settings?.home
+
   return (
-    <Section tone="soft" title={t('home.branches.title')} subtitle={t('home.branches.subtitle')}>
+    <Section
+      tone="soft"
+      title={home?.branchesTitle || t('home.branches.title')}
+      subtitle={home?.branchesSubtitle || t('home.branches.subtitle')}
+    >
       <ul className={styles.grid}>
         {branches.map((branch) => (
           <li key={branch.id} className={styles.card}>
