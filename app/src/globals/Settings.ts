@@ -125,6 +125,11 @@ export const Settings: GlobalConfig = {
            * nhầm một ô cũng không làm trang trắng.
            *
            * Vì vậy KHÔNG đặt `required: true` ở bất kỳ field nào bên dưới.
+           *
+           * Cũng KHÔNG đặt `initCollapsed` trên chính field `array`: hàng vừa bấm
+           * "Add" sinh ra ở trạng thái gập và không mở lại được cho tới khi Save
+           * rồi tải lại trang (P1-02). `initCollapsed` trên `collapsible` bao
+           * ngoài thì vô hại — nó chỉ quyết định nhóm nào mở sẵn khi vào tab.
            */
           label: 'Trang chủ',
           description:
@@ -180,7 +185,6 @@ export const Settings: GlobalConfig = {
                       admin: {
                         description:
                           'Để trống cả mảng thì dùng 3 ô mặc định (Giảm thiểu / Nâng cao / Tối ưu). Thêm ô thứ 4 sẽ làm hàng bị lệch trên màn hình hẹp.',
-                        initCollapsed: true,
                       },
                       fields: [
                         {
@@ -220,7 +224,6 @@ export const Settings: GlobalConfig = {
                       admin: {
                         description:
                           'Để trống cả mảng thì dùng 4 điểm mặc định. Biểu tượng chọn theo danh sách có sẵn.',
-                        initCollapsed: true,
                       },
                       fields: [
                         {

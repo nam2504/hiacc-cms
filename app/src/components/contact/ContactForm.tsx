@@ -85,6 +85,7 @@ export function ContactForm() {
 
   const values = state.values
   const fieldErrors = state.fieldErrors ?? {}
+  const hasFieldErrors = Object.keys(fieldErrors).length > 0
 
   return (
     <section className={styles.wrap}>
@@ -104,9 +105,15 @@ export function ContactForm() {
         {/*
          * [B3] Tóm tắt cho trình đọc màn hình: `aria-live` báo ngay khi có lỗi,
          * kể cả khi lỗi nằm ở ô đang ngoài khung nhìn.
+         *
+         * Chỉ đọc khi THẬT SỰ có ô bị đánh dấu. Lỗi mức form (chặn spam, trùng
+         * lặp) không gắn với ô nào, mà câu tóm tắt lại bảo "kiểm tra lại các ô
+         * được đánh dấu" — người dùng trình đọc màn hình đi tìm ô lỗi không hề
+         * tồn tại, vì `aria-invalid` cả 4 ô đều false (P2-03). Lỗi mức form đã có
+         * `role="alert"` bên dưới đọc đúng nội dung của nó.
          */}
         <p className={styles.srOnly} role="status" aria-live="polite">
-          {state.status === 'error' ? t('contact.form.error.summary') : ''}
+          {hasFieldErrors ? t('contact.form.error.summary') : ''}
         </p>
 
         {state.errorKey && (
