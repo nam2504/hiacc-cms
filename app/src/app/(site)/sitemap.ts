@@ -33,12 +33,23 @@ export const dynamic = 'force-dynamic'
 /** Trang tĩnh đã có route riêng — bỏ khỏi nhánh `/<slug>` để không khai trùng URL. */
 const PAGES_WITH_OWN_ROUTE = new Set(['gioi-thieu', 'lien-he'])
 
+/**
+ * Mọi trang có route tĩnh riêng phải nằm ở đây — không nhánh nào bên dưới sinh ra
+ * chúng. Ba trang cuối từng bị bỏ sót: chúng có nội dung thật và khai canonical +
+ * hreflang đầy đủ, nhưng không có trong sitemap nên Google không được mời vào.
+ * Thêm route tĩnh mới thì thêm một dòng vào đây.
+ */
 const STATIC_PATHS = [
   { path: '/', priority: 1 },
   { path: '/gioi-thieu', priority: 0.8 },
   { path: '/lien-he', priority: 0.8 },
   { path: '/tin-tuc', priority: 0.7 },
   { path: '/chuyen-muc', priority: 0.6 },
+  { path: '/van-ban-phap-luat', priority: 0.6 },
+  { path: '/cong-cu/tinh-luong', priority: 0.6 },
+  // Trang giữ chỗ (xem app/(site)/bang-gia/page.tsx). Vẫn khai vì mục này nằm
+  // trên menu chính: để Google thấy một trang tử tế còn hơn để nó gặp 404.
+  { path: '/bang-gia', priority: 0.5 },
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

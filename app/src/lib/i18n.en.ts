@@ -275,6 +275,9 @@ export const en = {
   'payroll.brackets.card.level': 'Bracket',
   'nav.secondaryLinks': 'Secondary links',
   'nav.pricing': 'Pricing',
+  'pricing.pending.title': 'Our price list is being updated',
+  'pricing.pending.body':
+    'Fees for each service are being finalised. In the meantime, call our hotline or send a request to get a quote matched to the size of your business.',
   'nav.legalDocs': 'Legal documents',
   'nav.newsletter': 'Newsletter',
   'about.profile.title': 'Company profile',

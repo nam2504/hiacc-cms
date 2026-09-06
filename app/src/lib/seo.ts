@@ -11,10 +11,26 @@ import { mediaUrl } from './site'
 /**
  * Domain gốc của site. Deploy đổi domain thì đổi biến môi trường, KHÔNG sửa code.
  * Bỏ dấu `/` cuối để mọi chỗ nối chuỗi ra đúng một dấu gạch.
+ *
+ * ⚠️ Đây là `NEXT_PUBLIC_*`, tức Next thay nó bằng GIÁ TRỊ CỨNG ngay lúc
+ * `next build` (xem lib/staging.ts). Set biến lúc `next start` là ĐÃ MUỘN —
+ * giá trị đã nằm trong bundle. Phải set TRƯỚC khi build.
+ *
+ * Quên set thì mọi URL tuyệt đối — canonical, hreflang, sitemap, og:url,
+ * JSON-LD — đều là `localhost:3000`, và Google nuốt nguyên như vậy. Đây là hỏng
+ * IM LẶNG: site vẫn lên, mọi trang vẫn 200, chỉ có SEO chết. Nên phải kêu.
  */
-export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-).replace(/\/+$/, '')
+const FALLBACK_SITE_URL = 'http://localhost:3000'
+
+if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_SITE_URL) {
+  console.error(
+    '[seo] THIẾU NEXT_PUBLIC_SITE_URL — canonical, sitemap, og:url và JSON-LD sẽ ' +
+      `phát "${FALLBACK_SITE_URL}" ra ngoài. Biến này bị nướng cứng lúc \`next build\`, ` +
+      'nên phải set TRƯỚC khi build, không phải lúc chạy.',
+  )
+}
+
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || FALLBACK_SITE_URL).replace(/\/+$/, '')
 
 /** Nối một đường dẫn nội bộ thành URL tuyệt đối — dùng cho canonical, sitemap, JSON-LD. */
 export function absoluteUrl(path = '/'): string {

@@ -303,6 +303,9 @@ const vi: Dict = {
   'payroll.brackets.card.level': 'Bậc',
   'nav.secondaryLinks': 'Liên kết phụ',
   'nav.pricing': 'Bảng giá',
+  'pricing.pending.title': 'Bảng giá đang được cập nhật',
+  'pricing.pending.body':
+    'Biểu phí từng dịch vụ đang được hoàn thiện. Trong lúc chờ, gọi hotline hoặc gửi yêu cầu để nhận báo giá đúng theo quy mô doanh nghiệp của bạn.',
   'nav.legalDocs': 'Văn bản pháp luật',
   'nav.newsletter': 'Bản tin',
   'about.profile.title': 'Hồ sơ công ty',
