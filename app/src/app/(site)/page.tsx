@@ -1,16 +1,14 @@
 import type { Metadata } from 'next'
 import { About } from '@/components/home/About'
-import { Branches } from '@/components/home/Branches'
 import { CallToAction } from '@/components/home/CallToAction'
 import { Hero } from '@/components/home/Hero'
-import { Knowledge } from '@/components/home/Knowledge'
-import { Services } from '@/components/home/Services'
-import { Social } from '@/components/home/Social'
+import { ServiceGroups } from '@/components/home/ServiceGroups'
 import { Stats } from '@/components/home/Stats'
 import { JsonLd, accountingServiceJsonLd } from '@/components/seo/JsonLd'
 import { t } from '@/lib/i18n'
 import { absoluteMediaUrl, ogImages } from '@/lib/seo'
-import { getBranches, getCategories, getServices, getSettings } from '@/lib/site'
+import { getBranches, getSettings } from '@/lib/site'
+import { getNodeImages, getServiceTree } from '@/lib/serviceTree'
 
 /**
  * Trang này đọc dữ liệu từ DB → PHẢI dynamic.
@@ -63,12 +61,14 @@ export async function generateMetadata(): Promise<Metadata> {
  * hỏng thì khối tương ứng tự ẩn, trang vẫn trả 200 thay vì sập cả site.
  */
 export default async function HomePage() {
-  const [settings, services, branches, categories] = await Promise.all([
+  const [settings, branches, tree] = await Promise.all([
     getSettings(),
-    getServices(),
     getBranches(),
-    getCategories(),
+    getServiceTree(),
   ])
+
+  // Ảnh chỉ nạp cho 5 nhóm cấp cao nhất — đúng số thẻ hiện trên trang chủ.
+  const groupImages = await getNodeImages(tree.map((group) => group.id))
 
   /**
    * Dữ liệu có cấu trúc lấy TOÀN BỘ từ Settings + Branches — khách sửa trong admin
@@ -94,15 +94,17 @@ export default async function HomePage() {
   return (
     <>
       <JsonLd data={jsonLd} />
+      {/* Thứ tự khối theo thiết kế khách 06/09 (`Trang chủ.png`):
+          hero → strip 3 giá trị → Về công ty → Lĩnh vực hoạt động → dải đỏ CTA.
+
+          Ba khối Chi nhánh / Trung tâm kiến thức / Mạng xã hội đã BỎ khỏi trang
+          chủ: không có trong thiết kế mới, và khối Chi nhánh đang hiện 5 dòng
+          "Đang cập nhật" vì khách chưa cấp địa chỉ thật. Component vẫn còn trong
+          repo, gắn lại được nếu khách muốn. */}
       <Hero settings={settings} />
       <Stats settings={settings} />
       <About settings={settings} />
-      <Services services={services} settings={settings} />
-      <Branches branches={branches} settings={settings} />
-      <Knowledge categories={categories} settings={settings} />
-      {/* Social đứng sau Knowledge: Branches và Knowledge là hai khối chứng minh
-          năng lực, chèn dải mạng xã hội vào giữa cắt ngang mạch đó. */}
-      <Social settings={settings} />
+      <ServiceGroups tree={tree} settings={settings} images={groupImages} />
       <CallToAction settings={settings} />
     </>
   )

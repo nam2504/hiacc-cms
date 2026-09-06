@@ -36,6 +36,7 @@ import { Posts } from './collections/Posts'
 import { Categories } from './collections/Categories'
 import { Services } from './collections/Services'
 import { ServiceNodes } from './collections/ServiceNodes'
+import { LegalDocuments } from './collections/LegalDocuments'
 import { Branches } from './collections/Branches'
 import { ContactSubmissions } from './collections/ContactSubmissions'
 import { Settings } from './globals/Settings'
@@ -73,6 +74,7 @@ export default buildConfig({
     Pages,
     Services,
     ServiceNodes,
+    LegalDocuments,
     Categories,
     Media,
     // Cấu hình

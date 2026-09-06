@@ -1,40 +1,43 @@
-import { Button } from '@/components/ui/Button'
-import { Section } from '@/components/ui/Section'
+import Link from 'next/link'
+import { Container } from '@/components/ui/Container'
+import { TENANT } from '@/config/tenant'
 import { t } from '@/lib/i18n'
 import type { Setting } from '@/payload-types'
 import styles from './CallToAction.module.css'
 
 /**
- * Khối CTA cuối trang — đóng finding P0-2 của review bố cục.
+ * Dải đỏ CTA cuối trang — theo thiết kế khách 06/09 (`Trang chủ.png`, khối 7):
+ * nền đỏ full-width, kicker nhỏ phía trên, tiêu đề lớn căn TRÁI, hai nút.
  *
- * Trước khối này, toàn bộ trang chủ chỉ có 2 nút và cả hai nằm trong Hero ở
- * y≈509px: 88% chiều dài trang desktop (93% ở mobile) không có điểm hành động
- * nào. Khách đọc hết Services → Branches → Knowledge rồi rơi thẳng vào Footer
- * đúng lúc ý định liên hệ cao nhất.
+ * Lý do khối này tồn tại (từ review bố cục trước, vẫn đúng): không có nó thì 88%
+ * chiều dài trang desktop không có điểm hành động nào — khách đọc hết rồi rơi
+ * thẳng vào footer đúng lúc ý định liên hệ cao nhất.
  *
- * Hotline lấy từ Settings; chưa điền thì chỉ hiện nút — không dựng link `tel:`
- * rỗng.
+ * ⚠️ Quyết định V3 (31/08) từng bỏ dải đỏ để chuyển sang nền trắng chữ đỏ. Thiết
+ * kế khách gửi 06/09 có lại dải đỏ và user đã chốt theo thiết kế mới.
  */
 export function CallToAction({ settings }: { settings: Setting | null }) {
-  const hotline = settings?.hotline
   const home = settings?.home
+  const title = home?.ctaTitle || t('home.cta.title')
+  const primaryLabel = home?.ctaButton || t('home.cta.button')
 
   return (
-    <Section
-      tone="brand"
-      title={home?.ctaTitle || t('home.cta.title')}
-      subtitle={home?.ctaSubtitle || t('home.cta.subtitle')}
-    >
-      <div className={styles.actions}>
-        <Button href="/lien-he" variant="invert" size="lg">
-          {home?.ctaButton || t('home.cta.button')}
-        </Button>
-        {hotline && (
-          <a className={styles.hotline} href={`tel:${hotline.replace(/[^\d+]/g, '')}`}>
-            {t('common.hotline')}: {hotline}
-          </a>
-        )}
-      </div>
-    </Section>
+    <section className={styles.cta}>
+      <Container>
+        <div className={styles.inner}>
+          {TENANT.slogan ? <p className={styles.kicker}>{TENANT.slogan}</p> : null}
+          <h2 className={styles.title}>{title}</h2>
+
+          <div className={styles.actions}>
+            <Link className={styles.primary} href="/lien-he">
+              {primaryLabel}
+            </Link>
+            <Link className={styles.secondary} href="/bang-gia">
+              Bảng giá tổng hợp
+            </Link>
+          </div>
+        </div>
+      </Container>
+    </section>
   )
 }

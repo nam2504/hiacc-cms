@@ -3,6 +3,7 @@ import { Container } from '@/components/ui/Container'
 import { brandName } from '@/config/tenant'
 import { FOOTER_NAV } from '@/lib/nav'
 import { t } from '@/lib/i18n'
+import type { TreeNode } from '@/lib/serviceTree'
 import type { Post, Setting } from '@/payload-types'
 import styles from './Footer.module.css'
 
@@ -13,9 +14,12 @@ import styles from './Footer.module.css'
 export function Footer({
   settings,
   recentPosts = [],
+  tree = [],
 }: {
   settings: Setting | null
   recentPosts?: Post[]
+  /** Cây dịch vụ — footer liệt kê các nhóm, sinh từ DB như menu chính. */
+  tree?: TreeNode[]
 }) {
   const socials = [
     { href: settings?.facebook, label: 'Facebook' },
@@ -46,6 +50,14 @@ export function Footer({
           <div className={styles.col}>
             <h3 className={styles.heading}>{headings?.quickLinks || t('footer.quickLinks')}</h3>
             <ul className={styles.list}>
+              {/* Nhóm dịch vụ sinh từ cây trong DB; các link còn lại là trang tĩnh. */}
+              {tree.map((group) => (
+                <li key={group.id}>
+                  <Link href={group.path} className={styles.link}>
+                    {group.title}
+                  </Link>
+                </li>
+              ))}
               {FOOTER_NAV.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className={styles.link}>

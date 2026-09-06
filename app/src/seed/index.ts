@@ -27,6 +27,7 @@ import {
 } from './data'
 import { seedPayrollConfig } from './payrollConfig'
 import { seedServiceTree } from './serviceTree'
+import { seedLegalDocuments } from './legalDocuments'
 
 /**
  * Thư mục chứa file ảnh stock nguồn để nạp qua Local API (gói M1, đợt 6).
@@ -234,6 +235,9 @@ async function seed() {
   // Cây dịch vụ (5 nhóm / 32 hạng mục theo SET WEB.xlsx 06/09). Tên hạng mục là
   // thật, nội dung bên trong để khách nhập — xem chú thích trong serviceTree.ts.
   await seedServiceTree(payload)
+
+  // Danh mục văn bản pháp luật (thiết kế 06/09). Link nguồn để khách tự điền.
+  await seedLegalDocuments(payload)
 
   // payroll-config (W5) cũng là global, cùng nguyên tắc: chỉ điền ô còn trống.
   const payrollFilled = await seedPayrollConfig(payload)

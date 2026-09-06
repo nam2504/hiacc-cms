@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { ContactChannels } from '@/components/pages/ContactChannels'
 import { ContactForm } from '@/components/contact/ContactForm'
 import { BranchList } from '@/components/pages/BranchList'
 import { ContactInfo } from '@/components/pages/ContactInfo'
@@ -81,6 +82,8 @@ export default async function LienHePage() {
         subtitle={page?.seo?.description || t('contact.subtitle')}
         image={page?.heroImage}
       />
+
+      <ContactChannels settings={settings} />
 
       <Section>
         <div className={styles.columns}>

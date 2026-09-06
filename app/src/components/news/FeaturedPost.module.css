@@ -1,0 +1,116 @@
+.featured {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2.5rem 0 2rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 900px) {
+  .featured {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 3rem;
+    align-items: center;
+  }
+}
+
+.media {
+  display: block;
+  overflow: hidden;
+  border-radius: 0.375rem;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  /* Khung cố định chống nhảy nội dung khi ảnh tải xong. */
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.media:hover .image {
+  transform: scale(1.03);
+}
+
+.body {
+  min-width: 0;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 0.875rem;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.badge {
+  padding: 0.25rem 0.625rem;
+  background: var(--color-brand-tint);
+  color: var(--color-brand);
+  border-radius: 0.125rem;
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.category {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-brand);
+  font-weight: var(--weight-semibold);
+}
+
+.title {
+  margin: 0 0 0.875rem;
+  font-size: clamp(1.5rem, 3.2vw, 2.125rem);
+  font-weight: var(--weight-bold, 800);
+  line-height: 1.2;
+}
+
+.titleLink {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.titleLink:hover {
+  color: var(--color-brand);
+}
+
+.titleLink:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.excerpt {
+  margin: 0 0 1.5rem;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6875rem 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.action:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}

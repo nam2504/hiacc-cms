@@ -9,6 +9,7 @@ import { DEFAULT_LOCALE } from '@/lib/locales'
 import { ogImages, SITE_URL } from '@/lib/seo'
 import { isStaging } from '@/lib/staging'
 import { getRecentPosts, getSettings } from '@/lib/site'
+import { getServiceTree } from '@/lib/serviceTree'
 import { brandName } from '@/config/tenant'
 import '@/styles/tokens.css'
 import '@/styles/globals.css'
@@ -70,7 +71,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   // Một lần fetch cho cả layout — trang con không phải gọi lại
-  const [settings, recentPosts] = await Promise.all([getSettings(), getRecentPosts(3)])
+  const [settings, recentPosts, tree] = await Promise.all([
+    getSettings(),
+    getRecentPosts(3),
+    getServiceTree(),
+  ])
 
   // Màu thương hiệu đè lúc chạy: Settings (khách sửa trong /admin) → tenant.
   // Nhờ vậy field "Màu chủ đạo" có tác dụng thật, không cần build lại.
@@ -84,9 +89,9 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           {t('nav.skipToContent')}
         </a>
         <StagingBanner />
-        <Header settings={settings} />
+        <Header settings={settings} tree={tree} />
         <main id="main-content">{children}</main>
-        <Footer settings={settings} recentPosts={recentPosts} />
+        <Footer settings={settings} recentPosts={recentPosts} tree={tree} />
       </body>
     </html>
   )

@@ -89,6 +89,16 @@ export const Settings: GlobalConfig = {
               localized: true,
               admin: { description: 'Địa chỉ hiện ở chân trang. Chi nhánh khác khai ở mục Chi nhánh.' },
             },
+            {
+              name: 'workingHours',
+              type: 'text',
+              label: 'Giờ làm việc',
+              localized: true,
+              admin: {
+                description:
+                  'Hiện cạnh email ở trang Liên hệ. Ví dụ: 08:00 – 17:30, thứ Hai – thứ Sáu. Bỏ trống thì không hiện dòng này.',
+              },
+            },
             { name: 'taxCode', type: 'text', label: 'Mã số thuế' },
             {
               name: 'companyName',

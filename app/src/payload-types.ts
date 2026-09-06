@@ -71,6 +71,7 @@ export interface Config {
     pages: Page;
     services: Service;
     'service-nodes': ServiceNode;
+    'legal-documents': LegalDocument;
     categories: Category;
     media: Media;
     branches: Branch;
@@ -87,6 +88,7 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     'service-nodes': ServiceNodesSelect<false> | ServiceNodesSelect<true>;
+    'legal-documents': LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     branches: BranchesSelect<false> | BranchesSelect<true>;
@@ -580,6 +582,45 @@ export interface ServiceNode {
   createdAt: string;
 }
 /**
+ * Danh mục luật, nghị định, thông tư hiển thị ở trang Văn bản pháp luật. Chỉ dẫn link tới nguồn chính thức, không đăng lại file.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-documents".
+ */
+export interface LegalDocument {
+  id: number;
+  /**
+   * Ví dụ: Luật Kế toán, Chế độ kế toán doanh nghiệp.
+   */
+  title: string;
+  /**
+   * Ví dụ: 88/2015/QH13, 200/2014/TT-BTC.
+   */
+  code: string;
+  /**
+   * Văn bản nằm ở tab nào trên trang.
+   */
+  group: 'ke-toan' | 'thue' | 'bhxh' | 'lao-dong' | 'dang-ky-kinh-doanh' | 'dau-tu' | 'thuong-mai';
+  /**
+   * Ví dụ: Quốc hội, Bộ Tài chính, Chính phủ.
+   */
+  issuer?: string | null;
+  /**
+   * Năm văn bản có hiệu lực, ví dụ 2017. Để chữ chứ không phải số để ghi được "đã hết hiệu lực" hay "sửa đổi 2021".
+   */
+  effectiveYear?: string | null;
+  /**
+   * Địa chỉ đầy đủ tới văn bản trên trang của cơ quan ban hành (bắt đầu bằng https://). Bỏ trống thì dòng đó không có link.
+   */
+  sourceUrl?: string | null;
+  /**
+   * Số nhỏ hiện trước trong nhóm.
+   */
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Danh sách văn phòng hiển thị ở chân trang và trang Liên hệ. Chỉ Quản trị viên sửa được.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -701,6 +742,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'service-nodes';
         value: number | ServiceNode;
+      } | null)
+    | ({
+        relationTo: 'legal-documents';
+        value: number | LegalDocument;
       } | null)
     | ({
         relationTo: 'categories';
@@ -923,6 +968,21 @@ export interface ServiceNodesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-documents_select".
+ */
+export interface LegalDocumentsSelect<T extends boolean = true> {
+  title?: T;
+  code?: T;
+  group?: T;
+  issuer?: T;
+  effectiveYear?: T;
+  sourceUrl?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
@@ -1125,6 +1185,10 @@ export interface Setting {
    * Địa chỉ hiện ở chân trang. Chi nhánh khác khai ở mục Chi nhánh.
    */
   headOfficeAddress?: string | null;
+  /**
+   * Hiện cạnh email ở trang Liên hệ. Ví dụ: 08:00 – 17:30, thứ Hai – thứ Sáu. Bỏ trống thì không hiện dòng này.
+   */
+  workingHours?: string | null;
   taxCode?: string | null;
   /**
    * Tên đầy đủ trên giấy phép kinh doanh, dùng cho dòng bản quyền.
@@ -1357,6 +1421,7 @@ export interface SettingsSelect<T extends boolean = true> {
   hotline2?: T;
   email?: T;
   headOfficeAddress?: T;
+  workingHours?: T;
   taxCode?: T;
   companyName?: T;
   facebook?: T;

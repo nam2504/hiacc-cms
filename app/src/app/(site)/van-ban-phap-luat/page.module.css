@@ -1,0 +1,159 @@
+/* Hero nền đen — theo prototype khách (REQUIREMENTS §A4). */
+.hero {
+  background: var(--color-bg-dark);
+  color: var(--color-text-invert);
+  padding: 3rem 0 3.5rem;
+}
+
+.kicker {
+  margin: 0 0 0.75rem;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-brand-light);
+}
+
+.title {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: var(--weight-bold, 800);
+  line-height: 1.12;
+  color: var(--color-text-invert);
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 46rem;
+  line-height: 1.6;
+  color: rgb(255 255 255 / 0.76);
+}
+
+/* --- Tabs nhóm --- */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.75rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 2.5rem;
+}
+
+.tab {
+  padding: 0.375rem 0;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 2px solid transparent;
+}
+
+.tab:hover {
+  color: var(--color-brand);
+  border-bottom-color: var(--color-brand);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* --- Nhóm văn bản --- */
+.group {
+  margin-bottom: 3rem;
+  /* Chừa chỗ cho header dính khi nhảy tới anchor, không thì tiêu đề bị che. */
+  scroll-margin-top: 6rem;
+}
+
+.groupTitle {
+  margin: 0 0 0.375rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: var(--weight-bold, 800);
+  color: var(--color-text);
+}
+
+.groupCount {
+  margin: 0 0 1.25rem;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  min-width: 44rem;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table th {
+  text-align: left;
+  padding: 0.75rem 1rem 0.75rem 0;
+  border-bottom: 2px solid var(--color-border);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 0.875rem 1rem 0.875rem 0;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.code {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.name {
+  font-weight: var(--weight-semibold);
+}
+
+.source {
+  color: var(--color-brand);
+  text-decoration: none;
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.source:hover {
+  text-decoration: underline;
+}
+
+.source:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.noSource {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.note,
+.empty {
+  margin: 0 0 3rem;
+  padding-top: 1rem;
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.empty {
+  padding: 3rem 0;
+  font-size: var(--text-base);
+  text-align: center;
+}

@@ -3,6 +3,7 @@ import { Container } from '@/components/ui/Container'
 import { EmptyState } from '@/components/news/EmptyState'
 import { PageHero } from '@/components/news/PageHero'
 import { Pagination } from '@/components/news/Pagination'
+import { FeaturedPost } from '@/components/news/FeaturedPost'
 import { PostGrid } from '@/components/news/PostGrid'
 import { readPage, type SearchParams } from '@/components/news/params'
 import { t } from '@/lib/i18n'
@@ -28,6 +29,9 @@ export default async function NewsListPage({ searchParams }: { searchParams: Sea
   const page = readPage(params.page)
   const { docs, totalPages } = await getPosts({ page, limit: PER_PAGE })
 
+  const featured = page === 1 ? docs[0] : null
+  const rest = featured ? docs.slice(1) : docs
+
   return (
     <>
       <PageHero
@@ -40,7 +44,16 @@ export default async function NewsListPage({ searchParams }: { searchParams: Sea
         <Container>
           {docs.length > 0 ? (
             <>
-              <PostGrid posts={docs} />
+              {/* Bài mới nhất lên khối nổi bật, phần còn lại xuống lưới — chỉ ở
+                  trang 1: từ trang 2 trở đi mọi bài đều cũ, đôn một bài lên làm
+                  "nổi bật" là sai nghĩa. */}
+              {featured ? <FeaturedPost post={featured} /> : null}
+              {rest.length > 0 ? (
+                <>
+                  <h2 className={styles.gridTitle}>Bài mới</h2>
+                  <PostGrid posts={rest} />
+                </>
+              ) : null}
               <Pagination basePath="/tin-tuc" page={page} totalPages={totalPages} />
             </>
           ) : (
