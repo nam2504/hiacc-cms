@@ -4,7 +4,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import type { TreeNode } from '@/lib/serviceTree'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { DEFAULT_LOCALE, enabledLocaleObjects } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
 import styles from './MegaMenu.module.css'
 
 /**
@@ -26,12 +28,17 @@ export function MegaMenu({
   staticItems,
   ctaLabel,
   ctaHref,
+  locale,
 }: {
   tree: TreeNode[]
   staticItems: StaticNavItem[]
   ctaLabel: string
   ctaHref: string
+  locale: string
 }) {
+  const t = createTranslator(locale as Parameters<typeof createTranslator>[0])
+  /** Mọi link trong menu phải giữ ngôn ngữ đang xem, không thì bấm là rơi về tiếng Việt. */
+  const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openGroup, setOpenGroup] = useState<string | null>(null)
@@ -62,7 +69,11 @@ export function MegaMenu({
     return () => window.removeEventListener('keydown', onKey)
   }, [openGroup, mobileOpen])
 
-  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href))
+  // Bỏ tiền tố ngôn ngữ trước khi so: ở /en/ke-toan thì pathname có "/en" còn
+  // đường dẫn trong cây thì không, so thẳng sẽ không mục nào sáng lên.
+  const current =
+    locale === DEFAULT_LOCALE ? pathname : pathname.replace(new RegExp(`^/${locale}`), '') || '/'
+  const isActive = (path: string) => (path === '/' ? current === '/' : current.startsWith(path))
 
   return (
     <>
@@ -91,7 +102,7 @@ export function MegaMenu({
           {staticItems.slice(0, 1).map((item) => (
             <li key={item.href}>
               <Link
-                href={item.href}
+                href={href(item.href)}
                 className={`${styles.link} ${isActive(item.href) ? styles.active : ''}`}
                 aria-current={isActive(item.href) ? 'page' : undefined}
               >
@@ -110,7 +121,7 @@ export function MegaMenu({
                 onMouseEnter={() => group.children.length > 0 && setOpenGroup(group.id)}
               >
                 <Link
-                  href={group.path}
+                  href={href(group.path)}
                   className={`${styles.link} ${active ? styles.active : ''}`}
                   aria-current={active ? 'page' : undefined}
                   aria-expanded={group.children.length > 0 ? expanded : undefined}
@@ -123,19 +134,19 @@ export function MegaMenu({
                   <div className={`${styles.panel} ${expanded ? styles.panelOpen : ''}`}>
                     <div className={styles.panelInner}>
                       <div className={styles.panelIntro}>
-                        <p className={styles.panelKicker}>Nhóm dịch vụ</p>
+                        <p className={styles.panelKicker}>{t('nav.serviceGroup')}</p>
                         <p className={styles.panelTitle}>{group.title}</p>
                         {group.summary ? (
                           <p className={styles.panelSummary}>{group.summary}</p>
                         ) : null}
-                        <Link className={styles.panelMore} href={group.path}>
-                          Trang dịch vụ →
+                        <Link className={styles.panelMore} href={href(group.path)}>
+                          {t('nav.servicePage')}
                         </Link>
                       </div>
                       <ul className={styles.panelList}>
                         {group.children.map((child) => (
                           <li key={child.id}>
-                            <Link className={styles.panelLink} href={child.path}>
+                            <Link className={styles.panelLink} href={href(child.path)}>
                               {child.title}
                             </Link>
                           </li>
@@ -151,7 +162,7 @@ export function MegaMenu({
           {staticItems.slice(1).map((item) => (
             <li key={item.href}>
               <Link
-                href={item.href}
+                href={href(item.href)}
                 className={`${styles.link} ${isActive(item.href) ? styles.active : ''}`}
                 aria-current={isActive(item.href) ? 'page' : undefined}
               >
@@ -161,7 +172,24 @@ export function MegaMenu({
           ))}
         </ul>
 
-        <Link className={styles.cta} href={ctaHref}>
+        {enabledLocaleObjects.length > 1 ? (
+          <div className={styles.locales} role="group" aria-label={t('nav.language')}>
+            {enabledLocaleObjects.map((item) => (
+              <Link
+                key={item.code}
+                href={localizedHref(current, item.code, DEFAULT_LOCALE)}
+                className={`${styles.locale} ${item.code === locale ? styles.localeActive : ''}`}
+                aria-current={item.code === locale ? 'true' : undefined}
+                lang={item.code}
+                hrefLang={item.code}
+              >
+                {item.code.toUpperCase()}
+              </Link>
+            ))}
+          </div>
+        ) : null}
+
+        <Link className={styles.cta} href={href(ctaHref)}>
           {ctaLabel}
         </Link>
       </nav>

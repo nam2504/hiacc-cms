@@ -28,6 +28,8 @@ import {
 import { seedPayrollConfig } from './payrollConfig'
 import { seedServiceTree } from './serviceTree'
 import { seedLegalDocuments } from './legalDocuments'
+import { migrateServicesToTree } from './migrateServices'
+import { seedServiceTreeEn } from './serviceTreeEn'
 
 /**
  * Thư mục chứa file ảnh stock nguồn để nạp qua Local API (gói M1, đợt 6).
@@ -223,6 +225,10 @@ async function seed() {
   const current = await payload.findGlobal({ slug: 'settings' })
   const merged: Record<string, unknown> = { ...SETTINGS }
   for (const [key, value] of Object.entries(current ?? {})) {
+    // Mảng rỗng cũng là "chưa có dữ liệu": Payload trả [] cho array chưa ai nhập,
+    // mà [] không phải null cũng không phải '' nên vòng lặp cũ coi là giá trị
+    // thật rồi giữ lại, khiến seed không bao giờ điền được các field dạng array.
+    if (Array.isArray(value) && value.length === 0) continue
     if (value !== null && value !== undefined && value !== '') merged[key] = value
   }
   // Ảnh hero: chỉ nạp khi khách CHƯA chọn ảnh nào, để seed không đè ảnh thật.
@@ -238,6 +244,13 @@ async function seed() {
 
   // Danh mục văn bản pháp luật (thiết kế 06/09). Link nguồn để khách tự điền.
   await seedLegalDocuments(payload)
+
+  // Chuyển nội dung 7 dịch vụ của cấu trúc cũ sang cây. Không xoá bản ghi cũ,
+  // không đè nội dung đã có trong cây — xem chú thích trong migrateServices.ts.
+  await migrateServicesToTree(payload)
+
+  // Bản tiếng Anh: tên nhóm và hạng mục, cộng nội dung hai hạng mục demo.
+  await seedServiceTreeEn(payload)
 
   // payroll-config (W5) cũng là global, cùng nguyên tắc: chỉ điền ô còn trống.
   const payrollFilled = await seedPayrollConfig(payload)

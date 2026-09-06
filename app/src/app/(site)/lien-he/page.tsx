@@ -10,6 +10,7 @@ import { t } from '@/lib/i18n'
 import { ogImages } from '@/lib/seo'
 import { getBranches, getPageBySlug, getSettings } from '@/lib/site'
 import styles from './page.module.css'
+import { getRequestLocale } from '@/lib/requestLocale'
 
 /**
  * Trang này đọc dữ liệu từ DB → PHẢI dynamic.
@@ -38,9 +39,10 @@ export const dynamic = 'force-dynamic'
 const SLUG = 'lien-he'
 
 export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale()
   // Khác các trang khác: KHÔNG return {} khi thiếu bản ghi `pages` — trang này vẫn
   // render bằng hotline + chi nhánh, nên metadata cũng phải đứng được với page = null.
-  const [page, settings] = await Promise.all([getPageBySlug(SLUG), getSettings()])
+  const [page, settings] = await Promise.all([getPageBySlug(SLUG, locale), getSettings(locale)])
 
   const title = page?.seo?.title || page?.title || t('nav.contact')
   const description = page?.seo?.description || undefined
@@ -69,10 +71,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function LienHePage() {
+  const locale = await getRequestLocale()
   const [page, settings, branches] = await Promise.all([
-    getPageBySlug(SLUG),
-    getSettings(),
-    getBranches(),
+    getPageBySlug(SLUG, locale),
+    getSettings(locale),
+    getBranches(locale),
   ])
 
   return (

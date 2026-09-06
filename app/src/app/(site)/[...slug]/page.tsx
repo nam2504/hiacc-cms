@@ -6,13 +6,15 @@ import { ServiceSidebar } from '@/components/services/ServiceSidebar'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { Container } from '@/components/ui/Container'
 import { brandName } from '@/config/tenant'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { ogImages } from '@/lib/seo'
 import { findByPath, getServiceTree, type TreeNode } from '@/lib/serviceTree'
-import { getSettings, mediaUrl } from '@/lib/site'
+import type { LocaleCode } from '@/lib/locales'
+import { getSettings, mediaUrl, toPayloadLocale } from '@/lib/site'
 import { getPayloadClient } from '@/lib/site'
 import type { ServiceNode } from '@/payload-types'
 import styles from './page.module.css'
+import { getRequestLocale } from '@/lib/requestLocale'
 
 /**
  * Route bắt mọi đường dẫn còn lại — dùng cho CÂY dịch vụ.
@@ -37,10 +39,15 @@ export const dynamic = 'force-dynamic'
 type Params = { slug: string[] }
 
 /** Đọc phần nội dung đầy đủ của node — cây chỉ giữ phần nhẹ để dựng menu. */
-async function getNodeDetail(id: string): Promise<ServiceNode | null> {
+async function getNodeDetail(id: string, locale: LocaleCode): Promise<ServiceNode | null> {
   try {
     const payload = await getPayloadClient()
-    return (await payload.findByID({ collection: 'service-nodes', id, depth: 1 })) as ServiceNode
+    return (await payload.findByID({
+      collection: 'service-nodes',
+      id,
+      depth: 1,
+      locale: toPayloadLocale(locale),
+    })) as ServiceNode
   } catch (error) {
     console.error('[service-node] không đọc được chi tiết mục:', id, error)
     return null
@@ -52,12 +59,13 @@ export async function generateMetadata({
 }: {
   params: Promise<Params>
 }): Promise<Metadata> {
+  const locale = await getRequestLocale()
   const { slug } = await params
-  const tree = await getServiceTree()
+  const tree = await getServiceTree(locale)
   const match = findByPath(tree, slug)
   if (!match) return {}
 
-  const [detail, settings] = await Promise.all([getNodeDetail(match.node.id), getSettings()])
+  const [detail, settings] = await Promise.all([getNodeDetail(match.node.id, locale), getSettings(locale)])
   const title = detail?.seo?.title || match.node.title
   const description = detail?.seo?.description || match.node.summary || undefined
   const images = ogImages(detail?.seo?.image, settings?.logo)
@@ -85,15 +93,17 @@ export async function generateMetadata({
 }
 
 export default async function ServiceNodePage({ params }: { params: Promise<Params> }) {
+  const locale = await getRequestLocale()
   const { slug } = await params
-  const tree = await getServiceTree()
+  const tree = await getServiceTree(locale)
   const match = findByPath(tree, slug)
   // Đường dẫn không có trong cây → 404 THẬT. Không render khung rỗng trả 200:
   // trang 200 mà trống là thứ Google index rồi mới phát hiện là rác.
   if (!match) notFound()
 
   const { node, trail, root } = match
-  const detail = await getNodeDetail(node.id)
+  const tr = createTranslator(locale)
+  const detail = await getNodeDetail(node.id, locale)
 
   /**
    * Node có con (một NHÓM) thì hiện hạng mục đầu tiên ngay trong trang nhóm —
@@ -102,7 +112,7 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
    */
   const isGroup = node.children.length > 0
   const shown = isGroup ? node.children[0] : node
-  const shownDetail = isGroup ? await getNodeDetail(shown.id) : detail
+  const shownDetail = isGroup ? await getNodeDetail(shown.id, locale) : detail
 
   // Danh sách cho sidebar: các anh em cùng nhóm (hoặc con của chính nó nếu là nhóm).
   const siblings = isGroup ? node.children : findSiblings(tree, trail)
@@ -114,7 +124,7 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
     <>
       <JsonLd
         data={breadcrumbJsonLd([
-          { name: t('seo.breadcrumb.home'), path: '/' },
+          { name: tr('seo.breadcrumb.home'), path: '/' },
           ...trail.map((item) => ({ name: item.title, path: item.path })),
         ])}
       />
@@ -124,7 +134,7 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
           <nav className={styles.crumbs} aria-label="Breadcrumb">
             <ol>
               <li>
-                <Link href="/">{t('seo.breadcrumb.home')}</Link>
+                <Link href="/">{tr('seo.breadcrumb.home')}</Link>
               </li>
               {trail.map((item, index) => (
                 <li key={item.id}>
@@ -182,23 +192,23 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
 
             <div className={styles.actions}>
               <Link className={styles.actionPrimary} href="/lien-he">
-                Yêu cầu báo phí
+                {tr('service.requestQuote')}
               </Link>
               {isGroup ? (
                 <Link className={styles.actionGhost} href={shown.path}>
-                  Xem dạng trang riêng
+                  {tr('service.viewOwnPage')}
                 </Link>
               ) : null}
             </div>
 
             {related.length > 0 ? (
               <section className={styles.related}>
-                <h2 className={styles.relatedTitle}>Có thể bạn quan tâm</h2>
+                <h2 className={styles.relatedTitle}>{tr('service.related')}</h2>
                 <ul className={styles.relatedGrid}>
                   {related.map((item) => (
                     <li key={item.id}>
                       <Link className={styles.relatedCard} href={item.path}>
-                        <span className={styles.relatedKicker}>Nhóm dịch vụ</span>
+                        <span className={styles.relatedKicker}>{tr('nav.serviceGroup')}</span>
                         <span className={styles.relatedName}>{item.title}</span>
                         {item.summary ? (
                           <span className={styles.relatedSummary}>{item.summary}</span>

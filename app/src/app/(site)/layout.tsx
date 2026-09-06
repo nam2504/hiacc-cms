@@ -5,7 +5,8 @@ import { Header } from '@/components/layout/Header'
 import { StagingBanner } from '@/components/layout/StagingBanner'
 import { brandStyle } from '@/lib/brandStyle'
 import { t } from '@/lib/i18n'
-import { DEFAULT_LOCALE } from '@/lib/locales'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import { ogImages, SITE_URL } from '@/lib/seo'
 import { isStaging } from '@/lib/staging'
 import { getRecentPosts, getSettings } from '@/lib/site'
@@ -29,8 +30,9 @@ const beVietnamPro = Be_Vietnam_Pro({
 })
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings()
-  const siteName = brandName(settings?.siteName) || t('seo.siteName')
+  const locale = await getRequestLocale()
+  const settings = await getSettings(locale)
+  const siteName = brandName(settings?.siteName) || createTranslator(locale)('seo.siteName')
   const description = settings?.tagline || undefined
   const images = ogImages(settings?.logo)
 
@@ -54,7 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: 'website',
       siteName,
-      locale: 'vi_VN',
+      locale: locale === 'vi' ? 'vi_VN' : 'en_US',
       url: '/',
       title: siteName,
       description,
@@ -71,25 +73,27 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   // Một lần fetch cho cả layout — trang con không phải gọi lại
+  const locale = await getRequestLocale()
   const [settings, recentPosts, tree] = await Promise.all([
-    getSettings(),
-    getRecentPosts(3),
-    getServiceTree(),
+    getSettings(locale),
+    getRecentPosts(3, locale),
+    getServiceTree(locale),
   ])
+  const tr = createTranslator(locale)
 
   // Màu thương hiệu đè lúc chạy: Settings (khách sửa trong /admin) → tenant.
   // Nhờ vậy field "Màu chủ đạo" có tác dụng thật, không cần build lại.
   const brandCss = brandStyle(settings?.primaryColor)
 
   return (
-    <html lang={DEFAULT_LOCALE} className={beVietnamPro.variable}>
+    <html lang={locale} className={beVietnamPro.variable}>
       <head>{brandCss ? <style>{brandCss}</style> : null}</head>
       <body>
         <a className="skip-link" href="#main-content">
-          {t('nav.skipToContent')}
+          {tr('nav.skipToContent')}
         </a>
         <StagingBanner />
-        <Header settings={settings} tree={tree} />
+        <Header settings={settings} tree={tree} locale={locale} />
         <main id="main-content">{children}</main>
         <Footer settings={settings} recentPosts={recentPosts} tree={tree} />
       </body>

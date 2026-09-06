@@ -102,7 +102,7 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: ('false' | 'none' | 'null') | false | null | 'vi' | 'vi'[];
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('vi' | 'en') | ('vi' | 'en')[];
   globals: {
     settings: Setting;
     'payroll-config': PayrollConfig;
@@ -111,7 +111,7 @@ export interface Config {
     settings: SettingsSelect<false> | SettingsSelect<true>;
     'payroll-config': PayrollConfigSelect<false> | PayrollConfigSelect<true>;
   };
-  locale: 'vi';
+  locale: 'vi' | 'en';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -1191,6 +1191,16 @@ export interface Setting {
   workingHours?: string | null;
   taxCode?: string | null;
   /**
+   * Hiện ở trang Giới thiệu, cột phải. Bỏ trống hết thì khối đó không hiện.
+   */
+  principles?:
+    | {
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Tên đầy đủ trên giấy phép kinh doanh, dùng cho dòng bản quyền.
    */
   companyName?: string | null;
@@ -1423,6 +1433,13 @@ export interface SettingsSelect<T extends boolean = true> {
   headOfficeAddress?: T;
   workingHours?: T;
   taxCode?: T;
+  principles?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
   companyName?: T;
   facebook?: T;
   tiktok?: T;

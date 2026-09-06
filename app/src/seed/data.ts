@@ -742,11 +742,38 @@ export const SETTINGS = {
   primaryColor: '#CC1420',
   companyName: 'Công ty TNHH HiACC',
   taxCode: '0110387991',
-  // Để trống thay vì placeholder: field `email` có validate định dạng,
-  // và TopBar/Footer tự ẩn dòng thiếu dữ liệu thay vì hiện chuỗi rác.
-  headOfficeAddress: '',
-  hotline: '',
-  email: '',
+  /**
+   * Liên hệ: SĐT và email lấy từ chính tài liệu khách gửi (SET WEB.xlsx, sheet
+   * PAGE) nên là số THẬT. Địa chỉ trụ sở là mẫu — khách chưa cấp, và ảnh thiết
+   * kế cũng ghi "Số nhà — đường — phường — quận — thành phố".
+   */
+  headOfficeAddress: 'Tầng 14, toà nhà Việt Á, phường Cầu Giấy, thành phố Hà Nội [địa chỉ mẫu — khách xác nhận lại]',
+  hotline: '0948 861 209',
+  hotline2: '0965 963 813',
+  email: 'hiacc.kt01@gmail.com',
+  workingHours: '08:00 – 17:30, thứ Hai – thứ Sáu',
+  /**
+   * Nguyên tắc hành nghề: nội dung MẪU cho trang Giới thiệu. Ba mục này mô tả
+   * cách làm việc, không phải tuyên bố năng lực kiểm chứng được (chứng chỉ, giải
+   * thưởng, số khách hàng) — loại đó phải do khách cấp và chịu trách nhiệm.
+   */
+  principles: [
+    {
+      title: 'Tuân thủ trước tối ưu',
+      description:
+        'Mọi phương án đều được đặt trong khuôn khổ pháp luật hiện hành; phần tối ưu chi phí chỉ xét sau khi điều kiện tuân thủ được bảo đảm.',
+    },
+    {
+      title: 'Một đầu mối phụ trách',
+      description:
+        'Mỗi khách hàng có một chuyên viên phụ trách xuyên suốt hồ sơ, chịu trách nhiệm về tiến độ và nội dung bàn giao.',
+    },
+    {
+      title: 'Phí báo trước, không phát sinh',
+      description:
+        'Biểu phí và lệ phí nhà nước được thông báo bằng văn bản trước khi thực hiện thủ tục.',
+    },
+  ],
   // KHÔNG khẳng định năng lực chưa được khách xác nhận ("đội ngũ 100% có chứng
   // chỉ hành nghề" là tuyên bố kiểm chứng được, khách phải tự chịu trách nhiệm).
   aboutShort:

@@ -9,6 +9,7 @@ import { t } from '@/lib/i18n'
 import { absoluteMediaUrl, ogImages } from '@/lib/seo'
 import { getBranches, getSettings } from '@/lib/site'
 import { getNodeImages, getServiceTree } from '@/lib/serviceTree'
+import { getRequestLocale } from '@/lib/requestLocale'
 
 /**
  * Trang này đọc dữ liệu từ DB → PHẢI dynamic.
@@ -25,7 +26,8 @@ import { getNodeImages, getServiceTree } from '@/lib/serviceTree'
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings()
+  const locale = await getRequestLocale()
+  const settings = await getSettings(locale)
   const siteName = settings?.siteName || t('seo.siteName')
   const description = settings?.tagline || settings?.aboutShort || undefined
   const images = ogImages(settings?.logo)
@@ -61,10 +63,11 @@ export async function generateMetadata(): Promise<Metadata> {
  * hỏng thì khối tương ứng tự ẩn, trang vẫn trả 200 thay vì sập cả site.
  */
 export default async function HomePage() {
+  const locale = await getRequestLocale()
   const [settings, branches, tree] = await Promise.all([
-    getSettings(),
-    getBranches(),
-    getServiceTree(),
+    getSettings(locale),
+    getBranches(locale),
+    getServiceTree(locale),
   ])
 
   // Ảnh chỉ nạp cho 5 nhóm cấp cao nhất — đúng số thẻ hiện trên trang chủ.

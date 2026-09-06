@@ -6,6 +6,7 @@ import { PageHero } from '@/components/news/PageHero'
 import { t } from '@/lib/i18n'
 import { getCategories } from '@/lib/site'
 import styles from './page.module.css'
+import { getRequestLocale } from '@/lib/requestLocale'
 
 /**
  * Trang này đọc dữ liệu từ DB → PHẢI dynamic.
@@ -33,7 +34,8 @@ export function generateMetadata(): Metadata {
  * categories KHÔNG bật drafts (INTERFACE §6.1) nên không phải lọc _status.
  */
 export default async function CategoryListPage() {
-  const categories = await getCategories()
+  const locale = await getRequestLocale()
+  const categories = await getCategories(locale)
 
   return (
     <>

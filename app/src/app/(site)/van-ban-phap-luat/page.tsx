@@ -6,6 +6,7 @@ import { ogImages } from '@/lib/seo'
 import { getPayloadClient, getSettings } from '@/lib/site'
 import type { LegalDocument } from '@/payload-types'
 import styles from './page.module.css'
+import { getRequestLocale } from '@/lib/requestLocale'
 
 /**
  * /van-ban-phap-luat — thư viện văn bản, thiết kế khách 06/09.
@@ -23,7 +24,8 @@ const SUBTITLE =
   'Luật, nghị định và thông tư liên quan đến kế toán, thuế, bảo hiểm xã hội, lao động, đăng ký kinh doanh, đầu tư và thương mại.'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings()
+  const locale = await getRequestLocale()
+  const settings = await getSettings(locale)
   const images = ogImages(settings?.logo)
 
   return {
@@ -59,7 +61,8 @@ async function getDocuments(): Promise<LegalDocument[]> {
 }
 
 export default async function LegalDocumentsPage() {
-  const [docs, settings] = await Promise.all([getDocuments(), getSettings()])
+  const locale = await getRequestLocale()
+  const [docs, settings] = await Promise.all([getDocuments(), getSettings(locale)])
   const siteName = brandName(settings?.siteName)
 
   const byGroup = LEGAL_GROUPS.map((group) => ({

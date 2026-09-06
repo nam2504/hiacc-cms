@@ -9,6 +9,7 @@
  */
 import { DEFAULT_LOCALE, type LocaleCode } from './locales'
 import { TENANT } from '@/config/tenant'
+import { en } from './i18n.en'
 
 type Dict = Record<string, string>
 
@@ -24,6 +25,11 @@ const vi: Dict = {
   'nav.menu.open': 'Mở menu',
   'nav.menu.close': 'Đóng menu',
   'nav.skipToContent': 'Bỏ qua, tới nội dung chính',
+  'service.requestQuote': 'Yêu cầu báo phí',
+  'service.viewOwnPage': 'Xem dạng trang riêng',
+  'service.related': 'Có thể bạn quan tâm',
+  'nav.serviceGroup': 'Nhóm dịch vụ',
+  'nav.servicePage': 'Trang dịch vụ →',
   'nav.language': 'Ngôn ngữ',
 
   'common.readMore': 'Xem thêm',
@@ -291,7 +297,7 @@ const vi: Dict = {
 const DICTIONARIES: Record<LocaleCode, Dict> = {
   vi,
   zh: {},
-  en: {},
+  en,
   ko: {},
 }
 

@@ -11,14 +11,16 @@ import { t } from '@/lib/i18n'
 import { ogImages } from '@/lib/seo'
 import { getCategoryBySlug, getPosts, getSettings } from '@/lib/site'
 import styles from './page.module.css'
+import { getRequestLocale } from '@/lib/requestLocale'
 
 const PER_PAGE = 9
 
 type Params = Promise<{ slug: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const locale = await getRequestLocale()
   const { slug } = await params
-  const [category, settings] = await Promise.all([getCategoryBySlug(slug), getSettings()])
+  const [category, settings] = await Promise.all([getCategoryBySlug(slug), getSettings(locale)])
   if (!category) return { title: t('error.notFound.title') }
 
   const base = seoMetadata(category.seo, category.name, category.description)
@@ -60,12 +62,13 @@ export default async function CategoryDetailPage({
   params: Params
   searchParams: SearchParams
 }) {
+  const locale = await getRequestLocale()
   const [{ slug }, query] = await Promise.all([params, searchParams])
-  const category = await getCategoryBySlug(slug)
+  const category = await getCategoryBySlug(slug, locale)
   if (!category) notFound()
 
   const page = readPage(query.page)
-  const { docs, totalPages } = await getPosts({ categorySlug: slug, page, limit: PER_PAGE })
+  const { docs, totalPages } = await getPosts({ categorySlug: slug, page, limit: PER_PAGE , locale })
 
   return (
     <>

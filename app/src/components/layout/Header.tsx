@@ -17,7 +17,15 @@ import styles from './Header.module.css'
 /** Link tĩnh cạnh các nhóm dịch vụ — không nằm trong cây nên khai ở đây. */
 const STATIC_ITEMS: StaticNavItem[] = [{ label: 'Giới thiệu', href: '/gioi-thieu' }]
 
-export function Header({ settings, tree }: { settings: Setting | null; tree: TreeNode[] }) {
+export function Header({
+  settings,
+  tree,
+  locale,
+}: {
+  settings: Setting | null
+  tree: TreeNode[]
+  locale: string
+}) {
   return (
     <header className={styles.header}>
       <TopBar settings={settings} />
@@ -26,6 +34,7 @@ export function Header({ settings, tree }: { settings: Setting | null; tree: Tre
           <div className={styles.inner}>
             <Logo settings={settings} />
             <MegaMenu
+              locale={locale}
               tree={tree}
               staticItems={STATIC_ITEMS}
               ctaLabel="Tư vấn miễn phí"

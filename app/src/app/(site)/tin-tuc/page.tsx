@@ -9,6 +9,7 @@ import { readPage, type SearchParams } from '@/components/news/params'
 import { t } from '@/lib/i18n'
 import { getPosts } from '@/lib/site'
 import styles from './page.module.css'
+import { getRequestLocale } from '@/lib/requestLocale'
 
 const PER_PAGE = 9
 
@@ -25,9 +26,10 @@ export function generateMetadata(): Metadata {
  * nên DB hỏng thì ra trạng thái rỗng chứ không phải 500.
  */
 export default async function NewsListPage({ searchParams }: { searchParams: SearchParams }) {
+  const locale = await getRequestLocale()
   const params = await searchParams
   const page = readPage(params.page)
-  const { docs, totalPages } = await getPosts({ page, limit: PER_PAGE })
+  const { docs, totalPages } = await getPosts({ page, limit: PER_PAGE, locale })
 
   const featured = page === 1 ? docs[0] : null
   const rest = featured ? docs.slice(1) : docs

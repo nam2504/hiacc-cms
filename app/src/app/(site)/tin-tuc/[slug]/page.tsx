@@ -8,12 +8,14 @@ import { t } from '@/lib/i18n'
 import { absoluteMediaUrl, absoluteUrl, ogImages } from '@/lib/seo'
 import { getPostBySlug, getSettings } from '@/lib/site'
 import type { Category } from '@/payload-types'
+import { getRequestLocale } from '@/lib/requestLocale'
 
 type Params = Promise<{ slug: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const locale = await getRequestLocale()
   const { slug } = await params
-  const [post, settings] = await Promise.all([getPostBySlug(slug), getSettings()])
+  const [post, settings] = await Promise.all([getPostBySlug(slug), getSettings(locale)])
   if (!post) return { title: t('error.notFound.title') }
 
   const base = seoMetadata(post.seo, post.title, post.excerpt)
@@ -50,8 +52,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
  * chấp nhận được vì thà 404 còn hơn lộ trang trắng có mã 200 cho Google.
  */
 export default async function PostDetailPage({ params }: { params: Params }) {
+  const locale = await getRequestLocale()
   const { slug } = await params
-  const [post, settings] = await Promise.all([getPostBySlug(slug), getSettings()])
+  const [post, settings] = await Promise.all([getPostBySlug(slug), getSettings(locale)])
   if (!post) notFound()
 
   const category = typeof post.category === 'object' ? (post.category as Category) : null

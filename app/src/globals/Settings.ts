@@ -101,6 +101,27 @@ export const Settings: GlobalConfig = {
             },
             { name: 'taxCode', type: 'text', label: 'Mã số thuế' },
             {
+              name: 'principles',
+              type: 'array',
+              label: 'Nguyên tắc hành nghề',
+              labels: { singular: 'Nguyên tắc', plural: 'Nguyên tắc' },
+              maxRows: 6,
+              admin: {
+                description:
+                  'Hiện ở trang Giới thiệu, cột phải. Bỏ trống hết thì khối đó không hiện.',
+              },
+              fields: [
+                { name: 'title', type: 'text', label: 'Tiêu đề', required: true, localized: true },
+                {
+                  name: 'description',
+                  type: 'textarea',
+                  label: 'Diễn giải',
+                  required: true,
+                  localized: true,
+                },
+              ],
+            },
+            {
               name: 'companyName',
               type: 'text',
               label: 'Tên pháp nhân',
