@@ -26,11 +26,13 @@ import type { TextFieldClientComponent } from 'payload'
 const HEX = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/
 
 /**
- * `#CC1420` là đỏ đo từ pixel logo HiACC, nên đứng đầu. Các màu sau là dải an
- * toàn cho website kế toán (đủ tương phản với chữ trắng trên nút).
+ * Dải màu an toàn cho website kế toán (đủ tương phản với chữ trắng trên nút).
+ *
+ * Màu logo của tenant KHÔNG nằm trong danh sách này — nó được chèn vào đầu lúc
+ * chạy từ prop `tenantBrand` (xem `globals/Settings.ts`). Viết cứng ở đây thì
+ * site HiTax cũng hiện ô "Đỏ HiACC", tức là rò thương hiệu khách này sang khách kia.
  */
 const SWATCHES: { value: string; label: string }[] = [
-  { value: '#CC1420', label: 'Đỏ HiACC (logo)' },
   { value: '#0F52BA', label: 'Xanh dương' },
   { value: '#0E7C66', label: 'Xanh lá đậm' },
   { value: '#1F3A5F', label: 'Xanh navy' },
@@ -50,9 +52,18 @@ const toSixDigits = (value: string) => {
   return `#${r}${r}${g}${g}${b}${b}`
 }
 
+type TenantProps = { tenantBrand?: string; tenantName?: string }
+
 const PrimaryColorField: TextFieldClientComponent = (props) => {
   const { path } = props
+  const { tenantBrand, tenantName } = props as typeof props & TenantProps
   const { value, setValue } = useField<string>({ path })
+
+  // Màu logo của tenant đứng đầu bảng. Thiếu prop (field dùng ở chỗ khác) thì
+  // bảng vẫn chạy với dải màu chung, chỉ mất ô đầu.
+  const swatches = tenantBrand
+    ? [{ value: tenantBrand, label: `Màu logo${tenantName ? ` ${tenantName}` : ''}` }, ...SWATCHES]
+    : SWATCHES
 
   const current = normalize(value)
   const sixDigits = toSixDigits(current)
@@ -76,7 +87,7 @@ const PrimaryColorField: TextFieldClientComponent = (props) => {
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem', alignItems: 'center' }}>
-          {SWATCHES.map((swatch) => {
+          {swatches.map((swatch) => {
             const selected = sixDigits === swatch.value.toLowerCase()
             return (
               <button
@@ -115,7 +126,7 @@ const PrimaryColorField: TextFieldClientComponent = (props) => {
           >
             <input
               type="color"
-              value={sixDigits ?? '#cc1420'}
+              value={sixDigits ?? toSixDigits(normalize(tenantBrand)) ?? '#000000'}
               onChange={(e) => setValue(e.target.value.toUpperCase())}
               style={{
                 width: 32,
@@ -160,7 +171,7 @@ const PrimaryColorField: TextFieldClientComponent = (props) => {
           {isEmpty
             ? 'Đang bỏ trống — website dùng màu mặc định của site.'
             : isInvalid
-              ? `"${current}" không phải mã màu hợp lệ. Website sẽ bỏ qua và dùng màu mặc định. Mã đúng có dạng #CC1420.`
+              ? `"${current}" không phải mã màu hợp lệ. Website sẽ bỏ qua và dùng màu mặc định. Mã đúng có dạng #RRGGBB, ví dụ #1F3A5F.`
               : `Đang dùng ${current}.`}
         </p>
       </div>

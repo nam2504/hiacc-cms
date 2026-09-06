@@ -1,5 +1,6 @@
 import type { GlobalConfig } from 'payload'
 import { isAdmin, isPublic } from '../access'
+import { TENANT } from '../config/tenant'
 
 /**
  * Cấu hình toàn site. Khách chốt 30/08: mọi thông tin liên hệ phải sửa được
@@ -65,8 +66,9 @@ export const Settings: GlobalConfig = {
               // Không đặt defaultValue: bỏ trống = dùng màu của tenant
               // (src/config/tenant.ts). Đặt cứng ở đây sẽ ghim màu HiACC vào DB HiTax.
               admin: {
-                description:
-                  'Bấm một ô trong bảng màu, hoặc gõ mã dạng #RRGGBB. Bỏ trống thì dùng màu mặc định của site (#CC1420 — đỏ lấy đúng từ logo). Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.',
+                // Mã màu lấy từ TENANT, không viết cứng: cùng file này chạy cho
+                // cả HiACC lẫn HiTax, viết cứng #CC1420 là mô tả sai màu ở site kia.
+                description: `Bấm một ô trong bảng màu, hoặc gõ mã dạng #RRGGBB. Bỏ trống thì dùng màu mặc định của site (${TENANT.colors.brand.toUpperCase()}). Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.`,
                 /**
                  * Ô text gốc được bọc thêm bảng màu bấm chọn — xem
                  * `components/admin/PrimaryColorField.tsx`. Vẫn ghi xuống DB
@@ -78,7 +80,18 @@ export const Settings: GlobalConfig = {
                  * "Module not found".
                  */
                 components: {
-                  Field: '@/components/admin/PrimaryColorField',
+                  Field: {
+                    path: '@/components/admin/PrimaryColorField',
+                    // Component là 'use client' nên không đọc được process.env.TENANT.
+                    // Truyền màu xuống từ đây (server) thay vì nướng cứng bằng
+                    // NEXT_PUBLIC_* — biến đó bị thay bằng giá trị cố định lúc
+                    // `next build`, một image chạy 2 tenant sẽ hiện màu của khách kia
+                    // (xem src/lib/staging.ts).
+                    clientProps: {
+                      tenantBrand: TENANT.colors.brand.toUpperCase(),
+                      tenantName: TENANT.name,
+                    },
+                  },
                 },
               },
             },

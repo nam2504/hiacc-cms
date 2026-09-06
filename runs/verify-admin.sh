@@ -42,11 +42,23 @@ if sed -n "/name: 'primaryColor'/,+6p" src/globals/Settings.ts | grep -v "^\s*//
   no "primaryColor bị thêm defaultValue (ghim màu HiACC vào DB HiTax)"
 else ok "primaryColor không có defaultValue"; fi
 git diff --quiet -- src/lib/brandStyle.ts && ok "brandStyle.ts không bị sửa" || no "brandStyle.ts bị sửa — cấm"
+# Tên/mã màu thương hiệu chỉ được sống trong config/tenant.ts. Lọt vào code admin
+# thì site HiTax hiện chữ "HiACC" cho khách khác đọc. Bỏ dòng comment (`//` và `*`
+# của khối /** */) vì các comment ở đó đang giải thích chính luật này.
+leak=$(grep -rn "HiACC\|CC1420\|cc1420" src/components/admin/ src/globals/ 2>/dev/null \
+       | grep -v ":[[:space:]]*//" | grep -v ":[[:space:]]*\*")
+if [ -n "$leak" ]; then
+  no "chuỗi thương hiệu HiACC lọt vào admin ngoài comment:"; echo "$leak" | sed 's/^/       /'
+else ok "không có chuỗi thương hiệu HiACC cứng trong admin"; fi
 
 echo "== 5. admin sống + build sạch =="
 c=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 "$BASE/admin")
 [ "$c" = "200" ] || [ "$c" = "307" ] && ok "/admin $c" || no "/admin $c"
-if npx tsc --noEmit 2>&1 | tail -3 | grep -q "error"; then no "tsc có lỗi"; else ok "tsc sạch"; fi
+# Đọc EXIT CODE của tsc, không grep output: `npx tsc | tail | grep` lấy exit code
+# của grep, và lỗi nằm ngoài 3 dòng cuối thì lọt.
+tsc_out=$(npx tsc --noEmit 2>&1); tsc_rc=$?
+if [ $tsc_rc -ne 0 ]; then no "tsc có lỗi:"; echo "$tsc_out" | head -5 | sed 's/^/       /'
+else ok "tsc sạch"; fi
 
 [ $fail -eq 0 ] && echo "PASS" || echo "FAILED"
 exit $fail
