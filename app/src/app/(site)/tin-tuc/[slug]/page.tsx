@@ -5,7 +5,14 @@ import { PostArticle } from '@/components/news/PostArticle'
 import { seoMetadata } from '@/components/news/params'
 import { JsonLd, articleJsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { createTranslator } from '@/lib/i18n'
-import { absoluteMediaUrl, absoluteUrl, localeAlternates, ogImages, ogLocale } from '@/lib/seo'
+import {
+  absoluteMediaUrl,
+  absoluteUrl,
+  localeAlternates,
+  localePath,
+  ogImages,
+  ogLocale,
+} from '@/lib/seo'
 import { getPostBySlug, getSettings } from '@/lib/site'
 import type { Category } from '@/payload-types'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -29,7 +36,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     alternates: localeAlternates(path, locale),
     openGraph: {
       type: 'article',
-      url: path,
+      // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
+      url: localePath(path, locale),
       siteName: settings?.siteName || t('seo.siteName'),
       locale: ogLocale(locale),
       title: base.title as string,
@@ -66,19 +74,23 @@ export default async function PostDetailPage({ params }: { params: Params }) {
   const jsonLd = [
     articleJsonLd({
       headline: post.title,
-      url: absoluteUrl(`/tin-tuc/${post.slug}`),
+      // Bài trên /en phải khai URL /en, khớp canonical của chính trang đó.
+      url: absoluteUrl(localePath(`/tin-tuc/${post.slug}`, locale)),
       description: post.seo?.description || post.excerpt,
       imageUrl: absoluteMediaUrl(post.seo?.image) ?? absoluteMediaUrl(post.cover),
       datePublished: post.publishedAt,
       dateModified: post.updatedAt,
       authorName,
     }),
-    breadcrumbJsonLd([
-      { name: t('seo.breadcrumb.home'), path: '/' },
-      { name: t('news.list.title'), path: '/tin-tuc' },
-      ...(category ? [{ name: category.name, path: `/chuyen-muc/${category.slug}` }] : []),
-      { name: post.title, path: `/tin-tuc/${post.slug}` },
-    ]),
+    breadcrumbJsonLd(
+      [
+        { name: t('seo.breadcrumb.home'), path: '/' },
+        { name: t('news.list.title'), path: '/tin-tuc' },
+        ...(category ? [{ name: category.name, path: `/chuyen-muc/${category.slug}` }] : []),
+        { name: post.title, path: `/tin-tuc/${post.slug}` },
+      ],
+      locale,
+    ),
   ]
 
   return (

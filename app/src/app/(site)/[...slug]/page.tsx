@@ -7,7 +7,7 @@ import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { Container } from '@/components/ui/Container'
 import { brandName } from '@/config/tenant'
 import { createTranslator } from '@/lib/i18n'
-import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
+import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { localizedHref } from '@/lib/nav'
 import { findByPath, getServiceTree, type TreeNode } from '@/lib/serviceTree'
 import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
@@ -77,7 +77,8 @@ export async function generateMetadata({
     alternates: localeAlternates(match.node.path, locale),
     openGraph: {
       type: 'website',
-      url: match.node.path,
+      // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
+      url: localePath(match.node.path, locale),
       siteName: brandName(settings?.siteName),
       locale: ogLocale(locale),
       title,
@@ -127,10 +128,13 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
   return (
     <>
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: tr('seo.breadcrumb.home'), path: '/' },
-          ...trail.map((item) => ({ name: item.title, path: item.path })),
-        ])}
+        data={breadcrumbJsonLd(
+          [
+            { name: tr('seo.breadcrumb.home'), path: '/' },
+            ...trail.map((item) => ({ name: item.title, path: item.path })),
+          ],
+          locale,
+        )}
       />
 
       <section className={styles.hero}>

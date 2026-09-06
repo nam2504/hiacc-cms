@@ -8,7 +8,7 @@ import { ServiceGroups } from '@/components/home/ServiceGroups'
 import { Stats } from '@/components/home/Stats'
 import { JsonLd, accountingServiceJsonLd } from '@/components/seo/JsonLd'
 import { createTranslator } from '@/lib/i18n'
-import { absoluteMediaUrl, localeAlternates, ogImages, ogLocale } from '@/lib/seo'
+import { absoluteMediaUrl, localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { getBranches, getSettings } from '@/lib/site'
 import { getNodeImages, getServiceTree } from '@/lib/serviceTree'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -42,7 +42,8 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: localeAlternates('/', locale),
     openGraph: {
       type: 'website',
-      url: '/',
+      // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
+      url: localePath('/', locale),
       siteName,
       locale: ogLocale(locale),
       title: siteName,

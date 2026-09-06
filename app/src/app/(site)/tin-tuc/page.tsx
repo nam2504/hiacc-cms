@@ -7,7 +7,7 @@ import { FeaturedPost } from '@/components/news/FeaturedPost'
 import { PostGrid } from '@/components/news/PostGrid'
 import { readPage, type SearchParams } from '@/components/news/params'
 import { createTranslator } from '@/lib/i18n'
-import { localeAlternates } from '@/lib/seo'
+import { localeAlternates, localePath } from '@/lib/seo'
 import { getPosts } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -23,6 +23,9 @@ export async function generateMetadata(): Promise<Metadata> {
     // Thiếu dòng này thì trang kế thừa canonical '/' của layout: Google coi
     // đây là bản sao trang chủ và bỏ cả nhánh VI lẫn EN khỏi chỉ mục.
     alternates: localeAlternates('/tin-tuc', locale),
+    // Không khai thì og:url kế thừa '/' của layout, tức trang /en/tin-tuc chia sẻ
+    // lên Facebook/Zalo ra preview trang chủ tiếng Việt.
+    openGraph: { url: localePath('/tin-tuc', locale) },
   }
 }
 

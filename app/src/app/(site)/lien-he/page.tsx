@@ -7,7 +7,7 @@ import { PageBody } from '@/components/pages/PageBody'
 import { PageHero } from '@/components/pages/PageHero'
 import { Section } from '@/components/ui/Section'
 import { createTranslator } from '@/lib/i18n'
-import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
+import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { getBranches, getPageBySlug, getSettings } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -55,7 +55,8 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: localeAlternates(`/${SLUG}`, locale),
     openGraph: {
       type: 'website',
-      url: `/${SLUG}`,
+      // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
+      url: localePath(`/${SLUG}`, locale),
       siteName: settings?.siteName || tr('seo.siteName'),
       locale: ogLocale(locale),
       title,

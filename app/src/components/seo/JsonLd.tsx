@@ -1,6 +1,6 @@
 import { createTranslator } from '@/lib/i18n'
 import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
-import { absoluteUrl } from '@/lib/seo'
+import { absoluteUrl, localePath } from '@/lib/seo'
 
 /**
  * Dữ liệu có cấu trúc (schema.org) nhúng vào trang — site tham chiếu không có
@@ -158,8 +158,17 @@ export function articleJsonLd({
   })
 }
 
-/** Đường dẫn phân cấp cho các trang chi tiết. `item` phải là URL tuyệt đối. */
-export function breadcrumbJsonLd(items: { name: string; path: string }[]): JsonLdNode {
+/**
+ * Đường dẫn phân cấp cho các trang chi tiết. `item` phải là URL tuyệt đối.
+ *
+ * `locale` để breadcrumb của trang `/en/...` trỏ vào nhánh `/en`. Bỏ trống thì
+ * ra đường dẫn tiếng Việt như trước — trang `/en` mà quên truyền sẽ khai
+ * breadcrumb tiếng Việt trong khi canonical là `/en`, hai tín hiệu SEO đá nhau.
+ */
+export function breadcrumbJsonLd(
+  items: { name: string; path: string }[],
+  locale: LocaleCode = DEFAULT_LOCALE,
+): JsonLdNode {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -167,7 +176,7 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]): JsonL
       '@type': 'ListItem',
       position: index + 1,
       name: item.name,
-      item: absoluteUrl(item.path),
+      item: absoluteUrl(localePath(item.path, locale)),
     })),
   }
 }

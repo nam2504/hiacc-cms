@@ -7,7 +7,7 @@ import { GroupSummary } from '@/components/pages/GroupSummary'
 import { Section } from '@/components/ui/Section'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { createTranslator } from '@/lib/i18n'
-import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
+import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { getPageBySlug, getSettings } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -50,7 +50,8 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: localeAlternates(`/${SLUG}`, locale),
     openGraph: {
       type: 'website',
-      url: `/${SLUG}`,
+      // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
+      url: localePath(`/${SLUG}`, locale),
       siteName: settings?.siteName || tr('seo.siteName'),
       locale: ogLocale(locale),
       title,
@@ -79,10 +80,13 @@ export default async function GioiThieuPage() {
   return (
     <>
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: tr('seo.breadcrumb.home'), path: '/' },
-          { name: page.title, path: `/${SLUG}` },
-        ])}
+        data={breadcrumbJsonLd(
+          [
+            { name: tr('seo.breadcrumb.home'), path: '/' },
+            { name: page.title, path: `/${SLUG}` },
+          ],
+          locale,
+        )}
       />
       <PageHero title={page.title} subtitle={page.seo?.description} image={page.heroImage} />
       <Section narrow>

@@ -6,7 +6,7 @@ import { StagingBanner } from '@/components/layout/StagingBanner'
 import { brandStyle } from '@/lib/brandStyle'
 import { createTranslator } from '@/lib/i18n'
 import { getRequestLocale } from '@/lib/requestLocale'
-import { ogImages, SITE_URL } from '@/lib/seo'
+import { localePath, ogImages, SITE_URL } from '@/lib/seo'
 import { isStaging } from '@/lib/staging'
 import { getRecentPosts, getSettings } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
@@ -56,7 +56,9 @@ export async function generateMetadata(): Promise<Metadata> {
       type: 'website',
       siteName,
       locale: locale === 'vi' ? 'vi_VN' : 'en_US',
-      url: '/',
+      // Phải theo ngôn ngữ: trang /en khai og:url tiếng Việt thì chia sẻ lên
+      // Facebook/Zalo ra preview bản VI, và đá nhau với canonical /en của chính nó.
+      url: localePath('/', locale),
       title: siteName,
       description,
       images,

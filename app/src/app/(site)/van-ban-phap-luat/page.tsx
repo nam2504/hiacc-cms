@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Container } from '@/components/ui/Container'
 import { LEGAL_GROUPS } from '@/collections/LegalDocuments'
 import { brandName } from '@/config/tenant'
-import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
+import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { getPayloadClient, getSettings } from '@/lib/site'
 import type { LegalDocument } from '@/payload-types'
 import styles from './page.module.css'
@@ -34,7 +34,8 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: localeAlternates('/van-ban-phap-luat', locale),
     openGraph: {
       type: 'website',
-      url: '/van-ban-phap-luat',
+      // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
+      url: localePath('/van-ban-phap-luat', locale),
       siteName: brandName(settings?.siteName),
       locale: ogLocale(locale),
       title: TITLE,

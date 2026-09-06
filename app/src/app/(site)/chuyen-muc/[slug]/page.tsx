@@ -8,7 +8,7 @@ import { PostGrid } from '@/components/news/PostGrid'
 import { readPage, seoMetadata, type SearchParams } from '@/components/news/params'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { createTranslator } from '@/lib/i18n'
-import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
+import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { getCategoryBySlug, getPosts, getSettings } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -34,7 +34,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     alternates: localeAlternates(path, locale),
     openGraph: {
       type: 'website',
-      url: path,
+      // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
+      url: localePath(path, locale),
       siteName: settings?.siteName || t('seo.siteName'),
       locale: ogLocale(locale),
       title: base.title as string,
@@ -75,11 +76,14 @@ export default async function CategoryDetailPage({
   return (
     <>
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: t('seo.breadcrumb.home'), path: '/' },
-          { name: t('news.categories.title'), path: '/chuyen-muc' },
-          { name: category.name, path: `/chuyen-muc/${category.slug}` },
-        ])}
+        data={breadcrumbJsonLd(
+          [
+            { name: t('seo.breadcrumb.home'), path: '/' },
+            { name: t('news.categories.title'), path: '/chuyen-muc' },
+            { name: category.name, path: `/chuyen-muc/${category.slug}` },
+          ],
+          locale,
+        )}
       />
       <PageHero
         title={category.name}
