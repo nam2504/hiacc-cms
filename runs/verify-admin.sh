@@ -19,9 +19,9 @@ done
 echo "== 2. cây dịch vụ: component admin có đăng ký được không =="
 if [ -d src/components/admin ]; then
   ok "có src/components/admin/"
-  grep -rq "components" src/collections/ServiceNodes.ts && ok "ServiceNodes khai admin.components" || no "chưa nối component vào ServiceNodes"
+  grep -q "beforeListTable" src/collections/ServiceNodes.ts && ok "ServiceNodes nối beforeListTable" || no "chưa nối component vào ServiceNodes"
   # importMap phải biết component mới, nếu không admin chết Module not found
-  if grep -rq "admin" src/app/\(payload\)/admin/importMap.js; then ok "importMap đã sinh lại"; else no "importMap CHƯA sinh lại — chạy npm run generate:importmap"; fi
+  if grep -q "components/admin/ServiceTree" src/app/\(payload\)/admin/importMap.js; then ok "importMap có ServiceTree"; else no "importMap CHƯA sinh lại — chạy npm run generate:importmap"; fi
 else
   no "chưa có src/components/admin/"
 fi

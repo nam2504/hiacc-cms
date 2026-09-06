@@ -3,14 +3,27 @@ import { slugField, seoField } from './fields'
 import { contentAccess } from '../access'
 
 /**
- * Nội dung của BA trang cố định đã có sẵn route: `/gioi-thieu`, `/dich-vu`,
- * `/lien-he`. Đây là chỗ sửa chữ và ảnh của ba trang đó, KHÔNG phải chỗ tạo
- * trang mới.
+ * Nội dung của HAI trang cố định đã có sẵn route: `/gioi-thieu` và `/lien-he`.
+ * Đây là chỗ sửa chữ và ảnh của hai trang đó, KHÔNG phải chỗ tạo trang mới.
+ *
+ * Đúng hai bản ghi, và đó là toàn bộ chỗ tiêu thụ collection này:
+ *   src/app/(site)/gioi-thieu/page.tsx → getPageBySlug('gioi-thieu')
+ *   src/app/(site)/lien-he/page.tsx    → getPageBySlug('lien-he')
+ * (`getPageBySlug` ở `src/lib/site.ts`.)
+ *
+ * ⚠️ Comment cũ ở đây ghi BA trang, kể thêm `/dich-vu`. Sai: route `/dich-vu`
+ * không tồn tại và trong DB cũng không có bản ghi nào slug đó. Trang dịch vụ
+ * nay do collection "Cây dịch vụ" (`service-nodes`) sinh ra qua route catch-all.
+ * Đừng đưa `/dich-vu` trở lại danh sách này.
  *
  * Vì sao chặn tạo mới: trang chỉ hiện ra khi có route trong code đọc đúng slug
  * của nó. Bản ghi mới với slug lạ sẽ lưu được nhưng mở ngoài web là 404 — người
  * nhập tưởng mình đã đăng trang, thực tế không ai xem được. Cần thêm trang mới
- * thì thêm route trong code, hoặc dùng "Cây dịch vụ" (tự sinh đường dẫn).
+ * thì dev thêm route trong code trước; muốn thêm trang dịch vụ thì dùng "Cây
+ * dịch vụ" (tự sinh đường dẫn, không cần dev).
+ *
+ * Collection này KHÔNG phải code cũ — có người từng nghi vậy. Xoá nó là làm
+ * trắng nội dung hai trang Giới thiệu và Liên hệ đang chạy ngoài production.
  */
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -19,15 +32,15 @@ export const Pages: CollectionConfig = {
     group: 'Nội dung',
     defaultColumns: ['title', 'slug', '_status', 'updatedAt'],
     description:
-      'Nội dung ba trang cố định: Giới thiệu, Dịch vụ chuyên ngành, Liên hệ. Sửa chữ và ảnh ở đây. Không tạo được trang mới ở đây — trang mới cần route trong code; muốn thêm trang dịch vụ thì dùng "Cây dịch vụ".',
+      'Chỗ sửa chữ và ảnh của ĐÚNG HAI trang: Giới thiệu và Liên hệ. Đây không phải nơi tạo trang mới — cố ý không có nút "Create new", vì một trang chỉ hiện ra ngoài web khi lập trình viên đã làm sẵn đường dẫn cho nó; bản ghi tự thêm sẽ lưu được nhưng mở ra là lỗi 404. Cần thêm trang dịch vụ thì dùng "Cây dịch vụ" (tự sinh đường dẫn). Cần một trang khác hẳn thì báo lập trình viên.',
     preview: (doc) => (typeof doc?.slug === 'string' ? `/${doc.slug}` : null),
   },
   labels: { singular: 'Trang', plural: 'Trang' },
   versions: { drafts: true },
   /**
    * Không cho tạo mới: xem lý do ở đầu file. Sửa và đọc vẫn theo quyền chung,
-   * xoá vẫn để admin — xoá một trong ba trang là làm trang đó trống, nên chỉ
-   * admin được làm.
+   * xoá vẫn để admin — xoá một trong hai trang là làm trang đó trống ngoài
+   * production, nên chỉ admin được làm.
    */
   access: { ...contentAccess, create: () => false },
   fields: [

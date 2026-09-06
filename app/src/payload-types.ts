@@ -208,7 +208,7 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Nhóm bài viết của Trung tâm kiến thức. Mỗi bài viết thuộc một chuyên mục.
+ * Chuyên mục của Trung tâm kiến thức — mỗi bài viết thuộc một chuyên mục. Xoá một chuyên mục sẽ làm các bài viết đang thuộc nó mất chuyên mục, nên sửa tên thay vì xoá rồi tạo lại.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
@@ -221,7 +221,7 @@ export interface Category {
    */
   slug: string;
   /**
-   * Chuyên mục nằm ở cột nào trong menu Trung tâm kiến thức.
+   * Menu Trung tâm kiến thức ngoài site chia làm hai cột; đây là cột chứa chuyên mục này. Bắt buộc chọn.
    */
   group: 'accounting' | 'legal-hr';
   /**
@@ -303,7 +303,7 @@ export interface Media {
   };
 }
 /**
- * Nội dung ba trang cố định: Giới thiệu, Dịch vụ chuyên ngành, Liên hệ. Sửa chữ và ảnh ở đây. Không tạo được trang mới ở đây — trang mới cần route trong code; muốn thêm trang dịch vụ thì dùng "Cây dịch vụ".
+ * Chỗ sửa chữ và ảnh của ĐÚNG HAI trang: Giới thiệu và Liên hệ. Đây không phải nơi tạo trang mới — cố ý không có nút "Create new", vì một trang chỉ hiện ra ngoài web khi lập trình viên đã làm sẵn đường dẫn cho nó; bản ghi tự thêm sẽ lưu được nhưng mở ra là lỗi 404. Cần thêm trang dịch vụ thì dùng "Cây dịch vụ" (tự sinh đường dẫn). Cần một trang khác hẳn thì báo lập trình viên.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
@@ -426,7 +426,7 @@ export interface Service {
   createdAt: string;
 }
 /**
- * Cây dịch vụ, sắp theo nhóm. Mục không chọn "Thuộc nhóm" là nhóm cấp cao nhất, hiện trên thanh menu. Mục có chọn là hạng mục con của nhóm đó.
+ * Cây dịch vụ. Sơ đồ phía trên cho thấy mục nào nằm trong nhóm nào; bảng bên dưới để sửa. Mục không chọn "Thuộc nhóm" là nhóm cấp cao nhất, hiện trên thanh menu. Mục có chọn là hạng mục con của nhóm đó.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "service-nodes".
@@ -582,7 +582,7 @@ export interface ServiceNode {
   createdAt: string;
 }
 /**
- * Danh mục luật, nghị định, thông tư hiển thị ở trang Văn bản pháp luật. Chỉ dẫn link tới nguồn chính thức, không đăng lại file.
+ * Danh mục luật, nghị định, thông tư hiển thị ở trang Văn bản pháp luật. Mỗi dòng chỉ DẪN LINK tới nguồn chính thức — cố ý không đăng lại file, vì file đăng lại sẽ sai khi nguồn sửa mà không ai biết. Thứ tự trên trang: theo cột "Nhóm", trong mỗi nhóm theo "Thứ tự".
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "legal-documents".
@@ -598,7 +598,7 @@ export interface LegalDocument {
    */
   code: string;
   /**
-   * Văn bản nằm ở tab nào trên trang.
+   * Quyết định văn bản nằm ở tab nào trên trang Văn bản pháp luật. Bắt buộc chọn — không có nhóm thì văn bản không hiện ở tab nào.
    */
   group: 'ke-toan' | 'thue' | 'bhxh' | 'lao-dong' | 'dang-ky-kinh-doanh' | 'dau-tu' | 'thuong-mai';
   /**
@@ -606,11 +606,11 @@ export interface LegalDocument {
    */
   issuer?: string | null;
   /**
-   * Năm văn bản có hiệu lực, ví dụ 2017. Để chữ chứ không phải số để ghi được "đã hết hiệu lực" hay "sửa đổi 2021".
+   * Năm văn bản có hiệu lực, ví dụ 2017. Ô này nhận cả chữ, nên ghi được "đã hết hiệu lực" hoặc "sửa đổi 2021" khi cần.
    */
   effectiveYear?: string | null;
   /**
-   * Địa chỉ đầy đủ tới văn bản trên trang của cơ quan ban hành (bắt đầu bằng https://). Bỏ trống thì dòng đó không có link.
+   * Địa chỉ đầy đủ tới văn bản trên trang của cơ quan ban hành, bắt đầu bằng https://. Đây là thứ người đọc bấm vào — bỏ trống thì dòng đó chỉ là chữ, không bấm được.
    */
   sourceUrl?: string | null;
   /**
@@ -1169,7 +1169,7 @@ export interface Setting {
    */
   tagline?: string | null;
   /**
-   * Mã màu dạng #RRGGBB, mặc định #CC1420 — đỏ lấy đúng từ logo. Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.
+   * Bấm một ô trong bảng màu, hoặc gõ mã dạng #RRGGBB. Bỏ trống thì dùng màu mặc định của site (#CC1420 — đỏ lấy đúng từ logo). Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.
    */
   primaryColor?: string | null;
   /**

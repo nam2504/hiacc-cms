@@ -9,7 +9,8 @@ export const Categories: CollectionConfig = {
     useAsTitle: 'name',
     group: 'Nội dung',
     defaultColumns: ['name', 'group', 'order', 'slug'],
-    description: 'Nhóm bài viết của Trung tâm kiến thức. Mỗi bài viết thuộc một chuyên mục.',
+    description:
+      'Chuyên mục của Trung tâm kiến thức — mỗi bài viết thuộc một chuyên mục. Xoá một chuyên mục sẽ làm các bài viết đang thuộc nó mất chuyên mục, nên sửa tên thay vì xoá rồi tạo lại.',
   },
   labels: { singular: 'Chuyên mục', plural: 'Chuyên mục' },
   access: contentAccess,
@@ -19,15 +20,25 @@ export const Categories: CollectionConfig = {
     {
       name: 'group',
       type: 'select',
-      label: 'Nhóm',
+      /**
+       * "Nhóm" trần dễ bị đọc nhầm thành nhóm menu bên trái của admin. Nhãn mới
+       * nói rõ đây là cột nào trong menu Trung tâm kiến thức ngoài site.
+       */
+      label: 'Cột trong menu',
       required: true,
+      /**
+       * ⚠️ `value` của 2 nhóm này đang được các bản ghi trong DB tham chiếu —
+       * đổi hoặc xoá là mất nhóm của những chuyên mục đang dùng nó.
+       * Sửa `label` thì an toàn. Thêm cột mới thì thêm vào cuối.
+       */
       options: [
         { label: 'Kế toán & Doanh nghiệp', value: 'accounting' },
         { label: 'Pháp lý & Nhân sự', value: 'legal-hr' },
       ],
       admin: {
         position: 'sidebar',
-        description: 'Chuyên mục nằm ở cột nào trong menu Trung tâm kiến thức.',
+        description:
+          'Menu Trung tâm kiến thức ngoài site chia làm hai cột; đây là cột chứa chuyên mục này. Bắt buộc chọn.',
       },
     },
     {

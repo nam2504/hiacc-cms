@@ -42,20 +42,30 @@ export const ServiceNodes: CollectionConfig = {
     group: 'Nội dung',
     defaultColumns: ['title', 'parent', 'order', 'slug', 'updatedAt'],
     /**
-     * Sắp mặc định theo nhóm cha rồi tới thứ tự trong nhóm, để danh sách đọc
-     * được như một cây thay vì 37 dòng phẳng trộn lẫn các nhóm với nhau.
-     *
-     * Payload chưa có view cây thật; đây là cách gần nhất mà không phải dựng
-     * component admin riêng. Cột "Thuộc nhóm" cho biết mỗi mục nằm ở đâu.
+     * Sắp mặc định theo nhóm cha rồi tới thứ tự trong nhóm, để bảng bên dưới sơ
+     * đồ cũng đọc được theo nhóm thay vì trộn lẫn các nhóm với nhau.
      */
     description:
-      'Cây dịch vụ, sắp theo nhóm. Mục không chọn "Thuộc nhóm" là nhóm cấp cao nhất, hiện trên thanh menu. Mục có chọn là hạng mục con của nhóm đó.',
+      'Cây dịch vụ. Sơ đồ phía trên cho thấy mục nào nằm trong nhóm nào; bảng bên dưới để sửa. Mục không chọn "Thuộc nhóm" là nhóm cấp cao nhất, hiện trên thanh menu. Mục có chọn là hạng mục con của nhóm đó.',
+    /**
+     * Payload 3 chưa có view cây sẵn, nên gắn thêm một sơ đồ CHỈ ĐỌC ngay trên
+     * bảng danh sách (`components/admin/ServiceTree.tsx`).
+     *
+     * Cố ý KHÔNG thay bảng: mọi thao tác sửa vẫn đi qua form chuẩn của Payload,
+     * nên hook chặn vòng lặp và chặn slug trùng route ở cuối file này vẫn là
+     * đường duy nhất dữ liệu đi qua.
+     *
+     * ⚠️ Đổi đường dẫn này thì PHẢI chạy lại `npm run generate:importmap`,
+     * nếu không admin chết "Module not found".
+     */
+    components: {
+      beforeListTable: ['@/components/admin/ServiceTree'],
+    },
   },
   labels: { singular: 'Mục dịch vụ', plural: 'Cây dịch vụ' },
   /**
-   * Sắp theo nhóm cha để danh sách trong admin đọc được như một cây, thay vì
-   * 37 dòng phẳng trộn lẫn các nhóm. Payload chưa có view cây thật; đây là cách
-   * gần nhất mà không phải dựng component admin riêng.
+   * Sắp theo nhóm cha để bảng bên dưới sơ đồ gom được các mục cùng nhóm lại với
+   * nhau, thay vì 37 dòng trộn lẫn. Cấu trúc cha–con thì đọc ở sơ đồ phía trên.
    */
   defaultSort: 'parent',
   access: contentAccess,

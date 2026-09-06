@@ -25,9 +25,17 @@ export const LegalDocuments: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Nội dung',
-    defaultColumns: ['title', 'code', 'group', 'issuer', 'effectiveYear'],
+    /**
+     * `sourceUrl` và `order` vào danh sách vì cả hai đều là thứ chỉ nhìn bảng
+     * mới phát hiện được sai: thiếu link thì dòng đó ra trang ngoài không bấm
+     * được, còn `order` là cột đang quyết định thứ tự hiển thị (`defaultSort`)
+     * mà trước đây không hiện ra ở đâu cả.
+     * Bỏ `issuer` khỏi danh sách: nó dài, đẩy các cột sau tràn ngang, và vẫn
+     * đọc được khi mở từng văn bản.
+     */
+    defaultColumns: ['title', 'code', 'group', 'effectiveYear', 'sourceUrl', 'order'],
     description:
-      'Danh mục luật, nghị định, thông tư hiển thị ở trang Văn bản pháp luật. Chỉ dẫn link tới nguồn chính thức, không đăng lại file.',
+      'Danh mục luật, nghị định, thông tư hiển thị ở trang Văn bản pháp luật. Mỗi dòng chỉ DẪN LINK tới nguồn chính thức — cố ý không đăng lại file, vì file đăng lại sẽ sai khi nguồn sửa mà không ai biết. Thứ tự trên trang: theo cột "Nhóm", trong mỗi nhóm theo "Thứ tự".',
   },
   labels: { singular: 'Văn bản pháp luật', plural: 'Văn bản pháp luật' },
   access: contentAccess,
@@ -53,8 +61,17 @@ export const LegalDocuments: CollectionConfig = {
       type: 'select',
       label: 'Nhóm',
       required: true,
+      /**
+       * ⚠️ `value` của 7 nhóm này đang được các bản ghi trong DB tham chiếu —
+       * đổi hoặc xoá một `value` là mất nhóm của những văn bản đang dùng nó.
+       * Sửa `label` thì an toàn. Thêm nhóm mới thì thêm vào cuối.
+       */
       options: [...LEGAL_GROUPS],
-      admin: { position: 'sidebar', description: 'Văn bản nằm ở tab nào trên trang.' },
+      admin: {
+        position: 'sidebar',
+        description:
+          'Quyết định văn bản nằm ở tab nào trên trang Văn bản pháp luật. Bắt buộc chọn — không có nhóm thì văn bản không hiện ở tab nào.',
+      },
     },
     {
       name: 'issuer',
@@ -66,10 +83,14 @@ export const LegalDocuments: CollectionConfig = {
     {
       name: 'effectiveYear',
       type: 'text',
-      label: 'Hiệu lực',
+      /**
+       * Nhãn cũ chỉ có "Hiệu lực" — nhân viên không đoán được là điền năm hay
+       * điền ngày hay điền trạng thái. Nhãn mới nói thẳng đơn vị cần nhập.
+       */
+      label: 'Năm hiệu lực',
       admin: {
         description:
-          'Năm văn bản có hiệu lực, ví dụ 2017. Để chữ chứ không phải số để ghi được "đã hết hiệu lực" hay "sửa đổi 2021".',
+          'Năm văn bản có hiệu lực, ví dụ 2017. Ô này nhận cả chữ, nên ghi được "đã hết hiệu lực" hoặc "sửa đổi 2021" khi cần.',
       },
     },
     {
@@ -78,7 +99,7 @@ export const LegalDocuments: CollectionConfig = {
       label: 'Link nguồn',
       admin: {
         description:
-          'Địa chỉ đầy đủ tới văn bản trên trang của cơ quan ban hành (bắt đầu bằng https://). Bỏ trống thì dòng đó không có link.',
+          'Địa chỉ đầy đủ tới văn bản trên trang của cơ quan ban hành, bắt đầu bằng https://. Đây là thứ người đọc bấm vào — bỏ trống thì dòng đó chỉ là chữ, không bấm được.',
       },
     },
     {

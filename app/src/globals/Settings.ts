@@ -66,7 +66,20 @@ export const Settings: GlobalConfig = {
               // (src/config/tenant.ts). Đặt cứng ở đây sẽ ghim màu HiACC vào DB HiTax.
               admin: {
                 description:
-                  'Mã màu dạng #RRGGBB, mặc định #CC1420 — đỏ lấy đúng từ logo. Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.',
+                  'Bấm một ô trong bảng màu, hoặc gõ mã dạng #RRGGBB. Bỏ trống thì dùng màu mặc định của site (#CC1420 — đỏ lấy đúng từ logo). Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.',
+                /**
+                 * Ô text gốc được bọc thêm bảng màu bấm chọn — xem
+                 * `components/admin/PrimaryColorField.tsx`. Vẫn ghi xuống DB
+                 * đúng chuỗi `#RRGGBB` mà `lib/brandStyle.ts` đọc được, và vẫn
+                 * cho gõ tay mã bất kỳ.
+                 *
+                 * ⚠️ Đổi đường dẫn này thì PHẢI chạy lại
+                 * `npm run generate:importmap`, nếu không admin chết
+                 * "Module not found".
+                 */
+                components: {
+                  Field: '@/components/admin/PrimaryColorField',
+                },
               },
             },
           ],
