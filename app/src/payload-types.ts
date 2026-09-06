@@ -359,7 +359,7 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Các dịch vụ công ty cung cấp, hiển thị ở trang chủ và menu Dịch vụ.
+ * CẤU TRÚC CŨ, không còn hiển thị ra website. Nội dung đã chuyển sang "Cây dịch vụ" — sửa ở đó. Mục này giữ lại để đối chiếu, sẽ gỡ sau.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services".

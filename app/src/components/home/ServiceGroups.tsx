@@ -32,7 +32,8 @@ export function ServiceGroups({
     'Từ kế toán trọn gói tới giấy phép hoạt động — chọn đúng phần doanh nghiệp bạn cần.'
 
   return (
-    <section className={styles.section}>
+    // `id` là đích của nút "Xem dịch vụ" ở Hero.
+    <section id="linh-vuc" className={styles.section}>
       <Container>
         <div className={styles.head}>
           <h2 className={styles.title}>{title}</h2>

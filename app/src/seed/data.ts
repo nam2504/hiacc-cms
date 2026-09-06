@@ -341,28 +341,6 @@ export const PAGES = [
     ]),
   },
   {
-    title: 'Dịch vụ chuyên ngành',
-    slug: 'dich-vu',
-    content: richText([
-      paragraph(
-        'HiACC cung cấp các nhóm dịch vụ kế toán, thuế và tư vấn doanh nghiệp dưới đây. Chi tiết từng dịch vụ xem tại trang riêng của mỗi dịch vụ.',
-      ),
-      heading('h2', 'Nhóm dịch vụ kế toán'),
-      bulletList([
-        'Kế toán trọn gói',
-        'Kế toán nội bộ',
-        'Soát xét hồ sơ',
-        'Báo cáo tài chính',
-      ]),
-      heading('h2', 'Nhóm dịch vụ thuế'),
-      bulletList(['Quyết toán thuế', 'Hoàn thuế GTGT', 'Quyết toán giải thể']),
-      paragraph(
-        'Mỗi doanh nghiệp có đặc thù riêng, phạm vi công việc cụ thể sẽ được tư vấn và thống nhất trước khi ký hợp đồng dịch vụ.',
-      ),
-      sampleNotice(),
-    ]),
-  },
-  {
     title: 'Liên hệ',
     slug: 'lien-he',
     content: richText([

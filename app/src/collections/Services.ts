@@ -2,15 +2,26 @@ import type { CollectionConfig } from 'payload'
 import { slugField, seoField } from './fields'
 import { contentAccess } from '../access'
 
-/** Dịch vụ — AUDIT §3.5 (kế toán trọn gói, quyết toán thuế, hoàn thuế GTGT…). */
+/**
+ * Dịch vụ của CẤU TRÚC CŨ — đã bị "Cây dịch vụ" (service-nodes) thay thế.
+ *
+ * Vì sao còn trong repo: `seed/migrateServices.ts` đọc collection này để chuyển
+ * nội dung khách đã nhập sang cây. Xoá bây giờ là mất đường lùi nếu phát hiện
+ * mục nào chưa chuyển hết. Ẩn khỏi admin để khách không nhập nhầm vào chỗ không
+ * còn hiển thị ra web — route /dich-vu đã gỡ.
+ *
+ * Xoá hẳn collection này là một việc riêng, làm khi đã xác nhận cây có đủ nội
+ * dung của cả 7 mục.
+ */
 export const Services: CollectionConfig = {
   slug: 'services',
   admin: {
     useAsTitle: 'name',
     group: 'Nội dung',
     defaultColumns: ['name', 'order', 'slug', 'updatedAt'],
-    description: 'Các dịch vụ công ty cung cấp, hiển thị ở trang chủ và menu Dịch vụ.',
-    preview: (doc) => (typeof doc?.slug === 'string' ? `/dich-vu/${doc.slug}` : null),
+    description:
+      'CẤU TRÚC CŨ, không còn hiển thị ra website. Nội dung đã chuyển sang "Cây dịch vụ" — sửa ở đó. Mục này giữ lại để đối chiếu, sẽ gỡ sau.',
+    hidden: true,
   },
   labels: { singular: 'Dịch vụ', plural: 'Dịch vụ' },
   access: contentAccess,

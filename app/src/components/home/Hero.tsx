@@ -64,7 +64,11 @@ export async function Hero({ settings }: { settings: Setting | null }) {
               <Button href={href("/lien-he")} size="lg">
                 {cta}
               </Button>
-              <Button href={href("/dich-vu")} variant="outline" size="lg">
+              {/* Cuộn tới khối 5 nhóm dịch vụ ngay bên dưới. Trước đây nút này
+                  trỏ /dich-vu — trang của cấu trúc cũ, đã bị cây dịch vụ thay
+                  thế và gỡ khỏi repo. Neo trong trang đúng hơn một trang riêng:
+                  danh sách nhóm đã nằm sẵn ở đây. */}
+              <Button href="#linh-vuc" variant="outline" size="lg">
                 {ctaSecondary}
               </Button>
             </div>
