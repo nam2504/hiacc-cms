@@ -29,3 +29,15 @@ app/public/media/
 
 # OS
 .DS_Store
+
+# Tài liệu nội bộ — KHÔNG đưa vào git.
+# Repo này sẽ bàn giao cho khách, nên mọi thứ không phải mã nguồn website đều
+# nằm ngoài: tài liệu gốc khách gửi, phân tích yêu cầu, câu hỏi nội bộ, và
+# NHẤT LÀ báo giá. Giữ ở máy và trên Drive.
+hitax/
+PROPOSAL-domain-hosting-combo.md
+ESTIMATE.md
+REVIEW-*.md
+AUDIT-*.md
+PLAN-execution.md
+HANDOFF.md
