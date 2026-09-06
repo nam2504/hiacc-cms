@@ -1,5 +1,6 @@
+import { cache } from 'react'
 import type { ServiceNode } from '@/payload-types'
-import { getPayloadClient, toPayloadLocale } from '@/lib/site'
+import { getPayloadClient, mediaUrl, toPayloadLocale } from '@/lib/site'
 import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
 
 /**
@@ -45,7 +46,23 @@ async function fetchNodes(locale: LocaleCode): Promise<RawNode[]> {
       // Cây thật ~40 bản ghi. Đặt 500 để không bị cắt âm thầm khi khách thêm mục,
       // nhưng vẫn có trần để một lỗi dữ liệu không kéo về hàng vạn dòng.
       limit: 500,
+      /**
+       * depth 0 + `select`: chỉ kéo đúng những cột cần để dựng cây và menu.
+       *
+       * Trước đây để depth 1 cho tiện lấy URL ảnh, nhưng cây này chạy ở LAYOUT
+       * nên mọi trang đều gánh: 37 node × toàn bộ bản ghi media lồng nhau (kèm
+       * mọi imageSizes) làm trang chủ chậm dần 3.9s → 16.8s và server phình lên
+       * 1.5GB. Ảnh nhóm nay lấy riêng bằng getGroupImages() — chỉ trang chủ cần.
+       */
       depth: 0,
+      select: {
+        title: true,
+        slug: true,
+        order: true,
+        icon: true,
+        summary: true,
+        parent: true,
+      },
       locale: toPayloadLocale(locale),
       sort: 'order',
     })
@@ -97,10 +114,19 @@ function buildTree(rows: RawNode[]): TreeNode[] {
   return roots
 }
 
-/** Cây đầy đủ, dùng cho menu, sitemap và trang chủ. */
-export async function getServiceTree(locale: LocaleCode = DEFAULT_LOCALE): Promise<TreeNode[]> {
-  return buildTree(await fetchNodes(locale))
-}
+/**
+ * Cây đầy đủ, dùng cho menu, sitemap và trang chủ.
+ *
+ * Bọc `cache()` của React: trong MỘT request, layout dựng menu và trang dựng nội
+ * dung đều gọi hàm này. Không có cache thì mỗi lần gọi là một lượt quét bảng —
+ * đo được 2 lượt cho mỗi trang cây dịch vụ. Cache chỉ sống trong phạm vi một
+ * request nên không giữ dữ liệu cũ giữa các lần tải trang.
+ */
+export const getServiceTree = cache(
+  async (locale: LocaleCode = DEFAULT_LOCALE): Promise<TreeNode[]> => {
+    return buildTree(await fetchNodes(locale))
+  },
+)
 
 export type NodeMatch = {
   node: TreeNode
@@ -132,3 +158,31 @@ export function findByPath(tree: TreeNode[], segments: string[]): NodeMatch | nu
 export function flatten(tree: TreeNode[]): TreeNode[] {
   return tree.flatMap((node) => [node, ...flatten(node.children)])
 }
+
+/**
+ * URL ảnh của các node theo id — tách khỏi `getServiceTree` vì chỉ trang chủ cần
+ * ảnh, còn cây thì mọi trang đều nạp qua layout. Gộp vào cây sẽ bắt cả site trả
+ * giá cho dữ liệu mà 90% số trang không dùng.
+ */
+export const getNodeImages = cache(async (ids: string[]): Promise<Record<string, string>> => {
+  if (ids.length === 0) return {}
+  try {
+    const payload = await getPayloadClient()
+    const res = await payload.find({
+      collection: 'service-nodes',
+      where: { id: { in: ids } },
+      limit: ids.length,
+      depth: 1,
+      select: { image: true },
+    })
+    const map: Record<string, string> = {}
+    for (const doc of res.docs) {
+      const url = mediaUrl((doc as { image?: unknown }).image as Parameters<typeof mediaUrl>[0])
+      if (url) map[String(doc.id)] = url
+    }
+    return map
+  } catch (error) {
+    console.error('[serviceTree] không đọc được ảnh mục dịch vụ:', error)
+    return {}
+  }
+})

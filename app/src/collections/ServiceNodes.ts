@@ -16,6 +16,25 @@ import { contentAccess } from '../access'
  * con của nó `ke-toan-tron-goi` → `/ke-toan/ke-toan-tron-goi`. Route catch-all
  * `src/app/(site)/[...slug]` giải chuỗi này.
  */
+
+/**
+ * Slug cấp cao nhất không được trùng route đã khai tường minh: Next ưu tiên route
+ * tĩnh nên node đó vĩnh viễn không mở được, mà admin không thấy lỗi gì.
+ */
+const RESERVED_ROOT_SLUGS = new Set([
+  'admin',
+  'api',
+  'gioi-thieu',
+  'lien-he',
+  'tin-tuc',
+  'chuyen-muc',
+  'cong-cu',
+  'van-ban-phap-luat',
+  'bang-gia',
+  'sitemap.xml',
+  'robots.txt',
+])
+
 export const ServiceNodes: CollectionConfig = {
   slug: 'service-nodes',
   admin: {
@@ -112,10 +131,20 @@ export const ServiceNodes: CollectionConfig = {
       ],
     },
   ],
+
   hooks: {
     beforeChange: [
       async ({ data, req, originalDoc, operation }) => {
         const parentId = data?.parent
+
+        // Chỉ node gốc mới đụng route cấp 1; node con nằm dưới slug của cha nên
+        // trùng tên là chuyện bình thường.
+        if (!parentId && data?.slug && RESERVED_ROOT_SLUGS.has(String(data.slug))) {
+          throw new APIError(
+            `Đường dẫn "${data.slug}" đã được trang khác của website dùng. Mục này sẽ không mở được. Chọn đường dẫn khác.`,
+            400,
+          )
+        }
         if (!parentId) return data
 
         const selfId = originalDoc?.id ?? (operation === 'update' ? data?.id : undefined)

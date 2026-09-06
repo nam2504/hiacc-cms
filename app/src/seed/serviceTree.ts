@@ -1,4 +1,5 @@
 import type { Payload } from 'payload'
+import { SERVICE_CONTENT, GROUP_HERO_STATS } from './serviceContent'
 
 /**
  * Seed CÂY dịch vụ — 5 nhóm / 32 hạng mục, lấy đúng từ `SET WEB.xlsx` khách gửi
@@ -155,5 +156,71 @@ export async function seedServiceTree(payload: Payload): Promise<void> {
     }
   }
 
-  console.log(`[seed] cây dịch vụ: tạo mới ${created}, bỏ qua ${skipped} (đã có).`)
+  const filled = await fillServiceContent(payload)
+  console.log(
+    `[seed] cây dịch vụ: tạo mới ${created}, bỏ qua ${skipped} (đã có), điền nội dung mẫu ${filled}.`,
+  )
+}
+
+/**
+ * Điền nội dung mẫu và dải số liệu. Chỉ ghi vào ô CÒN TRỐNG — khách sửa rồi thì
+ * chạy lại seed không đè mất công sức của họ.
+ */
+async function fillServiceContent(payload: Payload): Promise<number> {
+  let filled = 0
+
+  for (const [slug, stats] of Object.entries(GROUP_HERO_STATS)) {
+    const doc = await findBySlug(payload, slug)
+    if (!doc || (doc.heroStats?.length ?? 0) > 0) continue
+    await payload.update({ collection: 'service-nodes', id: doc.id, data: { heroStats: stats } })
+    filled += 1
+  }
+
+  for (const item of SERVICE_CONTENT) {
+    const doc = await findBySlug(payload, item.slug)
+    if (!doc || (doc.body?.length ?? 0) > 0) continue
+
+    const body = item.blocks.map((block) => {
+      switch (block.type) {
+        case 'pricingTable':
+          return {
+            blockType: 'pricingTable' as const,
+            title: block.title,
+            note: block.note,
+            rows: block.rows.map((row) => ({ item: row.item, scope: row.scope, fee: row.fee })),
+          }
+        case 'bulletList':
+          return {
+            blockType: 'bulletList' as const,
+            title: block.title,
+            items: block.items.map((text) => ({ text })),
+          }
+        case 'fieldTable':
+          return {
+            blockType: 'fieldTable' as const,
+            title: block.title,
+            rows: block.rows.map((row) => ({ label: row.label, value: row.value })),
+          }
+      }
+    })
+
+    /**
+     * Chỉ ghi `summary` khi ô đó ĐANG TRỐNG hoặc còn là chuỗi báo "đang cập nhật"
+     * do chính seed đặt. Trước đây guard chỉ xét `body` rồi ghi luôn `summary`,
+     * nên khách viết mô tả xong mà chưa nhập nội dung chi tiết thì lần seed sau
+     * ăn mất câu họ viết.
+     */
+    const summaryIsSeeded = !doc.summary?.trim() || doc.summary.trim() === PENDING
+    await payload.update({
+      collection: 'service-nodes',
+      id: doc.id,
+      data: {
+        ...(summaryIsSeeded && item.summary ? { summary: item.summary } : {}),
+        body,
+      },
+    })
+    filled += 1
+  }
+
+  return filled
 }

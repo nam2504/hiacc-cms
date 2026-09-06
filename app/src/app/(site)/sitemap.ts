@@ -5,8 +5,8 @@ import {
   getAllPageSlugs,
   getAllPostSlugs,
   getCategories,
-  getServices,
 } from '@/lib/site'
+import { flatten, getServiceTree } from '@/lib/serviceTree'
 
 /**
  * Sitemap đọc slug từ DB → PHẢI dynamic, cùng lý do như các trang khác:
@@ -35,7 +35,6 @@ const PAGES_WITH_OWN_ROUTE = new Set(['gioi-thieu', 'lien-he'])
 const STATIC_PATHS = [
   { path: '/', priority: 1 },
   { path: '/gioi-thieu', priority: 0.8 },
-  { path: '/dich-vu', priority: 0.9 },
   { path: '/lien-he', priority: 0.8 },
   { path: '/tin-tuc', priority: 0.7 },
   { path: '/chuyen-muc', priority: 0.6 },
@@ -49,8 +48,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    */
   if (isStaging()) return []
 
-  const [services, categories, posts, pages] = await Promise.all([
-    getServices(),
+  const [tree, categories, posts, pages] = await Promise.all([
+    getServiceTree(),
     getCategories(),
     getAllPostSlugs(),
     getAllPageSlugs(),
@@ -66,11 +65,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority,
     })),
 
-    ...services.map((service) => ({
-      url: absoluteUrl(`/dich-vu/${service.slug}`),
-      lastModified: new Date(service.updatedAt),
+    /**
+     * Cây dịch vụ: 5 nhóm + các hạng mục con, đường dẫn lấy từ chính cây nên
+     * khách thêm mục trong /admin là sitemap có ngay.
+     *
+     * Nhánh `/dich-vu/<slug>` cũ đã BỎ khỏi sitemap: nội dung của nó nay nằm ở
+     * cây, khai cả hai là tự tạo trang trùng nội dung.
+     */
+    ...flatten(tree).map((node) => ({
+      url: absoluteUrl(node.path),
+      lastModified: now,
       changeFrequency: 'monthly' as const,
-      priority: 0.8,
+      // Nhóm cấp cao nhất quan trọng hơn hạng mục con.
+      priority: node.path.split('/').length === 2 ? 0.9 : 0.8,
     })),
 
     ...categories.map((category) => ({
