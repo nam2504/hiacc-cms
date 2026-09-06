@@ -1169,7 +1169,7 @@ export interface Setting {
    */
   tagline?: string | null;
   /**
-   * Bấm một ô trong bảng màu, hoặc gõ mã dạng #RRGGBB. Bỏ trống thì dùng màu mặc định của site (#CC1420 — đỏ lấy đúng từ logo). Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.
+   * Bấm một ô trong bảng màu, hoặc gõ mã dạng #RRGGBB. Bỏ trống thì dùng màu mặc định của site (#CC1420). Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.
    */
   primaryColor?: string | null;
   /**
