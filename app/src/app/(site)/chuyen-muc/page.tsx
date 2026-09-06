@@ -3,7 +3,7 @@ import { Container } from '@/components/ui/Container'
 import { CategoryGroups } from '@/components/news/CategoryGroups'
 import { EmptyState } from '@/components/news/EmptyState'
 import { PageHero } from '@/components/news/PageHero'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { getCategories } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -22,7 +22,8 @@ import { getRequestLocale } from '@/lib/requestLocale'
  */
 export const dynamic = 'force-dynamic'
 
-export function generateMetadata(): Metadata {
+export async function generateMetadata(): Promise<Metadata> {
+  const t = createTranslator(await getRequestLocale())
   return {
     title: t('news.categories.title'),
     description: t('news.categories.subtitle'),
@@ -35,6 +36,7 @@ export function generateMetadata(): Metadata {
  */
 export default async function CategoryListPage() {
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const categories = await getCategories(locale)
 
   return (

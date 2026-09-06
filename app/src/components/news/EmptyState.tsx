@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import styles from './EmptyState.module.css'
 
 /**
@@ -13,7 +14,7 @@ import styles from './EmptyState.module.css'
  * V2 (REVIEW-visual.md §7①): `news.empty.icon` giờ là khoá icon 'newspaper'
  * (xem `Icon.tsx`), không còn emoji.
  */
-export function EmptyState({
+export async function EmptyState({
   title,
   body,
   actionHref,
@@ -24,6 +25,8 @@ export function EmptyState({
   actionHref?: string
   actionLabel?: string
 }) {
+  const t = createTranslator(await getRequestLocale())
+
   return (
     <div className={styles.empty}>
       <Icon name={t('news.empty.icon')} className={styles.icon} />

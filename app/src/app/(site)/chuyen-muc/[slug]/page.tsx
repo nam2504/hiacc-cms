@@ -7,7 +7,7 @@ import { Pagination } from '@/components/news/Pagination'
 import { PostGrid } from '@/components/news/PostGrid'
 import { readPage, seoMetadata, type SearchParams } from '@/components/news/params'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
 import { getCategoryBySlug, getPosts, getSettings } from '@/lib/site'
 import styles from './page.module.css'
@@ -19,6 +19,7 @@ type Params = Promise<{ slug: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const { slug } = await params
   const [category, settings] = await Promise.all([getCategoryBySlug(slug), getSettings(locale)])
   if (!category) return { title: t('error.notFound.title') }
@@ -63,6 +64,7 @@ export default async function CategoryDetailPage({
   searchParams: SearchParams
 }) {
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const [{ slug }, query] = await Promise.all([params, searchParams])
   const category = await getCategoryBySlug(slug, locale)
   if (!category) notFound()

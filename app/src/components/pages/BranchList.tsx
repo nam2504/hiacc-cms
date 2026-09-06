@@ -1,5 +1,6 @@
 import { BranchMap } from '@/components/map/BranchMap'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Branch } from '@/payload-types'
 import styles from './BranchList.module.css'
 
@@ -14,9 +15,14 @@ import styles from './BranchList.module.css'
  * dòng tự ẩn, nút "Xem bản đồ" chỉ hiện khi có mapUrl (W7: nút đó nằm trong
  * <BranchMap>, mở bản đồ ngay tại chỗ thay vì mở tab Google Maps).
  */
-export function BranchList({ branches }: { branches: Branch[] }) {
+export async function BranchList({ branches }: { branches: Branch[] }) {
+  // BranchMap là client component: nó không đọc được header x-locale, nên locale
+  // phải đi xuống qua props từ đây (server).
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
+
   if (branches.length === 0) {
-    return <p className={styles.empty}>{t('branches.empty')}</p>
+    return <p className={styles.empty}>{tr('branches.empty')}</p>
   }
 
   return (
@@ -26,12 +32,12 @@ export function BranchList({ branches }: { branches: Branch[] }) {
           <h3 className={styles.city}>{branch.city}</h3>
 
           <dl className={styles.details}>
-            <dt className={styles.term}>{t('common.address')}</dt>
+            <dt className={styles.term}>{tr('common.address')}</dt>
             <dd className={styles.desc}>{branch.address}</dd>
 
             {branch.phone && (
               <>
-                <dt className={styles.term}>{t('common.hotline')}</dt>
+                <dt className={styles.term}>{tr('common.hotline')}</dt>
                 <dd className={styles.desc}>
                   <a className={styles.link} href={`tel:${branch.phone.replace(/[\s.]/g, '')}`}>
                     {branch.phone}
@@ -42,7 +48,7 @@ export function BranchList({ branches }: { branches: Branch[] }) {
 
             {branch.email && (
               <>
-                <dt className={styles.term}>{t('common.email')}</dt>
+                <dt className={styles.term}>{tr('common.email')}</dt>
                 <dd className={styles.desc}>
                   <a className={styles.link} href={`mailto:${branch.email}`}>
                     {branch.email}
@@ -57,7 +63,7 @@ export function BranchList({ branches }: { branches: Branch[] }) {
             div rỗng sẽ để lại khoảng trắng thừa dưới thẻ. Khoảng cách nằm ở
             .wrap của BranchMap.
           */}
-          <BranchMap mapUrl={branch.mapUrl} city={branch.city} />
+          <BranchMap mapUrl={branch.mapUrl} city={branch.city} locale={locale} />
         </li>
       ))}
     </ul>

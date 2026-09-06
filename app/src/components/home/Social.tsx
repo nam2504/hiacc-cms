@@ -1,5 +1,6 @@
 import { Section } from '@/components/ui/Section'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Setting } from '@/payload-types'
 import styles from './Social.module.css'
 
@@ -8,12 +9,14 @@ import styles from './Social.module.css'
  * Kênh nào trống thì ẩn; trống hết (hoặc settings null) thì ẩn cả khối.
  * Seed hiện chưa có link nào → khối này không render cho tới khi khách điền.
  */
-export function Social({ settings }: { settings: Setting | null }) {
+export async function Social({ settings }: { settings: Setting | null }) {
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   const channels = [
-    { key: 'facebook', href: settings?.facebook, label: t('home.social.facebook') },
-    { key: 'tiktok', href: settings?.tiktok, label: t('home.social.tiktok') },
-    { key: 'youtube', href: settings?.youtube, label: t('home.social.youtube') },
-    { key: 'twitter', href: settings?.twitter, label: t('home.social.twitter') },
+    { key: 'facebook', href: settings?.facebook, label: tr('home.social.facebook') },
+    { key: 'tiktok', href: settings?.tiktok, label: tr('home.social.tiktok') },
+    { key: 'youtube', href: settings?.youtube, label: tr('home.social.youtube') },
+    { key: 'twitter', href: settings?.twitter, label: tr('home.social.twitter') },
   ].filter((c): c is { key: string; href: string; label: string } => Boolean(c.href))
 
   if (channels.length === 0) return null
@@ -21,8 +24,8 @@ export function Social({ settings }: { settings: Setting | null }) {
   return (
     <Section
       tone="soft"
-      title={settings?.home?.socialTitle || t('home.social.title')}
-      subtitle={settings?.home?.socialSubtitle || t('home.social.subtitle')}
+      title={settings?.home?.socialTitle || tr('home.social.title')}
+      subtitle={settings?.home?.socialSubtitle || tr('home.social.subtitle')}
     >
       <ul className={styles.list}>
         {channels.map((channel) => (

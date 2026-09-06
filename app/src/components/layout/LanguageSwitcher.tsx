@@ -1,7 +1,7 @@
 'use client'
 
 import { enabledLocaleObjects, ALL_LOCALES } from '@/lib/locales'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import styles from './LanguageSwitcher.module.css'
 
 /**
@@ -13,6 +13,10 @@ import styles from './LanguageSwitcher.module.css'
  * thì href phải trỏ route có locale prefix.
  */
 export function LanguageSwitcher({ current }: { current: string }) {
+  // Client component: không gọi được getRequestLocale(). `current` ĐÃ là locale đang
+  // xem (cha truyền xuống), nên dùng luôn làm ngôn ngữ dịch — không thêm prop trùng.
+  const t = createTranslator(current as Parameters<typeof createTranslator>[0])
+
   if (enabledLocaleObjects.length < 2) return null
 
   return (

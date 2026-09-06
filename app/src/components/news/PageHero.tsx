@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -27,6 +27,7 @@ export async function PageHero({
   // Breadcrumb giữ ngôn ngữ đang xem — cả link "Trang chủ" lẫn crumb do trang
   // gọi truyền vào (crumb.href là đường dẫn KHÔNG có tiền tố ngôn ngữ).
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
 
   return (

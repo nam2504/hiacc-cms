@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/Button'
 import { Section } from '@/components/ui/Section'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Branch, Setting } from '@/payload-types'
 import styles from './Branches.module.css'
 
@@ -9,7 +10,7 @@ import styles from './Branches.module.css'
  * phone/email/mapUrl là field tuỳ chọn (seed đang để trống chờ khách xác nhận)
  * → từng dòng tự ẩn khi thiếu, nút "Xem bản đồ" chỉ hiện khi có mapUrl.
  */
-export function Branches({
+export async function Branches({
   branches,
   settings,
 }: {
@@ -18,13 +19,15 @@ export function Branches({
 }) {
   if (branches.length === 0) return null
 
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   const home = settings?.home
 
   return (
     <Section
       tone="soft"
-      title={home?.branchesTitle || t('home.branches.title')}
-      subtitle={home?.branchesSubtitle || t('home.branches.subtitle')}
+      title={home?.branchesTitle || tr('home.branches.title')}
+      subtitle={home?.branchesSubtitle || tr('home.branches.subtitle')}
     >
       <ul className={styles.grid}>
         {branches.map((branch) => (
@@ -32,12 +35,12 @@ export function Branches({
             <h3 className={styles.city}>{branch.city}</h3>
 
             <dl className={styles.details}>
-              <dt className={styles.term}>{t('common.address')}</dt>
+              <dt className={styles.term}>{tr('common.address')}</dt>
               <dd className={styles.desc}>{branch.address}</dd>
 
               {branch.phone && (
                 <>
-                  <dt className={styles.term}>{t('common.hotline')}</dt>
+                  <dt className={styles.term}>{tr('common.hotline')}</dt>
                   <dd className={styles.desc}>
                     <a className={styles.link} href={`tel:${branch.phone}`}>
                       {branch.phone}
@@ -48,7 +51,7 @@ export function Branches({
 
               {branch.email && (
                 <>
-                  <dt className={styles.term}>{t('common.email')}</dt>
+                  <dt className={styles.term}>{tr('common.email')}</dt>
                   <dd className={styles.desc}>
                     <a className={styles.link} href={`mailto:${branch.email}`}>
                       {branch.email}
@@ -61,7 +64,7 @@ export function Branches({
             {branch.mapUrl && (
               <div className={styles.action}>
                 <Button href={branch.mapUrl} variant="outline" external>
-                  {t('common.viewMap')}
+                  {tr('common.viewMap')}
                 </Button>
               </div>
             )}

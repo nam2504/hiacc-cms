@@ -6,14 +6,15 @@ import { Pagination } from '@/components/news/Pagination'
 import { FeaturedPost } from '@/components/news/FeaturedPost'
 import { PostGrid } from '@/components/news/PostGrid'
 import { readPage, type SearchParams } from '@/components/news/params'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { getPosts } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
 
 const PER_PAGE = 9
 
-export function generateMetadata(): Metadata {
+export async function generateMetadata(): Promise<Metadata> {
+  const t = createTranslator(await getRequestLocale())
   return {
     title: t('news.list.title'),
     description: t('news.list.subtitle'),
@@ -27,6 +28,7 @@ export function generateMetadata(): Metadata {
  */
 export default async function NewsListPage({ searchParams }: { searchParams: SearchParams }) {
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const params = await searchParams
   const page = readPage(params.page)
   const { docs, totalPages } = await getPosts({ page, limit: PER_PAGE, locale })
@@ -52,7 +54,7 @@ export default async function NewsListPage({ searchParams }: { searchParams: Sea
               {featured ? <FeaturedPost post={featured} /> : null}
               {rest.length > 0 ? (
                 <>
-                  <h2 className={styles.gridTitle}>Bài mới</h2>
+                  <h2 className={styles.gridTitle}>{t('news.list.latest')}</h2>
                   <PostGrid posts={rest} />
                 </>
               ) : null}

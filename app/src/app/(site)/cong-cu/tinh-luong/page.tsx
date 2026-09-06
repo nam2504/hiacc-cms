@@ -2,7 +2,7 @@ import { getRequestLocale } from '@/lib/requestLocale'
 import type { Metadata } from 'next'
 import { PayrollCalculator } from '@/components/payroll/PayrollCalculator'
 import { Section } from '@/components/ui/Section'
-import { createTranslator, t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { getPayrollConfig } from '@/lib/payroll/global'
 import styles from './page.module.css'
 import { localeAlternates, ogLocale } from '@/lib/seo'
@@ -35,6 +35,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PayrollToolPage() {
   // Global lỗi/chưa seed → getPayrollConfig() trả fallback §2, trang vẫn chạy.
   const config = await getPayrollConfig()
+  // <PayrollCalculator> là client component → locale phải đi xuống qua props.
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
 
   return (
     <Section>
@@ -44,23 +47,23 @@ export default async function PayrollToolPage() {
           (căn giữa, gạch đỏ dưới tiêu đề, subtitle 640px) để nhìn giống hệt trang khác.
           Cây heading sau khi sửa: h1 → h2 "Kết quả bóc tách" → h2 "Số liệu đang áp dụng". */}
       <header className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>{t('payroll.title')}</h1>
-        <p className={styles.pageSubtitle}>{t('payroll.subtitle')}</p>
+        <h1 className={styles.pageTitle}>{tr('payroll.title')}</h1>
+        <p className={styles.pageSubtitle}>{tr('payroll.subtitle')}</p>
       </header>
 
-      <PayrollCalculator config={config} />
+      <PayrollCalculator config={config} locale={locale} />
 
       {/* Verify được (contract §2.6 mục 1): mốc hiệu lực + căn cứ pháp lý hiện công
           khai, lấy thẳng từ global — người dùng thấy đang áp luật nào, không tin suông. */}
       <aside className={styles.legal}>
-        <h2 className={styles.legalTitle}>{t('payroll.legal.title')}</h2>
+        <h2 className={styles.legalTitle}>{tr('payroll.legal.title')}</h2>
         <dl className={styles.legalList}>
           <div className={styles.legalRow}>
-            <dt className={styles.legalTerm}>{t('payroll.legal.effectiveFrom')}</dt>
+            <dt className={styles.legalTerm}>{tr('payroll.legal.effectiveFrom')}</dt>
             <dd className={styles.legalDesc}>{config.effectiveFrom}</dd>
           </div>
           <div className={styles.legalRow}>
-            <dt className={styles.legalTerm}>{t('payroll.legal.basis')}</dt>
+            <dt className={styles.legalTerm}>{tr('payroll.legal.basis')}</dt>
             <dd className={styles.legalDesc}>
               {/* legalBasis là textarea nhiều dòng trong admin — tách dòng để đọc được,
                   không đổ nguyên khối chữ dính liền. */}

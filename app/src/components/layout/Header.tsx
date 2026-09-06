@@ -42,7 +42,7 @@ export function Header({
               locale={locale}
               tree={tree}
               staticItems={staticItems}
-              ctaLabel="Tư vấn miễn phí"
+              ctaLabel={tr('home.services.consultCta')}
               ctaHref="/lien-he"
             />
           </div>

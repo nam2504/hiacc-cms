@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Category, Setting } from '@/payload-types'
 import styles from './Knowledge.module.css'
 
@@ -13,7 +14,7 @@ const GROUPS = [
   { value: 'legal-hr', title: 'home.knowledge.group.legal-hr' },
 ] as const
 
-export function Knowledge({
+export async function Knowledge({
   categories,
   settings,
 }: {
@@ -22,12 +23,14 @@ export function Knowledge({
 }) {
   if (categories.length === 0) return null
 
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   const home = settings?.home
 
   return (
     <Section
-      title={home?.knowledgeTitle || t('home.knowledge.title')}
-      subtitle={home?.knowledgeSubtitle || t('home.knowledge.subtitle')}
+      title={home?.knowledgeTitle || tr('home.knowledge.title')}
+      subtitle={home?.knowledgeSubtitle || tr('home.knowledge.subtitle')}
     >
       <div className={styles.groups}>
         {GROUPS.map((group) => {
@@ -36,7 +39,7 @@ export function Knowledge({
 
           return (
             <div key={group.value} className={styles.group}>
-              <h3 className={styles.groupTitle}>{t(group.title)}</h3>
+              <h3 className={styles.groupTitle}>{tr(group.title)}</h3>
               <ul className={styles.list}>
                 {items.map((category) => (
                   <li key={category.id}>

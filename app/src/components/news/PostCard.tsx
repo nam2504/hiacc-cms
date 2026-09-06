@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { mediaAlt, mediaUrl } from '@/lib/site'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import { formatPostDate } from './date'
 import type { Category, Post } from '@/payload-types'
 import styles from './PostCard.module.css'
@@ -13,7 +14,8 @@ import styles from './PostCard.module.css'
  * nhìn thấy đầu tiên, nên thiếu ảnh thì thay bằng ô giữ chỗ có chữ cái đầu
  * của tiêu đề, không để lỗ hổng trong lưới.
  */
-export function PostCard({ post }: { post: Post }) {
+export async function PostCard({ post }: { post: Post }) {
+  const t = createTranslator(await getRequestLocale())
   const cover = mediaUrl(post.cover)
   const category = typeof post.category === 'object' ? (post.category as Category) : null
   const date = formatPostDate(post.publishedAt)

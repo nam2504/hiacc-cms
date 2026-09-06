@@ -6,7 +6,7 @@ import { ContactInfo } from '@/components/pages/ContactInfo'
 import { PageBody } from '@/components/pages/PageBody'
 import { PageHero } from '@/components/pages/PageHero'
 import { Section } from '@/components/ui/Section'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
 import { getBranches, getPageBySlug, getSettings } from '@/lib/site'
 import styles from './page.module.css'
@@ -40,11 +40,12 @@ const SLUG = 'lien-he'
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   // Khác các trang khác: KHÔNG return {} khi thiếu bản ghi `pages` — trang này vẫn
   // render bằng hotline + chi nhánh, nên metadata cũng phải đứng được với page = null.
   const [page, settings] = await Promise.all([getPageBySlug(SLUG, locale), getSettings(locale)])
 
-  const title = page?.seo?.title || page?.title || t('nav.contact')
+  const title = page?.seo?.title || page?.title || tr('nav.contact')
   const description = page?.seo?.description || undefined
   const images = ogImages(page?.seo?.image, page?.heroImage, settings?.logo)
 
@@ -55,7 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: 'website',
       url: `/${SLUG}`,
-      siteName: settings?.siteName || t('seo.siteName'),
+      siteName: settings?.siteName || tr('seo.siteName'),
       locale: ogLocale(locale),
       title,
       description,
@@ -72,6 +73,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function LienHePage() {
   const locale = await getRequestLocale()
+  // <ContactForm> là client component → locale phải đi xuống qua props.
+  const tr = createTranslator(locale)
   const [page, settings, branches] = await Promise.all([
     getPageBySlug(SLUG, locale),
     getSettings(locale),
@@ -81,8 +84,8 @@ export default async function LienHePage() {
   return (
     <>
       <PageHero
-        title={page?.title || t('nav.contact')}
-        subtitle={page?.seo?.description || t('contact.subtitle')}
+        title={page?.title || tr('nav.contact')}
+        subtitle={page?.seo?.description || tr('contact.subtitle')}
         image={page?.heroImage}
       />
 
@@ -97,12 +100,12 @@ export default async function LienHePage() {
           <div className={styles.body}>
             <PageBody content={page?.content} fallback={false} />
             {/* Chỗ dành cho form liên hệ — gói W7 gắn component form vào đây. */}
-            <ContactForm />
+            <ContactForm locale={locale} />
           </div>
         </div>
       </Section>
 
-      <Section tone="soft" title={t('contact.branches.title')} subtitle={t('contact.branches.subtitle')}>
+      <Section tone="soft" title={tr('contact.branches.title')} subtitle={tr('contact.branches.subtitle')}>
         <BranchList branches={branches} />
       </Section>
     </>

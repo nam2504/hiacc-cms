@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
-import { createTranslator, t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -26,7 +26,7 @@ const SECONDARY_LINKS = [
 export async function TopBar({ settings }: { settings: Setting | null }) {
   // Nhóm link phụ phải giữ ngôn ngữ đang xem; tel:/mailto: thì không bọc.
   const locale = await getRequestLocale()
-  const tr = createTranslator(locale as Parameters<typeof createTranslator>[0])
+  const tr = createTranslator(locale)
   const hotline = settings?.hotline
   const hotline2 = settings?.hotline2
   const email = settings?.email
@@ -38,7 +38,7 @@ export async function TopBar({ settings }: { settings: Setting | null }) {
           <span className={styles.contacts}>
             {hotline && (
               <a className={styles.item} href={`tel:${hotline.replace(/\s/g, '')}`}>
-                {t('common.hotline')} {hotline}
+                {tr('common.hotline')} {hotline}
                 {hotline2 ? ` / ${hotline2}` : ''}
               </a>
             )}

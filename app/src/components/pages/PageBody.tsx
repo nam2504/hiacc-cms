@@ -1,6 +1,7 @@
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import { RichText } from '@/components/ui/RichText'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import styles from './PageBody.module.css'
 
 /**
@@ -14,7 +15,7 @@ import styles from './PageBody.module.css'
  * SerializedEditorState một chút → ép kiểu đúng một chỗ ở đây, component gọi
  * không phải tự ép.
  */
-export function PageBody({
+export async function PageBody({
   content,
   fallback = true,
 }: {
@@ -23,7 +24,8 @@ export function PageBody({
 }) {
   if (!content) {
     if (!fallback) return null
-    return <p className={styles.empty}>{t('page.contentComingSoon')}</p>
+    const tr = createTranslator(await getRequestLocale())
+    return <p className={styles.empty}>{tr('page.contentComingSoon')}</p>
   }
 
   return <RichText data={content as SerializedEditorState} />

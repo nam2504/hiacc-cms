@@ -5,7 +5,7 @@ import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { submitContactForm, type ContactFormState } from '@/app/(site)/lien-he/actions'
 import { Button } from '@/components/ui/Button'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import styles from './ContactForm.module.css'
 
 /**
@@ -34,7 +34,8 @@ const FIELD_ORDER = [
   ['message', 'contact-message'],
 ] as const
 
-function SubmitButton() {
+/** `t` đi vào qua prop: SubmitButton nằm dưới <form> nên không nhận locale trực tiếp. */
+function SubmitButton({ t }: { t: ReturnType<typeof createTranslator> }) {
   const { pending } = useFormStatus()
 
   return (
@@ -44,7 +45,10 @@ function SubmitButton() {
   )
 }
 
-export function ContactForm() {
+export function ContactForm({ locale }: { locale: string }) {
+  // Client component: không gọi được getRequestLocale() (headers() chỉ chạy phía
+  // server) → locale đi vào qua props từ trang cha.
+  const t = createTranslator(locale as Parameters<typeof createTranslator>[0])
   const [state, formAction] = useActionState(submitContactForm, INITIAL_STATE)
   const formRef = useRef<HTMLFormElement>(null)
 
@@ -237,7 +241,7 @@ export function ContactForm() {
         </div>
 
         <div className={styles.actions}>
-          <SubmitButton />
+          <SubmitButton t={t} />
         </div>
       </form>
     </section>

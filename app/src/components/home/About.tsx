@@ -1,13 +1,14 @@
 import { Icon } from '@/components/ui/Icon'
 import { Section } from '@/components/ui/Section'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Setting } from '@/payload-types'
 import styles from './About.module.css'
 
 /**
  * Khối 4 — AUDIT §3.4: 4 điểm tin cậy.
  * Đoạn giới thiệu ngắn và 4 điểm tin cậy đều lấy từ Settings (khách sửa trong
- * admin); để trống thì dùng bản mặc định trong t().
+ * admin); để trống thì dùng bản mặc định trong tr().
  *
  * V2 (REVIEW-visual.md §7①): emoji thay bằng khoá icon SVG (`Icon.tsx`), không
  * đổi ý nghĩa nội dung — chỉ đổi cách vẽ. 4 khoá này cố định, không phụ thuộc C1.
@@ -29,7 +30,9 @@ const DEFAULT_POINTS = [
   },
 ] as const
 
-export function About({ settings }: { settings: Setting | null }) {
+export async function About({ settings }: { settings: Setting | null }) {
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   const home = settings?.home
   const custom = home?.aboutPoints
 
@@ -48,15 +51,15 @@ export function About({ settings }: { settings: Setting | null }) {
       : DEFAULT_POINTS.map((p) => ({
           key: p.key,
           icon: p.icon,
-          title: t(p.title),
-          body: t(p.body),
+          title: tr(p.title),
+          body: tr(p.body),
         }))
 
   return (
     <Section
       tone="soft"
-      title={home?.aboutTitle || t('home.about.title')}
-      subtitle={settings?.aboutShort || t('home.about.subtitle')}
+      title={home?.aboutTitle || tr('home.about.title')}
+      subtitle={settings?.aboutShort || tr('home.about.subtitle')}
     >
       <ul className={styles.grid}>
         {points.map((point) => (

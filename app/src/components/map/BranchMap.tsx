@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react'
 import { Button } from '@/components/ui/Button'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import styles from './BranchMap.module.css'
 
 /**
@@ -53,7 +53,18 @@ function toEmbedUrl(raw: string): string | null {
   return url.toString()
 }
 
-export function BranchMap({ mapUrl, city }: { mapUrl?: string | null; city?: string | null }) {
+export function BranchMap({
+  mapUrl,
+  city,
+  locale,
+}: {
+  mapUrl?: string | null
+  city?: string | null
+  locale: string
+}) {
+  // Client component không đọc được header x-locale (getRequestLocale dùng headers(),
+  // chỉ chạy phía server) → locale đi vào qua props từ BranchList.
+  const t = createTranslator(locale as Parameters<typeof createTranslator>[0])
   const [open, setOpen] = useState(false)
   const panelId = useId()
 

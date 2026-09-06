@@ -103,6 +103,18 @@ export const en = {
   'services.listSubtitle':
     'Choose the service that fits your business — each one has its own detailed description.',
   'services.empty': 'No services have been published yet.',
+  'services.sidebar.label': 'Service items',
+  'services.sidebar.title': 'Contents',
+  'services.pricingTable.title': 'Service price list',
+  'services.pricingTable.item': 'Item',
+  'services.pricingTable.scope': 'Scope of work',
+  'services.pricingTable.fee': 'Service fee',
+  'home.services.groupsTitle': 'What we do',
+  'home.services.groupsSubtitle':
+    'From full-service accounting to operating licences — pick exactly what your business needs.',
+  'home.services.groupDetail': 'See details →',
+  'home.services.consultCta': 'Free consultation',
+  'home.services.pricingCta': 'Full price list',
   'service.cta': 'Get advice on this service',
   'service.backToList': 'View all services',
 
@@ -116,6 +128,7 @@ export const en = {
   'news.list.title': 'News',
   'news.list.subtitle':
     'Tax, accounting and corporate legal updates — from the {brand} team.',
+  'news.list.latest': 'Latest articles',
 
   'news.categories.title': 'Categories',
   'news.categories.subtitle': 'Articles and legal updates organised by category.',

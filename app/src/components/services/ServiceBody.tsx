@@ -1,5 +1,7 @@
 import { Button } from '@/components/ui/Button'
 import { RichText } from '@/components/ui/RichText'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { ServiceNode } from '@/payload-types'
 import styles from './ServiceBody.module.css'
 
@@ -12,35 +14,48 @@ import styles from './ServiceBody.module.css'
 
 type Block = NonNullable<ServiceNode['body']>[number]
 
-export function ServiceBody({ body }: { body?: ServiceNode['body'] }) {
+export async function ServiceBody({ body }: { body?: ServiceNode['body'] }) {
   if (!body || body.length === 0) return null
+
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
 
   return (
     <div className={styles.body}>
       {body.map((block) => (
-        <BlockRenderer key={block.id ?? `${block.blockType}-${Math.random()}`} block={block} />
+        <BlockRenderer
+          key={block.id ?? `${block.blockType}-${Math.random()}`}
+          block={block}
+          tr={tr}
+        />
       ))}
     </div>
   )
 }
 
-function BlockRenderer({ block }: { block: Block }) {
+function BlockRenderer({
+  block,
+  tr,
+}: {
+  block: Block
+  tr: ReturnType<typeof createTranslator>
+}) {
   switch (block.blockType) {
     case 'pricingTable': {
       const rows = block.rows ?? []
       if (rows.length === 0) return null
       return (
         <section className={styles.section}>
-          <h2 className={styles.heading}>{block.title || 'Bảng giá dịch vụ'}</h2>
+          <h2 className={styles.heading}>{block.title || tr('services.pricingTable.title')}</h2>
           {/* Bảng phải cuộn được trong khung riêng: trên điện thoại, bảng 3 cột
               tràn ra ngoài sẽ đẩy cả trang trượt ngang. */}
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th scope="col">Hạng mục</th>
-                  <th scope="col">Phạm vi công việc</th>
-                  <th scope="col">Phí dịch vụ</th>
+                  <th scope="col">{tr('services.pricingTable.item')}</th>
+                  <th scope="col">{tr('services.pricingTable.scope')}</th>
+                  <th scope="col">{tr('services.pricingTable.fee')}</th>
                 </tr>
               </thead>
               <tbody>

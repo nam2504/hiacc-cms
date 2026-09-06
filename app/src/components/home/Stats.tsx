@@ -1,5 +1,6 @@
 import { Container } from '@/components/ui/Container'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Setting } from '@/payload-types'
 import styles from './Stats.module.css'
 
@@ -16,7 +17,9 @@ const DEFAULT_STATS = [
   { key: 'cost', value: 'home.stats.cost.value', label: 'home.stats.cost.label' },
 ] as const
 
-export function Stats({ settings }: { settings?: Setting | null }) {
+export async function Stats({ settings }: { settings?: Setting | null }) {
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   const custom = settings?.home?.stats
 
   // Chỉ nhận hàng có ĐỦ cả hai dòng: một ô thiếu dòng mô tả hiện ra là một ô
@@ -26,7 +29,7 @@ export function Stats({ settings }: { settings?: Setting | null }) {
       ? custom
           .filter((row) => row.value && row.label)
           .map((row) => ({ key: row.id ?? row.value!, value: row.value!, label: row.label! }))
-      : DEFAULT_STATS.map((s) => ({ key: s.key, value: t(s.value), label: t(s.label) }))
+      : DEFAULT_STATS.map((s) => ({ key: s.key, value: tr(s.value), label: tr(s.label) }))
 
   // Khách xoá hết / điền dở toàn bộ → ẩn khối thay vì để dải trống giữa trang.
   if (items.length === 0) return null

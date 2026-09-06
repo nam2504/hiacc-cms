@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/Button'
 import { Section } from '@/components/ui/Section'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -15,14 +15,15 @@ import { getRequestLocale } from '@/lib/requestLocale'
 export default async function NotFound() {
   // Khách lạc vào /en/... thì hai lối thoát cũng phải ở lại bản tiếng Anh.
   const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
 
   return (
-    <Section title={t('error.notFound.title')} subtitle={t('error.notFound.body')}>
+    <Section title={tr('error.notFound.title')} subtitle={tr('error.notFound.body')}>
       <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-        <Button href={href('/')}>{t('common.backToHome')}</Button>
+        <Button href={href('/')}>{tr('common.backToHome')}</Button>
         <Button href={href('/tin-tuc')} variant="outline">
-          {t('nav.news')}
+          {tr('nav.news')}
         </Button>
       </div>
     </Section>

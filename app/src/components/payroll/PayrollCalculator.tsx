@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import {
   calculatePayroll,
   formatVnd,
@@ -22,8 +22,20 @@ import styles from './PayrollCalculator.module.css'
  * (chiều ngược lại, được phép), rồi mọi thứ ở lại đây.
  *
  * Trang cha là server component; chỉ khối này 'use client' vì cần state theo phím gõ.
+ *
+ * `locale` cũng đi vào qua props vì lý do đó: client không gọi được getRequestLocale()
+ * (nó dùng headers(), chỉ chạy phía server). Trước đây file này import `t` dựng sẵn ở
+ * i18n.ts — translator đó đóng băng tiếng Việt lúc import, nên trang /en hiện nhãn
+ * tiếng Việt trong khi con số vẫn đúng: người đọc dễ hiểu nhầm khoản mục.
  */
-export function PayrollCalculator({ config }: { config: PayrollConfig }) {
+export function PayrollCalculator({
+  config,
+  locale,
+}: {
+  config: PayrollConfig
+  locale: string
+}) {
+  const t = createTranslator(locale as Parameters<typeof createTranslator>[0])
   const [direction, setDirection] = useState<Direction>('grossToNet')
   // Giữ nguyên chuỗi người dùng gõ (không ép sang number) để ô nhập không nhảy lung
   // tung khi họ xoá hết hoặc đang gõ dở. Việc làm sạch nằm ở sanitizeAmount().

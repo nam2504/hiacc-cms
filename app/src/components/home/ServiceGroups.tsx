@@ -2,6 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { Icon } from '@/components/ui/Icon'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { TreeNode } from '@/lib/serviceTree'
 import type { Setting } from '@/payload-types'
 import styles from './ServiceGroups.module.css'
@@ -14,7 +16,7 @@ import styles from './ServiceGroups.module.css'
  * hiện thêm thẻ — không phải sửa code. Nhóm chưa có hạng mục con vẫn hiện thẻ,
  * chỉ không có danh sách.
  */
-export function ServiceGroups({
+export async function ServiceGroups({
   tree,
   settings,
   images = {},
@@ -26,10 +28,10 @@ export function ServiceGroups({
 }) {
   if (tree.length === 0) return null
 
-  const title = settings?.home?.servicesTitle || 'Lĩnh vực hoạt động'
-  const subtitle =
-    settings?.home?.servicesSubtitle ||
-    'Từ kế toán trọn gói tới giấy phép hoạt động — chọn đúng phần doanh nghiệp bạn cần.'
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
+  const title = settings?.home?.servicesTitle || tr('home.services.groupsTitle')
+  const subtitle = settings?.home?.servicesSubtitle || tr('home.services.groupsSubtitle')
 
   return (
     // `id` là đích của nút "Xem dịch vụ" ở Hero.
@@ -77,7 +79,7 @@ export function ServiceGroups({
                   ) : null}
 
                   <Link className={styles.more} href={group.path}>
-                    Xem chi tiết →
+                    {tr('home.services.groupDetail')}
                   </Link>
                 </div>
               </article>

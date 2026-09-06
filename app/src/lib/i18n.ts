@@ -117,6 +117,18 @@ const vi: Dict = {
   'services.listSubtitle':
     'Chọn dịch vụ phù hợp với doanh nghiệp của bạn — mỗi dịch vụ có mô tả chi tiết riêng.',
   'services.empty': 'Chưa có dịch vụ nào được đăng.',
+  'services.sidebar.label': 'Danh sách hạng mục',
+  'services.sidebar.title': 'Nội dung',
+  'services.pricingTable.title': 'Bảng giá dịch vụ',
+  'services.pricingTable.item': 'Hạng mục',
+  'services.pricingTable.scope': 'Phạm vi công việc',
+  'services.pricingTable.fee': 'Phí dịch vụ',
+  'home.services.groupsTitle': 'Lĩnh vực hoạt động',
+  'home.services.groupsSubtitle':
+    'Từ kế toán trọn gói tới giấy phép hoạt động — chọn đúng phần doanh nghiệp bạn cần.',
+  'home.services.groupDetail': 'Xem chi tiết →',
+  'home.services.consultCta': 'Tư vấn miễn phí',
+  'home.services.pricingCta': 'Bảng giá tổng hợp',
   'service.cta': 'Nhận tư vấn về dịch vụ này',
   'service.backToList': 'Xem tất cả dịch vụ',
 
@@ -131,6 +143,7 @@ const vi: Dict = {
   'news.list.title': 'Tin tức',
   'news.list.subtitle':
     'Bản tin thuế, kế toán và pháp luật doanh nghiệp — cập nhật bởi đội ngũ {brand}.',
+  'news.list.latest': 'Bài mới',
 
   'news.categories.title': 'Chuyên mục',
   'news.categories.subtitle': 'Bài viết và văn bản pháp luật chia theo từng chuyên mục.',

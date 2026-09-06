@@ -1,4 +1,5 @@
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Setting } from '@/payload-types'
 import styles from './ContactInfo.module.css'
 
@@ -9,7 +10,8 @@ import styles from './ContactInfo.module.css'
  * Seed để hotline / email / địa chỉ TRỐNG chờ khách xác nhận → mỗi dòng tự ẩn
  * khi thiếu dữ liệu; thiếu hết thì cả khối biến mất thay vì hiện khung rỗng.
  */
-export function ContactInfo({ settings }: { settings: Setting | null }) {
+export async function ContactInfo({ settings }: { settings: Setting | null }) {
+  const tr = createTranslator(await getRequestLocale())
   const hotlines = [settings?.hotline, settings?.hotline2].filter(
     (v): v is string => typeof v === 'string' && v.trim() !== '',
   )
@@ -26,7 +28,7 @@ export function ContactInfo({ settings }: { settings: Setting | null }) {
       <dl className={styles.list}>
         {hotlines.length > 0 && (
           <div className={styles.row}>
-            <dt className={styles.term}>{t('common.hotline')}</dt>
+            <dt className={styles.term}>{tr('common.hotline')}</dt>
             <dd className={styles.desc}>
               {hotlines.map((phone) => (
                 // tel: cần số liền, bỏ khoảng trắng và dấu chấm người nhập cho dễ đọc
@@ -40,7 +42,7 @@ export function ContactInfo({ settings }: { settings: Setting | null }) {
 
         {email && (
           <div className={styles.row}>
-            <dt className={styles.term}>{t('common.email')}</dt>
+            <dt className={styles.term}>{tr('common.email')}</dt>
             <dd className={styles.desc}>
               <a href={`mailto:${email}`}>{email}</a>
             </dd>
@@ -49,14 +51,14 @@ export function ContactInfo({ settings }: { settings: Setting | null }) {
 
         {headOfficeAddress && (
           <div className={styles.row}>
-            <dt className={styles.term}>{t('contact.headOffice')}</dt>
+            <dt className={styles.term}>{tr('contact.headOffice')}</dt>
             <dd className={styles.desc}>{headOfficeAddress}</dd>
           </div>
         )}
 
         {taxCode && (
           <div className={styles.row}>
-            <dt className={styles.term}>{t('common.taxCode')}</dt>
+            <dt className={styles.term}>{tr('common.taxCode')}</dt>
             <dd className={styles.desc}>{taxCode}</dd>
           </div>
         )}

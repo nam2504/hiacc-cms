@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { brandName } from '@/config/tenant'
 import { FOOTER_NAV, localizedHref } from '@/lib/nav'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { getRequestLocale } from '@/lib/requestLocale'
 import type { TreeNode } from '@/lib/serviceTree'
@@ -26,6 +26,7 @@ export async function Footer({
   // Mọi link nội bộ trong footer phải giữ ngôn ngữ đang xem; mạng xã hội,
   // tel: và mailto: là link ra ngoài nên KHÔNG bọc.
   const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
 
   const socials = [
@@ -44,18 +45,18 @@ export async function Footer({
       <Container>
         <div className={styles.grid}>
           <div className={styles.col}>
-            <h3 className={styles.heading}>{headings?.about || t('footer.about')}</h3>
+            <h3 className={styles.heading}>{headings?.about || tr('footer.about')}</h3>
             {settings?.aboutShort && <p className={styles.text}>{settings.aboutShort}</p>}
             {settings?.companyName && <p className={styles.text}>{settings.companyName}</p>}
             {settings?.taxCode && (
               <p className={styles.text}>
-                {t('common.taxCode')}: {settings.taxCode}
+                {tr('common.taxCode')}: {settings.taxCode}
               </p>
             )}
           </div>
 
           <div className={styles.col}>
-            <h3 className={styles.heading}>{headings?.quickLinks || t('footer.quickLinks')}</h3>
+            <h3 className={styles.heading}>{headings?.quickLinks || tr('footer.quickLinks')}</h3>
             <ul className={styles.list}>
               {/* Nhóm dịch vụ sinh từ cây trong DB; các link còn lại là trang tĩnh. */}
               {tree.map((group) => (
@@ -68,7 +69,7 @@ export async function Footer({
               {FOOTER_NAV.map((item) => (
                 <li key={item.href}>
                   <Link href={href(item.href)} className={styles.link}>
-                    {t(item.labelKey)}
+                    {tr(item.labelKey)}
                   </Link>
                 </li>
               ))}
@@ -76,14 +77,14 @@ export async function Footer({
           </div>
 
           <div className={styles.col}>
-            <h3 className={styles.heading}>{headings?.contact || t('footer.contact')}</h3>
+            <h3 className={styles.heading}>{headings?.contact || tr('footer.contact')}</h3>
             {settings?.headOfficeAddress && (
               <p className={styles.text}>{settings.headOfficeAddress}</p>
             )}
             {settings?.hotline && (
               <p className={styles.text}>
                 <a className={styles.link} href={`tel:${settings.hotline.replace(/\s/g, '')}`}>
-                  {t('common.hotline')}: {settings.hotline}
+                  {tr('common.hotline')}: {settings.hotline}
                 </a>
               </p>
             )}
@@ -97,7 +98,7 @@ export async function Footer({
             {socials.length > 0 && (
               <div className={styles.socials}>
                 <h3 className={styles.heading}>
-                  {headings?.followUs || t('footer.followUs')}
+                  {headings?.followUs || tr('footer.followUs')}
                 </h3>
                 {socials.map((s) => (
                   <a
@@ -117,7 +118,7 @@ export async function Footer({
           {recentPosts.length > 0 && (
             <div className={styles.col}>
               <h3 className={styles.heading}>
-                {headings?.recentPosts || t('footer.recentPosts')}
+                {headings?.recentPosts || tr('footer.recentPosts')}
               </h3>
               <ul className={styles.list}>
                 {recentPosts.map((post) => (

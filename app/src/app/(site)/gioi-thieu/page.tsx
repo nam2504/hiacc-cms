@@ -6,7 +6,7 @@ import { CompanyProfile } from '@/components/pages/CompanyProfile'
 import { GroupSummary } from '@/components/pages/GroupSummary'
 import { Section } from '@/components/ui/Section'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
 import { getPageBySlug, getSettings } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
@@ -36,6 +36,7 @@ const SLUG = 'gioi-thieu'
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   const [page, settings] = await Promise.all([getPageBySlug(SLUG, locale), getSettings(locale)])
   if (!page) return {}
 
@@ -50,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: 'website',
       url: `/${SLUG}`,
-      siteName: settings?.siteName || t('seo.siteName'),
+      siteName: settings?.siteName || tr('seo.siteName'),
       locale: ogLocale(locale),
       title,
       description,
@@ -67,6 +68,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function GioiThieuPage() {
   const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   const [page, settings, tree] = await Promise.all([
     getPageBySlug(SLUG, locale),
     getSettings(locale),
@@ -78,7 +80,7 @@ export default async function GioiThieuPage() {
     <>
       <JsonLd
         data={breadcrumbJsonLd([
-          { name: t('seo.breadcrumb.home'), path: '/' },
+          { name: tr('seo.breadcrumb.home'), path: '/' },
           { name: page.title, path: `/${SLUG}` },
         ])}
       />

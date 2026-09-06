@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Category } from '@/payload-types'
 import styles from './CategoryGroups.module.css'
 
@@ -13,7 +14,9 @@ const GROUPS = [
   { value: 'legal-hr', title: 'home.knowledge.group.legal-hr' },
 ] as const
 
-export function CategoryGroups({ categories }: { categories: Category[] }) {
+export async function CategoryGroups({ categories }: { categories: Category[] }) {
+  const t = createTranslator(await getRequestLocale())
+
   return (
     <div className={styles.groups}>
       {GROUPS.map((group) => {

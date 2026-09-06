@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { DEFAULT_LOCALE } from '@/lib/locales'
+import { createTranslator } from '@/lib/i18n'
 import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
 import type { TreeNode } from '@/lib/serviceTree'
@@ -27,10 +28,11 @@ export async function ServiceSidebar({
   // `item.path` trong cây KHÔNG có tiền tố ngôn ngữ — dùng thẳng là bản EN hiện
   // tiêu đề tiếng Anh nhưng link nhảy sang trang tiếng Việt.
   const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
 
   return (
-    <nav className={styles.sidebar} aria-label={title || 'Danh sách hạng mục'}>
-      <p className={styles.title}>{title || 'Nội dung'}</p>
+    <nav className={styles.sidebar} aria-label={title || tr('services.sidebar.label')}>
+      <p className={styles.title}>{title || tr('services.sidebar.title')}</p>
       <ol className={styles.list}>
         {items.map((item, index) => {
           const active = item.path === activePath

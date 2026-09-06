@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { TENANT } from '@/config/tenant'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -22,10 +22,11 @@ import styles from './CallToAction.module.css'
 export async function CallToAction({ settings }: { settings: Setting | null }) {
   // Giữ ngôn ngữ đang xem cho cả hai nút, không thì CTA đẩy khách về bản tiếng Việt.
   const locale = await getRequestLocale()
+  const tr = createTranslator(locale)
   const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
   const home = settings?.home
-  const title = home?.ctaTitle || t('home.cta.title')
-  const primaryLabel = home?.ctaButton || t('home.cta.button')
+  const title = home?.ctaTitle || tr('home.cta.title')
+  const primaryLabel = home?.ctaButton || tr('home.cta.button')
 
   return (
     <section className={styles.cta}>
@@ -39,7 +40,7 @@ export async function CallToAction({ settings }: { settings: Setting | null }) {
               {primaryLabel}
             </Link>
             <Link className={styles.secondary} href={href('/bang-gia')}>
-              Bảng giá tổng hợp
+              {tr('home.services.pricingCta')}
             </Link>
           </div>
         </div>

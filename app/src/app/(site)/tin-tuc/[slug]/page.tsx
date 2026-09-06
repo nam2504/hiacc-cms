@@ -4,7 +4,7 @@ import { PageHero } from '@/components/news/PageHero'
 import { PostArticle } from '@/components/news/PostArticle'
 import { seoMetadata } from '@/components/news/params'
 import { JsonLd, articleJsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { absoluteMediaUrl, absoluteUrl, localeAlternates, ogImages, ogLocale } from '@/lib/seo'
 import { getPostBySlug, getSettings } from '@/lib/site'
 import type { Category } from '@/payload-types'
@@ -14,6 +14,7 @@ type Params = Promise<{ slug: string }>
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const { slug } = await params
   const [post, settings] = await Promise.all([getPostBySlug(slug), getSettings(locale)])
   if (!post) return { title: t('error.notFound.title') }
@@ -53,6 +54,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
  */
 export default async function PostDetailPage({ params }: { params: Params }) {
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const { slug } = await params
   const [post, settings] = await Promise.all([getPostBySlug(slug), getSettings(locale)])
   if (!post) notFound()

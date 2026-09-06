@@ -1,4 +1,5 @@
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
 import { absoluteUrl } from '@/lib/seo'
 
 /**
@@ -19,16 +20,17 @@ export type JsonLdNode = Record<string, unknown>
  * người đọc thì chuỗi đó vô hại, nhưng đẩy vào schema.org là khai địa chỉ giả với
  * Google — đúng thứ contract cấm. Coi như rỗng.
  */
-function isPlaceholder(value: string): boolean {
+function isPlaceholder(value: string, locale: LocaleCode = DEFAULT_LOCALE): boolean {
+  const t = createTranslator(locale)
   return value.trim().toLowerCase() === t('seo.placeholder.pending').toLowerCase()
 }
 
 /** Bỏ mọi khoá có giá trị rỗng (null / undefined / chuỗi trắng / giữ chỗ / mảng rỗng). */
-function compact(node: JsonLdNode): JsonLdNode {
+function compact(node: JsonLdNode, locale: LocaleCode = DEFAULT_LOCALE): JsonLdNode {
   return Object.fromEntries(
     Object.entries(node).filter(([, value]) => {
       if (value === null || value === undefined) return false
-      if (typeof value === 'string') return value.trim() !== '' && !isPlaceholder(value)
+      if (typeof value === 'string') return value.trim() !== '' && !isPlaceholder(value, locale)
       if (Array.isArray(value)) return value.length > 0
       return true
     }),

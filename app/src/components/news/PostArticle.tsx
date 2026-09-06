@@ -3,7 +3,7 @@ import Link from 'next/link'
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
 import { Container } from '@/components/ui/Container'
 import { RichText } from '@/components/ui/RichText'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -21,6 +21,7 @@ import styles from './PostArticle.module.css'
 export async function PostArticle({ post }: { post: Post }) {
   // Link chuyên mục và link quay lại danh sách phải giữ ngôn ngữ đang xem.
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
   const cover = mediaUrl(post.cover)
   const category = typeof post.category === 'object' ? (post.category as Category) : null

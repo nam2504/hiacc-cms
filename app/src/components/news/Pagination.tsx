@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { t } from '@/lib/i18n'
+import { createTranslator } from '@/lib/i18n'
+import { getRequestLocale } from '@/lib/requestLocale'
 import styles from './Pagination.module.css'
 
 /**
@@ -14,7 +15,7 @@ function hrefFor(basePath: string, page: number) {
   return page <= 1 ? basePath : `${basePath}?page=${page}`
 }
 
-export function Pagination({
+export async function Pagination({
   basePath,
   page,
   totalPages,
@@ -25,6 +26,7 @@ export function Pagination({
 }) {
   if (totalPages <= 1) return null
 
+  const t = createTranslator(await getRequestLocale())
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1)
   const hasPrev = page > 1
   const hasNext = page < totalPages
