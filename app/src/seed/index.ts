@@ -26,6 +26,7 @@ import {
   SETTINGS_HERO_IMAGE,
 } from './data'
 import { seedPayrollConfig } from './payrollConfig'
+import { seedServiceTree } from './serviceTree'
 
 /**
  * Thư mục chứa file ảnh stock nguồn để nạp qua Local API (gói M1, đợt 6).
@@ -229,6 +230,10 @@ async function seed() {
     if (heroId) merged.heroImage = heroId
   }
   await payload.updateGlobal({ slug: 'settings', data: merged })
+
+  // Cây dịch vụ (5 nhóm / 32 hạng mục theo SET WEB.xlsx 06/09). Tên hạng mục là
+  // thật, nội dung bên trong để khách nhập — xem chú thích trong serviceTree.ts.
+  await seedServiceTree(payload)
 
   // payroll-config (W5) cũng là global, cùng nguyên tắc: chỉ điền ô còn trống.
   const payrollFilled = await seedPayrollConfig(payload)

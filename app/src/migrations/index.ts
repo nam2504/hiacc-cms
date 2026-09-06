@@ -1,5 +1,6 @@
 import * as migration_20260901_084542_initial from './20260901_084542_initial';
 import * as migration_20260904_015151_noi_dung_trang_chu from './20260904_015151_noi_dung_trang_chu';
+import * as migration_20260906_125026_them_cay_dich_vu from './20260906_125026_them_cay_dich_vu';
 
 export const migrations = [
   {
@@ -10,6 +11,11 @@ export const migrations = [
   {
     up: migration_20260904_015151_noi_dung_trang_chu.up,
     down: migration_20260904_015151_noi_dung_trang_chu.down,
-    name: '20260904_015151_noi_dung_trang_chu'
+    name: '20260904_015151_noi_dung_trang_chu',
+  },
+  {
+    up: migration_20260906_125026_them_cay_dich_vu.up,
+    down: migration_20260906_125026_them_cay_dich_vu.down,
+    name: '20260906_125026_them_cay_dich_vu'
   },
 ];

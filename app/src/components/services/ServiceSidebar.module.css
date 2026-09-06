@@ -1,0 +1,80 @@
+.sidebar {
+  /* Bám theo khi cuộn, nhưng chỉ từ màn hình rộng — trên điện thoại nó nằm
+     trên nội dung theo luồng thường. */
+  position: static;
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    position: sticky;
+    top: 1.5rem;
+    align-self: start;
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+  }
+}
+
+.title {
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.625rem;
+  border-bottom: 2px solid var(--color-text);
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.75rem 0.75rem 0.75rem 0.625rem;
+  border-bottom: 1px solid var(--color-border);
+  border-left: 2px solid transparent;
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--text-sm, 0.875rem);
+  line-height: 1.45;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.item:hover {
+  background: var(--color-bg-soft);
+  border-left-color: var(--color-brand-light);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: -2px;
+}
+
+.itemActive {
+  background: var(--color-brand-tint);
+  border-left-color: var(--color-brand);
+  color: var(--color-brand);
+  font-weight: 600;
+}
+
+.index {
+  font-size: var(--text-xs, 0.75rem);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.itemActive .index {
+  color: var(--color-brand);
+}
+
+.label {
+  min-width: 0;
+}

@@ -70,6 +70,7 @@ export interface Config {
     posts: Post;
     pages: Page;
     services: Service;
+    'service-nodes': ServiceNode;
     categories: Category;
     media: Media;
     branches: Branch;
@@ -85,6 +86,7 @@ export interface Config {
     posts: PostsSelect<false> | PostsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
+    'service-nodes': ServiceNodesSelect<false> | ServiceNodesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     branches: BranchesSelect<false> | BranchesSelect<true>;
@@ -257,7 +259,7 @@ export interface Category {
 export interface Media {
   id: number;
   /**
-   * Tả ngắn nội dung ảnh, ví dụ "Nhân viên HiACC tư vấn khách hàng". Quan trọng cho SEO và người khiếm thị đọc màn hình.
+   * Tả ngắn nội dung ảnh, ví dụ "Nhân viên tư vấn khách hàng". Quan trọng cho SEO và người khiếm thị đọc màn hình.
    */
   alt?: string | null;
   updatedAt: string;
@@ -355,7 +357,7 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Các dịch vụ HiACC cung cấp, hiển thị ở trang chủ và menu Dịch vụ.
+ * Các dịch vụ công ty cung cấp, hiển thị ở trang chủ và menu Dịch vụ.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "services".
@@ -401,6 +403,162 @@ export interface Service {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Phần hiển thị trên Google và khi chia sẻ lên Facebook/Zalo. Bỏ trống thì hệ thống tự lấy tiêu đề và mô tả ngắn của bài.
+   */
+  seo?: {
+    /**
+     * Dòng chữ xanh trên Google. Nên 50–60 ký tự, có tên dịch vụ chính.
+     */
+    title?: string | null;
+    /**
+     * Đoạn mô tả dưới tiêu đề trên Google. Nên 120–160 ký tự.
+     */
+    description?: string | null;
+    /**
+     * Ảnh hiện khi dán link lên Facebook/Zalo. Nên 1200×630 px.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cây dịch vụ. Mục không chọn "Thuộc nhóm" là nhóm cấp cao nhất, hiện trên thanh menu. Mục có chọn là hạng mục con của nhóm đó.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-nodes".
+ */
+export interface ServiceNode {
+  id: number;
+  title: string;
+  /**
+   * Phần đuôi địa chỉ web, viết thường không dấu, nối bằng dấu gạch ngang. Ví dụ: gioi-thieu. ĐÃ ĐĂNG RỒI THÌ ĐỪNG ĐỔI — đổi là mọi link cũ hỏng và mất thứ hạng Google.
+   */
+  slug: string;
+  /**
+   * Bỏ trống = nhóm cấp cao nhất, hiện trên thanh menu. Chọn một mục = nằm bên trong mục đó.
+   */
+  parent?: (number | null) | ServiceNode;
+  /**
+   * Số nhỏ hiện trước. Để 0 hết thì sắp theo tên.
+   */
+  order?: number | null;
+  /**
+   * Khoá icon có sẵn: chart, folder, search, document, finance, archive, growth. Gõ sai thì dùng icon mặc định, không vỡ giao diện.
+   */
+  icon?: string | null;
+  /**
+   * Hiện ở thẻ ngoài trang chủ và đầu trang chi tiết. Nên ảnh ngang 3:2.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Vài dòng hiện dưới tiêu đề và trong thẻ ngoài trang chủ.
+   */
+  summary?: string | null;
+  /**
+   * Dải số liệu dưới mô tả, ví dụ "7 / HẠNG MỤC", "03–05 / NGÀY LÀM VIỆC". Bỏ trống thì không hiện dải này.
+   */
+  heroStats?:
+    | {
+        value: string;
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Chọn từng khối cần dùng rồi kéo để đổi thứ tự. Không bắt buộc dùng đủ mọi khối.
+   */
+  body?:
+    | (
+        | {
+            /**
+             * Bỏ trống thì hiện "Bảng giá dịch vụ".
+             */
+            title?: string | null;
+            rows?:
+              | {
+                  item: string;
+                  scope?: string | null;
+                  /**
+                   * Ghi cả đơn vị, ví dụ "500.000 / tháng" hoặc "từ 3.000.000 / tháng". Đây là chữ, không phải số — để ghi được "liên hệ" hay "theo khối lượng".
+                   */
+                  fee?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Ví dụ: phí chưa gồm lệ phí nhà nước.
+             */
+            note?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'pricingTable';
+          }
+        | {
+            /**
+             * Ví dụ: Nhiệm vụ của công ty, Nhiệm vụ của khách hàng, Cam kết.
+             */
+            title: string;
+            items?:
+              | {
+                  text: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'bulletList';
+          }
+        | {
+            title?: string | null;
+            rows?:
+              | {
+                  /**
+                   * Ví dụ: Yêu cầu chung, Thực hiện, Thời gian, Trả kết quả.
+                   */
+                  label: string;
+                  value: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'fieldTable';
+          }
+        | {
+            title?: string | null;
+            content?: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            } | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richTextBlock';
+          }
+        | {
+            label: string;
+            /**
+             * Ví dụ: /lien-he — hoặc địa chỉ đầy đủ nếu trỏ ra ngoài.
+             */
+            href: string;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'ctaBlock';
+          }
+      )[]
+    | null;
   /**
    * Phần hiển thị trên Google và khi chia sẻ lên Facebook/Zalo. Bỏ trống thì hệ thống tự lấy tiêu đề và mô tả ngắn của bài.
    */
@@ -541,6 +699,10 @@ export interface PayloadLockedDocument {
         value: number | Service;
       } | null)
     | ({
+        relationTo: 'service-nodes';
+        value: number | ServiceNode;
+      } | null)
+    | ({
         relationTo: 'categories';
         value: number | Category;
       } | null)
@@ -657,6 +819,98 @@ export interface ServicesSelect<T extends boolean = true> {
   image?: T;
   summary?: T;
   content?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "service-nodes_select".
+ */
+export interface ServiceNodesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  parent?: T;
+  order?: T;
+  icon?: T;
+  image?: T;
+  summary?: T;
+  heroStats?:
+    | T
+    | {
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  body?:
+    | T
+    | {
+        pricingTable?:
+          | T
+          | {
+              title?: T;
+              rows?:
+                | T
+                | {
+                    item?: T;
+                    scope?: T;
+                    fee?: T;
+                    id?: T;
+                  };
+              note?: T;
+              id?: T;
+              blockName?: T;
+            };
+        bulletList?:
+          | T
+          | {
+              title?: T;
+              items?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        fieldTable?:
+          | T
+          | {
+              title?: T;
+              rows?:
+                | T
+                | {
+                    label?: T;
+                    value?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        richTextBlock?:
+          | T
+          | {
+              title?: T;
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        ctaBlock?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
   seo?:
     | T
     | {
@@ -839,7 +1093,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface Setting {
   id: number;
   /**
-   * Hiện ở tiêu đề trình duyệt và kết quả Google.
+   * Hiện ở tiêu đề trình duyệt và kết quả Google. Bỏ trống thì dùng tên mặc định của site.
    */
   siteName?: string | null;
   /**
@@ -877,7 +1131,7 @@ export interface Setting {
    */
   companyName?: string | null;
   /**
-   * Dán link đầy đủ, ví dụ https://facebook.com/hiacc. Bỏ trống thì ẩn icon.
+   * Dán link đầy đủ, ví dụ https://facebook.com/tencongty. Bỏ trống thì ẩn icon.
    */
   facebook?: string | null;
   /**
@@ -926,7 +1180,7 @@ export interface Setting {
         }[]
       | null;
     /**
-     * Mặc định: Về HiACC
+     * Bỏ trống thì dùng "Về " + tên site.
      */
     aboutTitle?: string | null;
     /**
@@ -956,7 +1210,7 @@ export interface Setting {
     knowledgeTitle?: string | null;
     knowledgeSubtitle?: string | null;
     /**
-     * Mặc định: Kết nối với HiACC
+     * Bỏ trống thì dùng "Kết nối với " + tên site.
      */
     socialTitle?: string | null;
     socialSubtitle?: string | null;
@@ -978,7 +1232,7 @@ export interface Setting {
    */
   aboutShort?: string | null;
   /**
-   * Ví dụ: © 2026 Công ty TNHH HiACC. Bảo lưu mọi quyền.
+   * Ví dụ: © 2026 Công ty TNHH ABC. Bảo lưu mọi quyền.
    */
   copyright?: string | null;
   /**
