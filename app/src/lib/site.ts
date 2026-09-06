@@ -32,7 +32,9 @@ export async function getSettings(
   try {
     const payload = await getPayloadClient()
     return (await payload.findGlobal({ slug: 'settings', locale: asPayloadLocale(locale), depth: 1 })) as Setting
-  } catch {
+  } catch (error) {
+    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
+    console.error('[site] getSettings không đọc được dữ liệu:', error)
     return null
   }
 }
@@ -47,7 +49,9 @@ export async function getBranches(locale: LocaleCode = DEFAULT_LOCALE): Promise<
       sort: 'order',
     })
     return res.docs as Branch[]
-  } catch {
+  } catch (error) {
+    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
+    console.error('[site] getBranches không đọc được dữ liệu:', error)
     return []
   }
 }
@@ -67,7 +71,9 @@ export async function getRecentPosts(
       where: { _status: { equals: 'published' } },
     })
     return res.docs as Post[]
-  } catch {
+  } catch (error) {
+    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
+    console.error('[site] getRecentPosts không đọc được dữ liệu:', error)
     return []
   }
 }
@@ -106,7 +112,9 @@ export async function getServices(locale: LocaleCode = DEFAULT_LOCALE): Promise<
       depth: 1,
     })
     return res.docs as Service[]
-  } catch {
+  } catch (error) {
+    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
+    console.error('[site] getServices không đọc được dữ liệu:', error)
     return []
   }
 }
@@ -122,7 +130,9 @@ export async function getCategories(locale: LocaleCode = DEFAULT_LOCALE): Promis
       sort: 'order',
     })
     return res.docs as Category[]
-  } catch {
+  } catch (error) {
+    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
+    console.error('[site] getCategories không đọc được dữ liệu:', error)
     return []
   }
 }
@@ -146,7 +156,9 @@ async function findOneBySlug<T>(
       depth: 2,
     })
     return (res.docs[0] as T) ?? null
-  } catch {
+  } catch (error) {
+    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
+    console.error('[site] findOneBySlug không đọc được dữ liệu:', error)
     return null
   }
 }
@@ -198,7 +210,9 @@ export async function getPosts({
       page: res.page ?? 1,
       totalDocs: res.totalDocs,
     }
-  } catch {
+  } catch (error) {
+    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
+    console.error('[site] getPosts không đọc được dữ liệu:', error)
     return { docs: [] as Post[], totalPages: 0, page: 1, totalDocs: 0 }
   }
 }
@@ -226,7 +240,9 @@ export async function getAllPostSlugs(
       sort: '-publishedAt',
     })
     return (res.docs as Post[]).map((doc) => ({ slug: doc.slug, updatedAt: doc.updatedAt }))
-  } catch {
+  } catch (error) {
+    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
+    console.error('[site] getAllPostSlugs không đọc được dữ liệu:', error)
     return []
   }
 }
@@ -248,7 +264,9 @@ export async function getAllPageSlugs(
       depth: 0,
     })
     return (res.docs as Page[]).map((doc) => ({ slug: doc.slug, updatedAt: doc.updatedAt }))
-  } catch {
+  } catch (error) {
+    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
+    console.error('[site] getAllPageSlugs không đọc được dữ liệu:', error)
     return []
   }
 }
