@@ -40,5 +40,7 @@ ESTIMATE.md
 REVIEW-*.md
 AUDIT-*.md
 PLAN-execution.md
+contracts/
+INTERFACE-W0.md
 HANDOFF.md
-clean-git-history.sh
+clean-git-history*.sh
