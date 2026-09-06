@@ -41,3 +41,4 @@ REVIEW-*.md
 AUDIT-*.md
 PLAN-execution.md
 HANDOFF.md
+clean-git-history.sh
