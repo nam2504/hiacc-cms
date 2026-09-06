@@ -2,6 +2,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Post } from '@/payload-types'
 import { mediaAlt, mediaUrl } from '@/lib/site'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
+import { getRequestLocale } from '@/lib/requestLocale'
 import { formatPostDate } from './date'
 import styles from './FeaturedPost.module.css'
 
@@ -9,14 +12,17 @@ import styles from './FeaturedPost.module.css'
  * Bài nổi bật đầu trang Bản tin — ảnh trái, nội dung phải (thiết kế khách 06/09).
  * Bài mới nhất được đẩy lên đây, phần còn lại xuống lưới "Bài mới".
  */
-export function FeaturedPost({ post }: { post: Post }) {
+export async function FeaturedPost({ post }: { post: Post }) {
+  // Link bài/chuyên mục phải giữ ngôn ngữ đang xem; bản EN dùng path thô
+  // là bấm vào rơi thẳng về trang tiếng Việt.
+  const locale = await getRequestLocale()
   const cover = mediaUrl(post.cover)
   const category = typeof post.category === 'object' ? post.category : null
 
   return (
     <article className={styles.featured}>
       {cover ? (
-        <Link className={styles.media} href={`/tin-tuc/${post.slug}`} tabIndex={-1} aria-hidden="true">
+        <Link className={styles.media} href={localizedHref(`/tin-tuc/${post.slug}`, locale, DEFAULT_LOCALE)} tabIndex={-1} aria-hidden="true">
           <Image
             className={styles.image}
             src={cover}
@@ -39,14 +45,14 @@ export function FeaturedPost({ post }: { post: Post }) {
         </p>
 
         <h2 className={styles.title}>
-          <Link className={styles.titleLink} href={`/tin-tuc/${post.slug}`}>
+          <Link className={styles.titleLink} href={localizedHref(`/tin-tuc/${post.slug}`, locale, DEFAULT_LOCALE)}>
             {post.title}
           </Link>
         </h2>
 
         {post.excerpt ? <p className={styles.excerpt}>{post.excerpt}</p> : null}
 
-        <Link className={styles.action} href={`/tin-tuc/${post.slug}`}>
+        <Link className={styles.action} href={localizedHref(`/tin-tuc/${post.slug}`, locale, DEFAULT_LOCALE)}>
           Đọc bài viết
         </Link>
       </div>

@@ -7,6 +7,7 @@ import { FeaturedPost } from '@/components/news/FeaturedPost'
 import { PostGrid } from '@/components/news/PostGrid'
 import { readPage, type SearchParams } from '@/components/news/params'
 import { createTranslator } from '@/lib/i18n'
+import { localeAlternates } from '@/lib/seo'
 import { getPosts } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -14,10 +15,14 @@ import { getRequestLocale } from '@/lib/requestLocale'
 const PER_PAGE = 9
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = createTranslator(await getRequestLocale())
+  const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   return {
     title: t('news.list.title'),
     description: t('news.list.subtitle'),
+    // Thiếu dòng này thì trang kế thừa canonical '/' của layout: Google coi
+    // đây là bản sao trang chủ và bỏ cả nhánh VI lẫn EN khỏi chỉ mục.
+    alternates: localeAlternates('/tin-tuc', locale),
   }
 }
 

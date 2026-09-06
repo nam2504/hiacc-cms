@@ -4,6 +4,7 @@ import { CategoryGroups } from '@/components/news/CategoryGroups'
 import { EmptyState } from '@/components/news/EmptyState'
 import { PageHero } from '@/components/news/PageHero'
 import { createTranslator } from '@/lib/i18n'
+import { localeAlternates } from '@/lib/seo'
 import { getCategories } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -23,10 +24,14 @@ import { getRequestLocale } from '@/lib/requestLocale'
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = createTranslator(await getRequestLocale())
+  const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   return {
     title: t('news.categories.title'),
     description: t('news.categories.subtitle'),
+    // Thiếu dòng này thì trang kế thừa canonical '/' của layout: Google coi
+    // đây là bản sao trang chủ và bỏ cả nhánh VI lẫn EN khỏi chỉ mục.
+    alternates: localeAlternates('/chuyen-muc', locale),
   }
 }
 

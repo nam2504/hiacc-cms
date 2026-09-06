@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { createTranslator } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
 import type { Category } from '@/payload-types'
 import styles from './CategoryGroups.module.css'
@@ -15,6 +17,9 @@ const GROUPS = [
 ] as const
 
 export async function CategoryGroups({ categories }: { categories: Category[] }) {
+  // Link bài/chuyên mục phải giữ ngôn ngữ đang xem; bản EN dùng path thô
+  // là bấm vào rơi thẳng về trang tiếng Việt.
+  const locale = await getRequestLocale()
   const t = createTranslator(await getRequestLocale())
 
   return (
@@ -29,7 +34,7 @@ export async function CategoryGroups({ categories }: { categories: Category[] })
             <ul className={styles.list}>
               {items.map((category) => (
                 <li key={category.id}>
-                  <Link className={styles.card} href={`/chuyen-muc/${category.slug}`}>
+                  <Link className={styles.card} href={localizedHref(`/chuyen-muc/${category.slug}`, locale, DEFAULT_LOCALE)}>
                     <span className={styles.name}>{category.name}</span>
                     {category.description && (
                       <span className={styles.description}>{category.description}</span>

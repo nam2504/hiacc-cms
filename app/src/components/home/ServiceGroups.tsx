@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { Icon } from '@/components/ui/Icon'
 import { createTranslator } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
 import type { TreeNode } from '@/lib/serviceTree'
 import type { Setting } from '@/payload-types'
@@ -30,6 +32,7 @@ export async function ServiceGroups({
 
   const locale = await getRequestLocale()
   const tr = createTranslator(locale)
+  const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
   const title = settings?.home?.servicesTitle || tr('home.services.groupsTitle')
   const subtitle = settings?.home?.servicesSubtitle || tr('home.services.groupsSubtitle')
 
@@ -70,7 +73,7 @@ export async function ServiceGroups({
                     <ul className={styles.items}>
                       {group.children.map((child) => (
                         <li key={child.id}>
-                          <Link className={styles.itemLink} href={child.path}>
+                          <Link className={styles.itemLink} href={href(child.path)}>
                             {child.title}
                           </Link>
                         </li>
@@ -78,7 +81,7 @@ export async function ServiceGroups({
                     </ul>
                   ) : null}
 
-                  <Link className={styles.more} href={group.path}>
+                  <Link className={styles.more} href={href(group.path)}>
                     {tr('home.services.groupDetail')}
                   </Link>
                 </div>

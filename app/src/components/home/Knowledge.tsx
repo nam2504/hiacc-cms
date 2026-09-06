@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { Section } from '@/components/ui/Section'
 import { createTranslator } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
 import type { Category, Setting } from '@/payload-types'
 import styles from './Knowledge.module.css'
@@ -43,7 +45,7 @@ export async function Knowledge({
               <ul className={styles.list}>
                 {items.map((category) => (
                   <li key={category.id}>
-                    <Link className={styles.link} href={`/chuyen-muc/${category.slug}`}>
+                    <Link className={styles.link} href={localizedHref(`/chuyen-muc/${category.slug}`, locale, DEFAULT_LOCALE)}>
                       {category.name}
                     </Link>
                   </li>
