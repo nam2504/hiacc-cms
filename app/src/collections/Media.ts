@@ -43,7 +43,7 @@ export const Media: CollectionConfig = {
       localized: true,
       admin: {
         description:
-          'Tả ngắn nội dung ảnh, ví dụ "Nhân viên HiACC tư vấn khách hàng". Quan trọng cho SEO và người khiếm thị đọc màn hình.',
+          'Tả ngắn nội dung ảnh, ví dụ "Nhân viên tư vấn khách hàng". Quan trọng cho SEO và người khiếm thị đọc màn hình.',
       },
     },
   ],

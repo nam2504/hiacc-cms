@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
+import { brandName } from '@/config/tenant'
 import { FOOTER_NAV } from '@/lib/nav'
 import { t } from '@/lib/i18n'
 import type { Post, Setting } from '@/payload-types'
@@ -119,7 +120,7 @@ export function Footer({
 
         <div className={styles.bottom}>
           <p className={styles.copyright}>
-            {settings?.copyright || `© ${year} ${settings?.siteName || 'HiACC'}`}
+            {settings?.copyright || `© ${year} ${brandName(settings?.siteName)}`}
           </p>
         </div>
       </Container>

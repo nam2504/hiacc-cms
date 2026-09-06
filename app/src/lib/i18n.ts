@@ -8,6 +8,7 @@
  * bên dưới, KHÔNG sửa component.
  */
 import { DEFAULT_LOCALE, type LocaleCode } from './locales'
+import { TENANT } from '@/config/tenant'
 
 type Dict = Record<string, string>
 
@@ -42,7 +43,7 @@ const vi: Dict = {
   'footer.followUs': 'Theo dõi chúng tôi',
 
   // --- Trang chủ (W1) — AUDIT §3, khối 2–8 ---
-  // Mọi số liệu marketing chép từ site tham chiếu hiacc.com.vn (điểm sao, số lượng
+  // Mọi số liệu marketing chép từ site tham chiếu site tham chiếu (điểm sao, số lượng
   // khách hàng, các mức phần trăm ở khối Stats) đã bị GỠ: không có nguồn nào kiểm
   // chứng được, mà tuyên bố định lượng của một công ty kế toán sai là rủi ro pháp lý.
   // Chỉ đưa lại khi khách tự cung cấp số thật kèm nguồn và chịu trách nhiệm về số đó.
@@ -61,8 +62,8 @@ const vi: Dict = {
   'home.stats.cost.value': 'Tối ưu',
   'home.stats.cost.label': 'chi phí vận hành so với kế toán nội bộ',
 
-  'home.about.title': 'Về HiACC',
-  'home.about.subtitle': 'Bốn lý do doanh nghiệp chọn HiACC làm đối tác kế toán.',
+  'home.about.title': 'Về {brand}',
+  'home.about.subtitle': 'Bốn lý do doanh nghiệp chọn {brand} làm đối tác kế toán.',
   'home.about.certification.title': 'Quy trình chuẩn hoá',
   'home.about.certification.body':
     'Quy trình làm việc chuẩn hoá theo thông lệ hành nghề kế toán, kiểm toán.',
@@ -82,7 +83,7 @@ const vi: Dict = {
   'home.branches.title': 'Mạng lưới chi nhánh',
   'home.branches.subtitle': 'Có mặt tại các trung tâm kinh tế lớn trên cả nước.',
 
-  'home.social.title': 'Kết nối với HiACC',
+  'home.social.title': 'Kết nối với {brand}',
   'home.social.subtitle': 'Theo dõi kênh chính thức để nhận bản tin thuế và pháp luật mới nhất.',
   'home.social.facebook': 'Facebook',
   'home.social.tiktok': 'TikTok',
@@ -114,7 +115,7 @@ const vi: Dict = {
   'service.backToList': 'Xem tất cả dịch vụ',
 
   'contact.subtitle':
-    'Liên hệ HiACC để được tư vấn miễn phí về kế toán, thuế và pháp lý doanh nghiệp.',
+    'Liên hệ {brand} để được tư vấn miễn phí về kế toán, thuế và pháp lý doanh nghiệp.',
   'contact.headOffice': 'Trụ sở chính',
   'contact.branches.title': 'Mạng lưới chi nhánh',
   'contact.branches.subtitle': 'Chọn văn phòng gần bạn nhất để được hỗ trợ trực tiếp.',
@@ -123,7 +124,7 @@ const vi: Dict = {
   // --- Tin tức + Chuyên mục (W3) ---
   'news.list.title': 'Tin tức',
   'news.list.subtitle':
-    'Bản tin thuế, kế toán và pháp luật doanh nghiệp — cập nhật bởi đội ngũ HiACC.',
+    'Bản tin thuế, kế toán và pháp luật doanh nghiệp — cập nhật bởi đội ngũ {brand}.',
 
   'news.categories.title': 'Chuyên mục',
   'news.categories.subtitle': 'Bài viết và văn bản pháp luật chia theo từng chuyên mục.',
@@ -152,7 +153,7 @@ const vi: Dict = {
   // --- Form liên hệ + bản đồ chi nhánh (W7) ---
   'contact.form.title': 'Gửi yêu cầu tư vấn',
   'contact.form.subtitle':
-    'Để lại thông tin, chuyên viên HiACC sẽ liên hệ lại trong giờ làm việc.',
+    'Để lại thông tin, chuyên viên {brand} sẽ liên hệ lại trong giờ làm việc.',
   'contact.form.name.label': 'Họ và tên',
   'contact.form.name.placeholder': 'Nguyễn Văn A',
   'contact.form.phone.label': 'Số điện thoại',
@@ -168,7 +169,7 @@ const vi: Dict = {
   'contact.form.honeypot.label': 'Để trống ô này',
   'contact.form.success.title': 'Đã nhận được thông tin của bạn',
   'contact.form.success.body':
-    'Cảm ơn bạn đã liên hệ HiACC. Chuyên viên sẽ gọi lại trong giờ làm việc.',
+    'Cảm ơn bạn đã liên hệ {brand}. Chuyên viên sẽ gọi lại trong giờ làm việc.',
   'contact.form.success.again': 'Gửi yêu cầu khác',
   'contact.form.error.name': 'Vui lòng nhập họ và tên.',
   'contact.form.error.phone': 'Vui lòng nhập số điện thoại.',
@@ -198,7 +199,7 @@ const vi: Dict = {
 
   // --- SEO kỹ thuật (W6) ---
   // Chỉ dùng cho thẻ meta / OG / JSON-LD khi CMS chưa có dữ liệu — không hiện trên giao diện.
-  'seo.siteName': 'Kế toán HiACC',
+  'seo.siteName': 'Kế toán {brand}',
   'seo.home.title': 'Dịch vụ kế toán, thuế và tư vấn doanh nghiệp',
   'seo.breadcrumb.home': 'Trang chủ',
   // Seed điền chuỗi này vào field bắt buộc `branches.address` khi khách chưa cấp
@@ -301,7 +302,17 @@ export function getDictionary(locale: LocaleCode = DEFAULT_LOCALE): Dict {
 /** t('nav.home') → 'Trang chủ'. Khoá lạ trả về chính nó để lỗi lộ ra khi review. */
 export function createTranslator(locale: LocaleCode = DEFAULT_LOCALE) {
   const dict = getDictionary(locale)
-  return (key: string): string => dict[key] ?? key
+  /**
+   * `{brand}` trong chuỗi dịch được thay bằng tên thương hiệu của tenant.
+   * Vì sao không lấy từ Settings: t() là hàm đồng bộ, không đọc được DB. Chỗ nào
+   * cần đúng tên khách vừa sửa trong /admin thì component tự truyền qua tham số
+   * `vars` — xem `brandName()` trong src/config/tenant.ts.
+   */
+  return (key: string, vars?: Record<string, string>): string => {
+    const raw = dict[key] ?? key
+    const brand = vars?.brand ?? TENANT.name
+    return raw.replace(/\{brand\}/g, brand).replace(/\{(\w+)\}/g, (m, k) => vars?.[k] ?? m)
+  }
 }
 
 /** Dùng nhanh ở component server khi chỉ có 1 ngôn ngữ. */

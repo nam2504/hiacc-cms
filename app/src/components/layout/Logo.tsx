@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { brandName } from '@/config/tenant'
 import { mediaAlt, mediaUrl } from '@/lib/site'
 import type { Setting } from '@/payload-types'
 import styles from './Logo.module.css'
@@ -12,7 +13,7 @@ import styles from './Logo.module.css'
  */
 export function Logo({ settings }: { settings: Setting | null }) {
   const url = mediaUrl(settings?.logo)
-  const siteName = settings?.siteName || 'HiACC'
+  const siteName = brandName(settings?.siteName)
 
   return (
     <Link href="/" className={styles.logo} aria-label={siteName}>

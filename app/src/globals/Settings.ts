@@ -26,8 +26,12 @@ export const Settings: GlobalConfig = {
               name: 'siteName',
               type: 'text',
               label: 'Tên website',
-              defaultValue: 'Kế toán HiACC',
-              admin: { description: 'Hiện ở tiêu đề trình duyệt và kết quả Google.' },
+              // Không đặt defaultValue: bỏ trống = dùng tên của tenant
+              // (src/config/tenant.ts). Đặt cứng ở đây sẽ ghim tên HiACC vào DB HiTax.
+              admin: {
+                description:
+                  'Hiện ở tiêu đề trình duyệt và kết quả Google. Bỏ trống thì dùng tên mặc định của site.',
+              },
             },
             {
               name: 'logo',
@@ -58,7 +62,8 @@ export const Settings: GlobalConfig = {
               name: 'primaryColor',
               type: 'text',
               label: 'Màu chủ đạo',
-              defaultValue: '#CC1420',
+              // Không đặt defaultValue: bỏ trống = dùng màu của tenant
+              // (src/config/tenant.ts). Đặt cứng ở đây sẽ ghim màu HiACC vào DB HiTax.
               admin: {
                 description:
                   'Mã màu dạng #RRGGBB, mặc định #CC1420 — đỏ lấy đúng từ logo. Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.',
@@ -101,7 +106,7 @@ export const Settings: GlobalConfig = {
               name: 'facebook',
               type: 'text',
               label: 'Facebook',
-              admin: { description: 'Dán link đầy đủ, ví dụ https://facebook.com/hiacc. Bỏ trống thì ẩn icon.' },
+              admin: { description: 'Dán link đầy đủ, ví dụ https://facebook.com/tencongty. Bỏ trống thì ẩn icon.' },
             },
             { name: 'tiktok', type: 'text', label: 'TikTok', admin: { description: 'Dán link đầy đủ.' } },
             { name: 'youtube', type: 'text', label: 'YouTube', admin: { description: 'Dán link đầy đủ.' } },
@@ -213,7 +218,7 @@ export const Settings: GlobalConfig = {
                       type: 'text',
                       label: 'Tiêu đề khối',
                       localized: true,
-                      admin: { description: 'Mặc định: Về HiACC' },
+                      admin: { description: 'Bỏ trống thì dùng "Về " + tên site.' },
                     },
                     {
                       name: 'aboutPoints',
@@ -314,7 +319,7 @@ export const Settings: GlobalConfig = {
                           type: 'text',
                           label: 'Mạng xã hội — tiêu đề',
                           localized: true,
-                          admin: { width: '50%', description: 'Mặc định: Kết nối với HiACC' },
+                          admin: { width: '50%', description: 'Bỏ trống thì dùng "Kết nối với " + tên site.' },
                         },
                         {
                           name: 'socialSubtitle',
@@ -377,7 +382,7 @@ export const Settings: GlobalConfig = {
               type: 'text',
               label: 'Dòng bản quyền',
               localized: true,
-              admin: { description: 'Ví dụ: © 2026 Công ty TNHH HiACC. Bảo lưu mọi quyền.' },
+              admin: { description: 'Ví dụ: © 2026 Công ty TNHH ABC. Bảo lưu mọi quyền.' },
             },
             {
               name: 'footerHeadings',

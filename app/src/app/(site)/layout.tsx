@@ -3,11 +3,13 @@ import { Be_Vietnam_Pro } from 'next/font/google'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { StagingBanner } from '@/components/layout/StagingBanner'
+import { brandStyle } from '@/lib/brandStyle'
 import { t } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { ogImages, SITE_URL } from '@/lib/seo'
 import { isStaging } from '@/lib/staging'
 import { getRecentPosts, getSettings } from '@/lib/site'
+import { brandName } from '@/config/tenant'
 import '@/styles/tokens.css'
 import '@/styles/globals.css'
 
@@ -27,7 +29,7 @@ const beVietnamPro = Be_Vietnam_Pro({
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings()
-  const siteName = settings?.siteName || t('seo.siteName')
+  const siteName = brandName(settings?.siteName) || t('seo.siteName')
   const description = settings?.tagline || undefined
   const images = ogImages(settings?.logo)
 
@@ -70,8 +72,13 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   // Một lần fetch cho cả layout — trang con không phải gọi lại
   const [settings, recentPosts] = await Promise.all([getSettings(), getRecentPosts(3)])
 
+  // Màu thương hiệu đè lúc chạy: Settings (khách sửa trong /admin) → tenant.
+  // Nhờ vậy field "Màu chủ đạo" có tác dụng thật, không cần build lại.
+  const brandCss = brandStyle(settings?.primaryColor)
+
   return (
     <html lang={DEFAULT_LOCALE} className={beVietnamPro.variable}>
+      <head>{brandCss ? <style>{brandCss}</style> : null}</head>
       <body>
         <a className="skip-link" href="#main-content">
           {t('nav.skipToContent')}

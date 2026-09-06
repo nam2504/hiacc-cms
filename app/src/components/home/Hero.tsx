@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { brandName } from "@/config/tenant";
 import { t } from "@/lib/i18n";
 import { mediaAlt, mediaUrl } from "@/lib/site";
 import type { Setting } from "@/payload-types";
@@ -22,7 +23,7 @@ import styles from "./Hero.module.css";
 export function Hero({ settings }: { settings: Setting | null }) {
   const logo = mediaUrl(settings?.logo);
   const heroImage = mediaUrl(settings?.heroImage);
-  const siteName = settings?.siteName || "HiACC";
+  const siteName = brandName(settings?.siteName);
   // Tagline ưu tiên nội dung khách sửa trong admin, không có thì rơi về khoá dịch.
   const tagline = settings?.tagline || t("home.hero.tagline");
   // Cùng quy tắc cho phần chữ còn lại: ô trống trong admin = dùng bản mặc định,

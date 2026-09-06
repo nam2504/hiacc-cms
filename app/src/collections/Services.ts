@@ -9,7 +9,7 @@ export const Services: CollectionConfig = {
     useAsTitle: 'name',
     group: 'Nội dung',
     defaultColumns: ['name', 'order', 'slug', 'updatedAt'],
-    description: 'Các dịch vụ HiACC cung cấp, hiển thị ở trang chủ và menu Dịch vụ.',
+    description: 'Các dịch vụ công ty cung cấp, hiển thị ở trang chủ và menu Dịch vụ.',
     preview: (doc) => (typeof doc?.slug === 'string' ? `/dich-vu/${doc.slug}` : null),
   },
   labels: { singular: 'Dịch vụ', plural: 'Dịch vụ' },

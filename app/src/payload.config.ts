@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url'
 import { buildConfig } from 'payload'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { migrations } from './migrations'
+import { TENANT } from './config/tenant'
 import {
   lexicalEditor,
   BoldFeature,
@@ -34,6 +35,7 @@ import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Categories } from './collections/Categories'
 import { Services } from './collections/Services'
+import { ServiceNodes } from './collections/ServiceNodes'
 import { Branches } from './collections/Branches'
 import { ContactSubmissions } from './collections/ContactSubmissions'
 import { Settings } from './globals/Settings'
@@ -70,6 +72,7 @@ export default buildConfig({
     Posts,
     Pages,
     Services,
+    ServiceNodes,
     Categories,
     Media,
     // Cấu hình
@@ -147,7 +150,7 @@ export default buildConfig({
    * rồi commit file trong src/migrations/. Đừng sửa file migration đã chạy.
    */
   db: sqliteAdapter({
-    client: { url: process.env.DATABASE_URI || 'file:./hiacc.db' },
+    client: { url: process.env.DATABASE_URI || `file:./${TENANT.key}.db` },
     prodMigrations: migrations,
   }),
   secret: payloadSecret,

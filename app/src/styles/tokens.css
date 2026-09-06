@@ -3,7 +3,8 @@
  * Mọi component chỉ dùng var(--...) ở đây. CẤM hardcode mã hex trong component
  * (rule PLAN §7). Đỏ #CC1420 đo từ pixel logo, xem AUDIT §1.
  *
- * Đồng bộ với src/lib/brand.ts — sửa một chỗ phải sửa cả hai.
+ * Màu thương hiệu ở đây là GIÁ TRỊ MẶC ĐỊNH. Lúc chạy, src/lib/brandStyle.ts đè
+ * lại theo Settings.primaryColor (khách sửa trong /admin) rồi mới tới src/config/tenant.ts.
  */
 :root {
   /* --- Màu thương hiệu --- */
