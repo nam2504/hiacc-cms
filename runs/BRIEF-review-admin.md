@@ -70,3 +70,32 @@ rồi HOÀN NGUYÊN · đổi màu rồi xem site · xem cây dịch vụ · th�
   đã tạo/xoá gì. Không đụng vào bản ghi có sẵn của khách.
 - KHÔNG chạy `npm run seed`.
 - Không sửa/xoá test.
+
+---
+
+## Bổ sung sau khi contract ADMIN land (commit `be6d797`)
+
+Người làm tự khai 3 điểm dưới đây. **Kiểm lại độc lập, đừng tin lời khai.**
+
+1. **`Pages` có `create: () => false`** — chặn nhân viên tạo bản ghi mới. Block này CÓ SẴN từ
+   trước (không phải người làm thêm), lý do: bản ghi mới lưu được nhưng site 404 vì route là
+   file tĩnh. Contract lại ghi "KHÔNG chặn tạo mới" → **contract và code mâu thuẫn**, người làm
+   chọn giữ code và khai báo thay vì tự quyết.
+   → Bạn đánh giá: giữ chặn có đúng không? Mô tả mới có giải thích đủ để nhân viên không bị kẹt
+   khi họ THẬT SỰ cần trang thứ ba không?
+
+2. **`ServiceTree.tsx` là component CHỈ ĐỌC**, đặt *trên* bảng chuẩn (`beforeListTable`), không
+   thay thế bảng. Người làm nói đây là chủ ý: mọi thao tác ghi vẫn đi qua form chuẩn nên hook
+   chặn vòng lặp `ServiceNodes.ts` vẫn là đường duy nhất dữ liệu đi qua.
+   → Kiểm: có đường ghi nào khác không? Cây hiện có khớp DB thật không (đếm 5 nhóm/32 hạng mục)?
+   Node mồ côi (cha bị xoá) hiện thế nào? Cây sâu hơn 2 tầng?
+
+3. **Không làm kéo-thả** (contract cho phép bỏ qua). Đánh giá xem thiếu nó có làm nhân viên
+   không sắp xếp được thứ tự không — trường `order` có đủ dùng thay thế không.
+
+Người làm cũng tìm ra 2 check yếu trong `runs/verify-admin.sh` (grep khớp cả comment văn xuôi;
+grep chuỗi `admin` quá rộng trong importMap). **Đã siết cả hai, chạy lại vẫn PASS** — nên kết
+quả 18/18 không phải xanh khống. Nếu bạn tìm thêm check yếu nào nữa, nói ra.
+
+⚠️ `src/payload-types.ts` là file SINH TỰ ĐỘNG, dev server tự regenerate. Diff 9 dòng đã kiểm:
+toàn bộ là doc-comment, không đổi type/field/union nào. Đừng báo nó như thay đổi ngoài phạm vi.

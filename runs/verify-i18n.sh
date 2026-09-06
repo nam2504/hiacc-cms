@@ -22,12 +22,12 @@ echo "== scope: $SCOPE =="
 case "$SCOPE" in
   layout|all)
     check /en/ke-toan "Tư vấn miễn phí"   "Header ctaLabel"
-    check /en/ke-toan "Danh sách hạng mục" "ServiceSidebar"
+    check /en/ke-toan "Có thể bạn quan tâm" "service.related"
     check /en        "Lĩnh vực hoạt động"  "ServiceGroups"
     ;;&
   news|all)
     check /en/tin-tuc "Xem thêm"      "news · common.readMore"
-    check /en/tin-tuc "Chuyên mục"    "news"
+    check /en/tin-tuc "Bài mới"        "news.list.latest"
     check /en/chuyen-muc "Chuyên mục" "news"
     ;;&
   pages|all)
