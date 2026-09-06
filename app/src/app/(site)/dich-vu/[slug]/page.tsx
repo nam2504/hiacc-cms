@@ -1,3 +1,4 @@
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { PageBody } from '@/components/pages/PageBody'
@@ -6,8 +7,8 @@ import { Button } from '@/components/ui/Button'
 import { Section } from '@/components/ui/Section'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { t } from '@/lib/i18n'
-import { ogImages } from '@/lib/seo'
-import { getServiceBySlug, getServices, getSettings } from '@/lib/site'
+import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
+import { getServiceBySlug, getSettings } from '@/lib/site'
 import styles from './page.module.css'
 
 /**
@@ -17,13 +18,14 @@ import styles from './page.module.css'
 type Params = { slug: string }
 
 /**
- * Dựng sẵn 7 dịch vụ lúc build — số lượng nhỏ và gần như không đổi.
- * Dịch vụ khách thêm sau này vẫn chạy được nhờ dynamicParams mặc định (= true).
+ * Render lúc chạy, không nướng tĩnh lúc build — giống 8 route còn lại.
+ *
+ * Trước đây route này dựng sẵn bằng `generateStaticParams`. Sai ở hai chỗ: DB lúc
+ * build rỗng nên danh sách trả về là mảng rỗng và trang bị nướng cứng ở trạng
+ * thái không có dữ liệu; và layout gọi `headers()` để đọc ngôn ngữ, thứ chỉ tồn
+ * tại khi có request thật.
  */
-export async function generateStaticParams(): Promise<Params[]> {
-  const services = await getServices()
-  return services.map((service) => ({ slug: service.slug }))
-}
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({
   params,
@@ -31,7 +33,8 @@ export async function generateMetadata({
   params: Promise<Params>
 }): Promise<Metadata> {
   const { slug } = await params
-  const [service, settings] = await Promise.all([getServiceBySlug(slug), getSettings()])
+  const locale = await getRequestLocale()
+  const [service, settings] = await Promise.all([getServiceBySlug(slug), getSettings(locale)])
   if (!service) return {}
 
   const title = service.seo?.title || service.name
@@ -42,12 +45,12 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: path },
+    alternates: localeAlternates(path, locale),
     openGraph: {
       type: 'website',
       url: path,
       siteName: settings?.siteName || t('seo.siteName'),
-      locale: 'vi_VN',
+      locale: ogLocale(locale),
       title,
       description,
       images,

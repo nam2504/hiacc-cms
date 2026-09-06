@@ -288,6 +288,17 @@ const vi: Dict = {
   'payroll.result.summary.net': 'Lương Net thực nhận',
   'payroll.result.summary.gross': 'Lương Gross cần thoả thuận',
   'payroll.brackets.card.level': 'Bậc',
+  'nav.secondaryLinks': 'Liên kết phụ',
+  'nav.pricing': 'Bảng giá',
+  'nav.legalDocs': 'Văn bản pháp luật',
+  'nav.newsletter': 'Bản tin',
+  'about.profile.title': 'Hồ sơ công ty',
+  'about.profile.companyName': 'Tên công ty',
+  'about.profile.taxCode': 'Mã số thuế',
+  'about.profile.headOffice': 'Trụ sở',
+  'about.profile.field': 'Lĩnh vực',
+  'about.principles.title': 'Nguyên tắc hành nghề',
+
 }
 
 /**

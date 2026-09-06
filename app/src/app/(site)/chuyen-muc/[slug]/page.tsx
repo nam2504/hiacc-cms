@@ -8,7 +8,7 @@ import { PostGrid } from '@/components/news/PostGrid'
 import { readPage, seoMetadata, type SearchParams } from '@/components/news/params'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { t } from '@/lib/i18n'
-import { ogImages } from '@/lib/seo'
+import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
 import { getCategoryBySlug, getPosts, getSettings } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -30,12 +30,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     ...base,
     // Canonical trỏ trang 1: `?page=` là biến thể phân trang, không phải URL riêng.
-    alternates: { canonical: path },
+    alternates: localeAlternates(path, locale),
     openGraph: {
       type: 'website',
       url: path,
       siteName: settings?.siteName || t('seo.siteName'),
-      locale: 'vi_VN',
+      locale: ogLocale(locale),
       title: base.title as string,
       description: base.description ?? undefined,
       images,

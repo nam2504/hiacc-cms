@@ -303,7 +303,7 @@ export interface Media {
   };
 }
 /**
- * Các trang cố định của website: Giới thiệu, Liên hệ, Dịch vụ chuyên ngành…
+ * Nội dung ba trang cố định: Giới thiệu, Dịch vụ chuyên ngành, Liên hệ. Sửa chữ và ảnh ở đây. Không tạo được trang mới ở đây — trang mới cần route trong code; muốn thêm trang dịch vụ thì dùng "Cây dịch vụ".
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
@@ -426,7 +426,7 @@ export interface Service {
   createdAt: string;
 }
 /**
- * Cây dịch vụ. Mục không chọn "Thuộc nhóm" là nhóm cấp cao nhất, hiện trên thanh menu. Mục có chọn là hạng mục con của nhóm đó.
+ * Cây dịch vụ, sắp theo nhóm. Mục không chọn "Thuộc nhóm" là nhóm cấp cao nhất, hiện trên thanh menu. Mục có chọn là hạng mục con của nhóm đó.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "service-nodes".

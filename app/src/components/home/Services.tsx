@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { Section } from '@/components/ui/Section'
 import { t } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
+import { getRequestLocale } from '@/lib/requestLocale'
 import { mediaAlt, mediaUrl } from '@/lib/site'
 import type { Service, Setting } from '@/payload-types'
 import styles from './Services.module.css'
@@ -15,7 +18,7 @@ import styles from './Services.module.css'
  * V2 (REVIEW-visual.md §7①): `service.icon` là khoá icon (xem `Icon.tsx`),
  * không còn emoji. Khoá lạ/rỗng tự rơi về fallback an toàn trong `<Icon>`.
  */
-export function Services({
+export async function Services({
   services,
   settings,
 }: {
@@ -24,6 +27,9 @@ export function Services({
 }) {
   if (services.length === 0) return null
 
+  // Link thẻ dịch vụ và nút "xem tất cả" phải giữ ngôn ngữ đang xem.
+  const locale = await getRequestLocale()
+  const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
   const home = settings?.home
 
   return (
@@ -36,7 +42,7 @@ export function Services({
           const cover = mediaUrl(service.image)
           return (
             <li key={service.id}>
-              <Link className={styles.card} href={`/dich-vu/${service.slug}`}>
+              <Link className={styles.card} href={href(`/dich-vu/${service.slug}`)}>
                 {cover ? (
                   <span className={styles.cover}>
                     <Image
@@ -59,7 +65,7 @@ export function Services({
       {/* 7 dịch vụ trên lưới 3 cột để trống 2 ô hàng cuối; nút đặt ở đây vừa
           đóng khoảng trắng đó vừa thêm một điểm hành động giữa trang. */}
       <div className={styles.footer}>
-        <Button href="/dich-vu" variant="outline">
+        <Button href={href('/dich-vu')} variant="outline">
           {t('home.services.viewAll')}
         </Button>
       </div>

@@ -45,6 +45,21 @@ function pickLocale(header: string | null): string {
   return DEFAULT_LOCALE
 }
 
+/**
+ * Ngôn ngữ khách đã TỰ CHỌN, đọc từ cookie. Trả null khi chưa chọn hoặc khi
+ * cookie giữ giá trị rác / ngôn ngữ đã tắt.
+ *
+ * Phải đọc `.get()` chứ không `.has()`: `.has()` chỉ biết cookie có tồn tại,
+ * không biết nó ghi gì. Bản trước dùng `.has()` nên cookie `en` chỉ có tác dụng
+ * CHẶN chuyển hướng theo trình duyệt, còn khách vẫn rơi vào tiếng Việt — lựa
+ * chọn được lưu nhưng chưa bao giờ được dùng.
+ */
+function storedLocale(request: NextRequest): string | null {
+  const value = request.cookies.get(COOKIE)?.value
+  if (!value) return null
+  return ENABLED_LOCALES.includes(value as (typeof ENABLED_LOCALES)[number]) ? value : null
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -61,14 +76,30 @@ export function middleware(request: NextRequest) {
     headers.set(LOCALE_HEADER, prefix)
 
     const response = NextResponse.rewrite(url, { request: { headers } })
-    // Nhớ lựa chọn để lần sau vào trang chủ không bị đá về tiếng Việt.
-    response.cookies.set(COOKIE, prefix, { path: '/', maxAge: 60 * 60 * 24 * 365 })
+
+    /**
+     * Chỉ ghi cookie khi khách CHƯA từng chọn ngôn ngữ.
+     *
+     * Ghi đè vô điều kiện thì khách đang đọc tiếng Việt mà mở một link `/en` —
+     * đồng nghiệp gửi, hay bấm từ Google — là bị ghim sang tiếng Anh vĩnh viễn,
+     * vì từ đó trang chủ luôn đá sang `/en`. Một cú bấm không phải một quyết định.
+     *
+     * Điều kiện `!== prefix` cũng không đủ: khách chọn `vi` rồi mở `/en` vẫn khác
+     * nhau nên vẫn bị ghi đè. Chỉ khi cookie còn TRỐNG thì đường dẫn mới được coi
+     * là ý định. Đổi ngôn ngữ thật đi qua nút chuyển trong menu, và nút đó dẫn
+     * tới `/en/...` khi cookie chưa có, hoặc người dùng xoá cookie.
+     */
+    if (storedLocale(request) === null) {
+      response.cookies.set(COOKIE, prefix, { path: '/', maxAge: 60 * 60 * 24 * 365 })
+    }
     return response
   }
 
-  // 2. Trang chủ, chưa từng chọn ngôn ngữ: theo trình duyệt.
-  if (pathname === '/' && !request.cookies.has(COOKIE)) {
-    const locale = pickLocale(request.headers.get('accept-language'))
+  // 2. Trang chủ: lựa chọn đã lưu THẮNG Accept-Language; chưa chọn thì theo trình duyệt.
+  if (pathname === '/') {
+    const chosen = storedLocale(request)
+    const locale = chosen ?? pickLocale(request.headers.get('accept-language'))
+
     if (locale !== DEFAULT_LOCALE) {
       const url = request.nextUrl.clone()
       url.pathname = `/${locale}`
@@ -76,6 +107,11 @@ export function middleware(request: NextRequest) {
       // vĩnh viễn. 308 bị trình duyệt nhớ, khách không quay lại tiếng Việt được.
       return NextResponse.redirect(url, 307)
     }
+
+    /**
+     * Đã chọn tiếng Việt: phục vụ tại chỗ, KHÔNG chuyển hướng, và cũng không
+     * ghi lại cookie — giá trị đang đúng rồi.
+     */
   }
 
   return NextResponse.next()

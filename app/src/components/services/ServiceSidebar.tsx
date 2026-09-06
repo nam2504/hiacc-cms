@@ -1,4 +1,7 @@
 import Link from 'next/link'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { TreeNode } from '@/lib/serviceTree'
 import styles from './ServiceSidebar.module.css'
 
@@ -10,7 +13,7 @@ import styles from './ServiceSidebar.module.css'
  * mỗi hạng mục có URL riêng chia sẻ được, và Google đọc được từng trang — thứ
  * mà tab dựng bằng JS không cho.
  */
-export function ServiceSidebar({
+export async function ServiceSidebar({
   items,
   activePath,
   title,
@@ -21,6 +24,10 @@ export function ServiceSidebar({
 }) {
   if (items.length === 0) return null
 
+  // `item.path` trong cây KHÔNG có tiền tố ngôn ngữ — dùng thẳng là bản EN hiện
+  // tiêu đề tiếng Anh nhưng link nhảy sang trang tiếng Việt.
+  const locale = await getRequestLocale()
+
   return (
     <nav className={styles.sidebar} aria-label={title || 'Danh sách hạng mục'}>
       <p className={styles.title}>{title || 'Nội dung'}</p>
@@ -30,7 +37,7 @@ export function ServiceSidebar({
           return (
             <li key={item.id}>
               <Link
-                href={item.path}
+                href={localizedHref(item.path, locale, DEFAULT_LOCALE)}
                 className={active ? `${styles.item} ${styles.itemActive}` : styles.item}
                 aria-current={active ? 'page' : undefined}
               >

@@ -7,7 +7,7 @@ import { PageBody } from '@/components/pages/PageBody'
 import { PageHero } from '@/components/pages/PageHero'
 import { Section } from '@/components/ui/Section'
 import { t } from '@/lib/i18n'
-import { ogImages } from '@/lib/seo'
+import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
 import { getBranches, getPageBySlug, getSettings } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -51,12 +51,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: { canonical: `/${SLUG}` },
+    alternates: localeAlternates(`/${SLUG}`, locale),
     openGraph: {
       type: 'website',
       url: `/${SLUG}`,
       siteName: settings?.siteName || t('seo.siteName'),
-      locale: 'vi_VN',
+      locale: ogLocale(locale),
       title,
       description,
       images,

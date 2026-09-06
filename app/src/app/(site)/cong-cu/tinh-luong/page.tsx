@@ -1,9 +1,11 @@
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Metadata } from 'next'
 import { PayrollCalculator } from '@/components/payroll/PayrollCalculator'
 import { Section } from '@/components/ui/Section'
-import { t } from '@/lib/i18n'
+import { createTranslator, t } from '@/lib/i18n'
 import { getPayrollConfig } from '@/lib/payroll/global'
 import styles from './page.module.css'
+import { localeAlternates, ogLocale } from '@/lib/seo'
 
 /**
  * /cong-cu/tinh-luong — công cụ tính lương Gross ↔ Net (gói W5).
@@ -20,11 +22,13 @@ import styles from './page.module.css'
  */
 export const dynamic = 'force-dynamic'
 
-export function generateMetadata(): Metadata {
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale as Parameters<typeof createTranslator>[0])
   return {
-    title: t('payroll.title'),
-    description: t('payroll.seo.description'),
-    alternates: { canonical: '/cong-cu/tinh-luong' },
+    title: tr('payroll.title'),
+    description: tr('payroll.seo.description'),
+    alternates: localeAlternates('/cong-cu/tinh-luong', locale),
   }
 }
 

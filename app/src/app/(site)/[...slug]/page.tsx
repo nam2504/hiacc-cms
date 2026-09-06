@@ -7,9 +7,10 @@ import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { Container } from '@/components/ui/Container'
 import { brandName } from '@/config/tenant'
 import { createTranslator } from '@/lib/i18n'
-import { ogImages } from '@/lib/seo'
+import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
+import { localizedHref } from '@/lib/nav'
 import { findByPath, getServiceTree, type TreeNode } from '@/lib/serviceTree'
-import type { LocaleCode } from '@/lib/locales'
+import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
 import { getSettings, mediaUrl, toPayloadLocale } from '@/lib/site'
 import { getPayloadClient } from '@/lib/site'
 import type { ServiceNode } from '@/payload-types'
@@ -73,12 +74,12 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: match.node.path },
+    alternates: localeAlternates(match.node.path, locale),
     openGraph: {
       type: 'website',
       url: match.node.path,
       siteName: brandName(settings?.siteName),
-      locale: 'vi_VN',
+      locale: ogLocale(locale),
       title,
       description,
       images,
@@ -103,6 +104,9 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
 
   const { node, trail, root } = match
   const tr = createTranslator(locale)
+  // Breadcrumb, nút CTA và thẻ dịch vụ liên quan phải giữ ngôn ngữ đang xem —
+  // `path` trong cây không có tiền tố ngôn ngữ.
+  const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
   const detail = await getNodeDetail(node.id, locale)
 
   /**
@@ -134,14 +138,14 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
           <nav className={styles.crumbs} aria-label="Breadcrumb">
             <ol>
               <li>
-                <Link href="/">{tr('seo.breadcrumb.home')}</Link>
+                <Link href={href('/')}>{tr('seo.breadcrumb.home')}</Link>
               </li>
               {trail.map((item, index) => (
                 <li key={item.id}>
                   {index === trail.length - 1 ? (
                     <span aria-current="page">{item.title}</span>
                   ) : (
-                    <Link href={item.path}>{item.title}</Link>
+                    <Link href={href(item.path)}>{item.title}</Link>
                   )}
                 </li>
               ))}
@@ -191,11 +195,11 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
             <ServiceBody body={shownDetail?.body} />
 
             <div className={styles.actions}>
-              <Link className={styles.actionPrimary} href="/lien-he">
+              <Link className={styles.actionPrimary} href={href('/lien-he')}>
                 {tr('service.requestQuote')}
               </Link>
               {isGroup ? (
-                <Link className={styles.actionGhost} href={shown.path}>
+                <Link className={styles.actionGhost} href={href(shown.path)}>
                   {tr('service.viewOwnPage')}
                 </Link>
               ) : null}
@@ -207,7 +211,7 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
                 <ul className={styles.relatedGrid}>
                   {related.map((item) => (
                     <li key={item.id}>
-                      <Link className={styles.relatedCard} href={item.path}>
+                      <Link className={styles.relatedCard} href={href(item.path)}>
                         <span className={styles.relatedKicker}>{tr('nav.serviceGroup')}</span>
                         <span className={styles.relatedName}>{item.title}</span>
                         {item.summary ? (

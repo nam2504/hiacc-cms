@@ -7,7 +7,7 @@ import { GroupSummary } from '@/components/pages/GroupSummary'
 import { Section } from '@/components/ui/Section'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { t } from '@/lib/i18n'
-import { ogImages } from '@/lib/seo'
+import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
 import { getPageBySlug, getSettings } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -46,12 +46,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: { canonical: `/${SLUG}` },
+    alternates: localeAlternates(`/${SLUG}`, locale),
     openGraph: {
       type: 'website',
       url: `/${SLUG}`,
       siteName: settings?.siteName || t('seo.siteName'),
-      locale: 'vi_VN',
+      locale: ogLocale(locale),
       title,
       description,
       images,
@@ -90,7 +90,7 @@ export default async function GioiThieuPage() {
       {/* Ba khối theo thiết kế khách 06/09: hồ sơ công ty + nguyên tắc hành nghề,
           rồi tóm tắt các nhóm dịch vụ. Dữ liệu lấy từ Settings và cây, khách sửa
           trong /admin. */}
-      <CompanyProfile settings={settings} />
+      <CompanyProfile settings={settings} locale={locale} />
       <GroupSummary tree={tree} />
     </>
   )

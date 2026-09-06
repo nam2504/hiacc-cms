@@ -260,4 +260,15 @@ export const en = {
   'payroll.result.summary.net': 'Net take-home salary',
   'payroll.result.summary.gross': 'Gross salary to negotiate',
   'payroll.brackets.card.level': 'Bracket',
+  'nav.secondaryLinks': 'Secondary links',
+  'nav.pricing': 'Pricing',
+  'nav.legalDocs': 'Legal documents',
+  'nav.newsletter': 'Newsletter',
+  'about.profile.title': 'Company profile',
+  'about.profile.companyName': 'Company name',
+  'about.profile.taxCode': 'Tax code',
+  'about.profile.headOffice': 'Head office',
+  'about.profile.field': 'Sector',
+  'about.principles.title': 'How we work',
+
 } as const

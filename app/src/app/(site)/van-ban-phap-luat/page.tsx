@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Container } from '@/components/ui/Container'
 import { LEGAL_GROUPS } from '@/collections/LegalDocuments'
 import { brandName } from '@/config/tenant'
-import { ogImages } from '@/lib/seo'
+import { localeAlternates, ogImages, ogLocale } from '@/lib/seo'
 import { getPayloadClient, getSettings } from '@/lib/site'
 import type { LegalDocument } from '@/payload-types'
 import styles from './page.module.css'
@@ -31,12 +31,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: TITLE,
     description: SUBTITLE,
-    alternates: { canonical: '/van-ban-phap-luat' },
+    alternates: localeAlternates('/van-ban-phap-luat', locale),
     openGraph: {
       type: 'website',
       url: '/van-ban-phap-luat',
       siteName: brandName(settings?.siteName),
-      locale: 'vi_VN',
+      locale: ogLocale(locale),
       title: TITLE,
       description: SUBTITLE,
       images,
@@ -44,7 +44,12 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-async function getDocuments(): Promise<LegalDocument[]> {
+/**
+ * `title` và `issuer` là field localized, nên phải nói rõ đang đọc ngôn ngữ nào.
+ * Không truyền thì Payload trả bản mặc định và trang tiếng Anh hiện tên văn bản
+ * bằng tiếng Việt. Chỗ nào chưa dịch vẫn rơi về tiếng Việt nhờ `fallback: true`.
+ */
+async function getDocuments(locale: string): Promise<LegalDocument[]> {
   try {
     const payload = await getPayloadClient()
     const res = await payload.find({
@@ -52,6 +57,7 @@ async function getDocuments(): Promise<LegalDocument[]> {
       limit: 500,
       depth: 0,
       sort: 'order',
+      locale: locale as Parameters<typeof payload.find>[0]['locale'],
     })
     return res.docs as LegalDocument[]
   } catch (error) {
@@ -62,7 +68,7 @@ async function getDocuments(): Promise<LegalDocument[]> {
 
 export default async function LegalDocumentsPage() {
   const locale = await getRequestLocale()
-  const [docs, settings] = await Promise.all([getDocuments(), getSettings(locale)])
+  const [docs, settings] = await Promise.all([getDocuments(locale), getSettings(locale)])
   const siteName = brandName(settings?.siteName)
 
   const byGroup = LEGAL_GROUPS.map((group) => ({

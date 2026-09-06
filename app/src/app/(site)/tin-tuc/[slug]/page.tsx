@@ -5,7 +5,7 @@ import { PostArticle } from '@/components/news/PostArticle'
 import { seoMetadata } from '@/components/news/params'
 import { JsonLd, articleJsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { t } from '@/lib/i18n'
-import { absoluteMediaUrl, absoluteUrl, ogImages } from '@/lib/seo'
+import { absoluteMediaUrl, absoluteUrl, localeAlternates, ogImages, ogLocale } from '@/lib/seo'
 import { getPostBySlug, getSettings } from '@/lib/site'
 import type { Category } from '@/payload-types'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -25,12 +25,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
   return {
     ...base,
-    alternates: { canonical: path },
+    alternates: localeAlternates(path, locale),
     openGraph: {
       type: 'article',
       url: path,
       siteName: settings?.siteName || t('seo.siteName'),
-      locale: 'vi_VN',
+      locale: ogLocale(locale),
       title: base.title as string,
       description: base.description ?? undefined,
       publishedTime: post.publishedAt ?? undefined,

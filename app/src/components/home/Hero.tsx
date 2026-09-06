@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { brandName } from "@/config/tenant";
 import { t } from "@/lib/i18n";
+import { DEFAULT_LOCALE } from "@/lib/locales";
+import { localizedHref } from "@/lib/nav";
+import { getRequestLocale } from "@/lib/requestLocale";
 import { mediaAlt, mediaUrl } from "@/lib/site";
 import type { Setting } from "@/payload-types";
 import styles from "./Hero.module.css";
@@ -20,7 +23,10 @@ import styles from "./Hero.module.css";
  * Không có ảnh thì rơi về 1 cột căn giữa như cũ — khách xoá ảnh trong admin
  * cũng không làm vỡ trang.
  */
-export function Hero({ settings }: { settings: Setting | null }) {
+export async function Hero({ settings }: { settings: Setting | null }) {
+  // Mọi link phải giữ ngôn ngữ đang xem, không thì bấm vào là rơi về bản tiếng Việt.
+  const locale = await getRequestLocale();
+  const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE);
   const logo = mediaUrl(settings?.logo);
   const heroImage = mediaUrl(settings?.heroImage);
   const siteName = brandName(settings?.siteName);
@@ -55,10 +61,10 @@ export function Hero({ settings }: { settings: Setting | null }) {
             <p className={styles.lead}>{lead}</p>
 
             <div className={styles.actions}>
-              <Button href="/lien-he" size="lg">
+              <Button href={href("/lien-he")} size="lg">
                 {cta}
               </Button>
-              <Button href="/dich-vu" variant="outline" size="lg">
+              <Button href={href("/dich-vu")} variant="outline" size="lg">
                 {ctaSecondary}
               </Button>
             </div>

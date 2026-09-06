@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
-import { t } from '@/lib/i18n'
+import { createTranslator, t } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Setting } from '@/payload-types'
 import styles from './TopBar.module.css'
 
@@ -11,14 +14,19 @@ import styles from './TopBar.module.css'
  *
  * Mọi giá trị liên hệ lấy từ Settings; thiếu field nào thì ẩn, không hiện rỗng.
  */
+/** Nhãn giữ dạng KHOÁ, dịch lúc render — hằng số ở tầng module không biết
+    người đang xem dùng ngôn ngữ nào. */
 const SECONDARY_LINKS = [
-  { label: 'Bảng giá', href: '/bang-gia' },
-  { label: 'Văn bản pháp luật', href: '/van-ban-phap-luat' },
-  { label: 'Bản tin', href: '/tin-tuc' },
-  { label: 'Liên hệ', href: '/lien-he' },
-]
+  { labelKey: 'nav.pricing', href: '/bang-gia' },
+  { labelKey: 'nav.legalDocs', href: '/van-ban-phap-luat' },
+  { labelKey: 'nav.newsletter', href: '/tin-tuc' },
+  { labelKey: 'nav.contact', href: '/lien-he' },
+] as const
 
-export function TopBar({ settings }: { settings: Setting | null }) {
+export async function TopBar({ settings }: { settings: Setting | null }) {
+  // Nhóm link phụ phải giữ ngôn ngữ đang xem; tel:/mailto: thì không bọc.
+  const locale = await getRequestLocale()
+  const tr = createTranslator(locale as Parameters<typeof createTranslator>[0])
   const hotline = settings?.hotline
   const hotline2 = settings?.hotline2
   const email = settings?.email
@@ -41,10 +49,14 @@ export function TopBar({ settings }: { settings: Setting | null }) {
             )}
           </span>
 
-          <nav className={styles.links} aria-label="Liên kết phụ">
+          <nav className={styles.links} aria-label={tr('nav.secondaryLinks')}>
             {SECONDARY_LINKS.map((link) => (
-              <Link key={link.href} className={styles.item} href={link.href}>
-                {link.label}
+              <Link
+                key={link.href}
+                className={styles.item}
+                href={localizedHref(link.href, locale, DEFAULT_LOCALE)}
+              >
+                {tr(link.labelKey)}
               </Link>
             ))}
           </nav>

@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { brandName } from '@/config/tenant'
-import { FOOTER_NAV } from '@/lib/nav'
+import { FOOTER_NAV, localizedHref } from '@/lib/nav'
 import { t } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { TreeNode } from '@/lib/serviceTree'
 import type { Post, Setting } from '@/payload-types'
 import styles from './Footer.module.css'
@@ -11,7 +13,7 @@ import styles from './Footer.module.css'
  * Chân trang theo AUDIT §3.9: về chúng tôi · liên hệ · bài viết gần đây · bản quyền.
  * Toàn bộ text lấy từ Settings — khối nào thiếu dữ liệu thì tự ẩn.
  */
-export function Footer({
+export async function Footer({
   settings,
   recentPosts = [],
   tree = [],
@@ -21,6 +23,11 @@ export function Footer({
   /** Cây dịch vụ — footer liệt kê các nhóm, sinh từ DB như menu chính. */
   tree?: TreeNode[]
 }) {
+  // Mọi link nội bộ trong footer phải giữ ngôn ngữ đang xem; mạng xã hội,
+  // tel: và mailto: là link ra ngoài nên KHÔNG bọc.
+  const locale = await getRequestLocale()
+  const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
+
   const socials = [
     { href: settings?.facebook, label: 'Facebook' },
     { href: settings?.tiktok, label: 'TikTok' },
@@ -53,14 +60,14 @@ export function Footer({
               {/* Nhóm dịch vụ sinh từ cây trong DB; các link còn lại là trang tĩnh. */}
               {tree.map((group) => (
                 <li key={group.id}>
-                  <Link href={group.path} className={styles.link}>
+                  <Link href={href(group.path)} className={styles.link}>
                     {group.title}
                   </Link>
                 </li>
               ))}
               {FOOTER_NAV.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className={styles.link}>
+                  <Link href={href(item.href)} className={styles.link}>
                     {t(item.labelKey)}
                   </Link>
                 </li>
@@ -115,7 +122,7 @@ export function Footer({
               <ul className={styles.list}>
                 {recentPosts.map((post) => (
                   <li key={post.id}>
-                    <Link href={`/tin-tuc/${post.slug}`} className={styles.link}>
+                    <Link href={href(`/tin-tuc/${post.slug}`)} className={styles.link}>
                       {post.title}
                     </Link>
                     {post.publishedAt && (

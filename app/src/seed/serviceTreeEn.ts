@@ -266,11 +266,18 @@ export async function seedServiceTreeEn(payload: Payload): Promise<void> {
       data.summary = node.summary ?? PENDING_EN
     }
 
-    const body = DEMO_BODIES[node.slug]
-    if (body) data.body = body
+    /**
+     * Thân bài và dải số liệu chỉ ghi khi CHƯA có bản dịch. Trước đây hai dòng
+     * này nằm ngoài guard, nên mỗi lần chạy seed là đè bản dịch khách tự sửa
+     * trong /admin — 7 hạng mục mất nội dung. Seed chỉ được vá chỗ trống.
+     */
+    if (untranslated) {
+      const body = DEMO_BODIES[node.slug]
+      if (body) data.body = body
 
-    const stats = HERO_STATS_EN[node.slug]
-    if (stats) data.heroStats = stats
+      const stats = HERO_STATS_EN[node.slug]
+      if (stats) data.heroStats = stats
+    }
 
     await payload.update({
       collection: 'service-nodes',

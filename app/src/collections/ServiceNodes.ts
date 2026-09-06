@@ -41,10 +41,23 @@ export const ServiceNodes: CollectionConfig = {
     useAsTitle: 'title',
     group: 'Nội dung',
     defaultColumns: ['title', 'parent', 'order', 'slug', 'updatedAt'],
+    /**
+     * Sắp mặc định theo nhóm cha rồi tới thứ tự trong nhóm, để danh sách đọc
+     * được như một cây thay vì 37 dòng phẳng trộn lẫn các nhóm với nhau.
+     *
+     * Payload chưa có view cây thật; đây là cách gần nhất mà không phải dựng
+     * component admin riêng. Cột "Thuộc nhóm" cho biết mỗi mục nằm ở đâu.
+     */
     description:
-      'Cây dịch vụ. Mục không chọn "Thuộc nhóm" là nhóm cấp cao nhất, hiện trên thanh menu. Mục có chọn là hạng mục con của nhóm đó.',
+      'Cây dịch vụ, sắp theo nhóm. Mục không chọn "Thuộc nhóm" là nhóm cấp cao nhất, hiện trên thanh menu. Mục có chọn là hạng mục con của nhóm đó.',
   },
   labels: { singular: 'Mục dịch vụ', plural: 'Cây dịch vụ' },
+  /**
+   * Sắp theo nhóm cha để danh sách trong admin đọc được như một cây, thay vì
+   * 37 dòng phẳng trộn lẫn các nhóm. Payload chưa có view cây thật; đây là cách
+   * gần nhất mà không phải dựng component admin riêng.
+   */
+  defaultSort: 'parent',
   access: contentAccess,
   fields: [
     { name: 'title', type: 'text', label: 'Tên mục', required: true, localized: true },

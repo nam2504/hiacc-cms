@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { absoluteUrl } from '@/lib/seo'
+import { absoluteUrl, hreflangLanguages, localePath } from '@/lib/seo'
+import { ENABLED_LOCALES } from '@/lib/locales'
 import { isStaging } from '@/lib/staging'
 import {
   getAllPageSlugs,
@@ -57,7 +58,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const now = new Date()
 
-  return [
+  const entries: MetadataRoute.Sitemap = [
     ...STATIC_PATHS.map(({ path, priority }) => ({
       url: absoluteUrl(path),
       lastModified: now,
@@ -103,4 +104,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.5,
       })),
   ]
+
+  /**
+   * Nhân bản mọi URL cho từng ngôn ngữ đang bật, kèm bảng hreflang.
+   *
+   * Trước đây sitemap chỉ khai bản tiếng Việt, nên toàn bộ nhánh `/en` không
+   * được Google biết tới — dịch xong mà không ai tìm thấy. Khai ở đây thay vì
+   * sửa năm chỗ map bên trên: mọi entry đều đi qua `absoluteUrl` cùng một kiểu,
+   * nên nhân bản một lượt ở cuối là đủ và không sót khi thêm loại trang mới.
+   *
+   * `alternates.languages` nói cho Google biết các URL này là bản dịch của nhau
+   * chứ không phải nội dung trùng lặp.
+   */
+  return entries.flatMap((entry) => {
+    const path = entry.url.replace(absoluteUrl('/'), '/').replace(/^\/+/, '/')
+    const languages = hreflangLanguages(path)
+    return ENABLED_LOCALES.map((code) => ({
+      ...entry,
+      url: absoluteUrl(localePath(path, code)),
+      alternates: { languages },
+    }))
+  })
 }

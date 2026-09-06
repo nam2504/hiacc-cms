@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
 import { About } from '@/components/home/About'
 import { CallToAction } from '@/components/home/CallToAction'
+import { ContactForm } from '@/components/contact/ContactForm'
+import { Section } from '@/components/ui/Section'
 import { Hero } from '@/components/home/Hero'
 import { ServiceGroups } from '@/components/home/ServiceGroups'
 import { Stats } from '@/components/home/Stats'
 import { JsonLd, accountingServiceJsonLd } from '@/components/seo/JsonLd'
-import { t } from '@/lib/i18n'
-import { absoluteMediaUrl, ogImages } from '@/lib/seo'
+import { createTranslator, t } from '@/lib/i18n'
+import { absoluteMediaUrl, localeAlternates, ogImages, ogLocale } from '@/lib/seo'
 import { getBranches, getSettings } from '@/lib/site'
 import { getNodeImages, getServiceTree } from '@/lib/serviceTree'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -36,12 +38,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { absolute: settings?.tagline ? `${siteName} — ${t('seo.home.title')}` : siteName },
     description,
-    alternates: { canonical: '/' },
+    alternates: localeAlternates('/', locale),
     openGraph: {
       type: 'website',
       url: '/',
       siteName,
-      locale: 'vi_VN',
+      locale: ogLocale(locale),
       title: siteName,
       description,
       images,
@@ -72,6 +74,8 @@ export default async function HomePage() {
 
   // Ảnh chỉ nạp cho 5 nhóm cấp cao nhất — đúng số thẻ hiện trên trang chủ.
   const groupImages = await getNodeImages(tree.map((group) => group.id))
+
+  const tr = createTranslator(locale as Parameters<typeof createTranslator>[0])
 
   /**
    * Dữ liệu có cấu trúc lấy TOÀN BỘ từ Settings + Branches — khách sửa trong admin
@@ -108,6 +112,14 @@ export default async function HomePage() {
       <Stats settings={settings} />
       <About settings={settings} />
       <ServiceGroups tree={tree} settings={settings} images={groupImages} />
+
+      {/* Khối 8 theo spec: form tư vấn ngay trên trang chủ, không bắt người đọc
+          bấm sang /lien-he mới gửi được yêu cầu. Dùng lại đúng component của
+          trang liên hệ — cùng Server Action, cùng chống spam. */}
+      <Section id="tu-van" tone="soft" title={tr('contact.form.title')} subtitle={tr('contact.form.subtitle')}>
+        <ContactForm />
+      </Section>
+
       <CallToAction settings={settings} />
     </>
   )

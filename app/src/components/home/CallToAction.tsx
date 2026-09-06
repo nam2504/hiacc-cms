@@ -2,6 +2,9 @@ import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { TENANT } from '@/config/tenant'
 import { t } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
+import { getRequestLocale } from '@/lib/requestLocale'
 import type { Setting } from '@/payload-types'
 import styles from './CallToAction.module.css'
 
@@ -16,7 +19,10 @@ import styles from './CallToAction.module.css'
  * ⚠️ Quyết định V3 (31/08) từng bỏ dải đỏ để chuyển sang nền trắng chữ đỏ. Thiết
  * kế khách gửi 06/09 có lại dải đỏ và user đã chốt theo thiết kế mới.
  */
-export function CallToAction({ settings }: { settings: Setting | null }) {
+export async function CallToAction({ settings }: { settings: Setting | null }) {
+  // Giữ ngôn ngữ đang xem cho cả hai nút, không thì CTA đẩy khách về bản tiếng Việt.
+  const locale = await getRequestLocale()
+  const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
   const home = settings?.home
   const title = home?.ctaTitle || t('home.cta.title')
   const primaryLabel = home?.ctaButton || t('home.cta.button')
@@ -29,10 +35,10 @@ export function CallToAction({ settings }: { settings: Setting | null }) {
           <h2 className={styles.title}>{title}</h2>
 
           <div className={styles.actions}>
-            <Link className={styles.primary} href="/lien-he">
+            <Link className={styles.primary} href={href('/lien-he')}>
               {primaryLabel}
             </Link>
-            <Link className={styles.secondary} href="/bang-gia">
+            <Link className={styles.secondary} href={href('/bang-gia')}>
               Bảng giá tổng hợp
             </Link>
           </div>
