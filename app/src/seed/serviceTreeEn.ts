@@ -53,7 +53,12 @@ const PENDING_EN = 'Detailed content is being updated.'
 
 const ITEMS: NodeEn[] = [
   // Accounting
-  { slug: 'ke-toan-tron-goi', title: 'Full-service accounting' },
+  {
+    slug: 'ke-toan-tron-goi',
+    title: 'Full-service accounting',
+    summary:
+      'General requirements, documents to provide, process steps, timeframe and service fees for full-service accounting.',
+  },
   { slug: 'ke-toan-noi-bo', title: 'In-house accounting' },
   { slug: 'kiem-tra-soat-xet-ho-so-ke-toan', title: 'Accounting records review' },
   { slug: 'quyet-toan-thue', title: 'Tax finalisation' },
@@ -67,7 +72,12 @@ const ITEMS: NodeEn[] = [
   { slug: 'thanh-lap-ho-kinh-doanh', title: 'Household business' },
   { slug: 'thanh-lap-cong-ty-von-nuoc-ngoai', title: 'Foreign-invested company' },
   // Registration changes
-  { slug: 'thay-doi-ten', title: 'Change of company name' },
+  {
+    slug: 'thay-doi-ten',
+    title: 'Change of company name',
+    summary:
+      'General requirements, documents to provide, process steps, timeframe and service fees for changing a company name.',
+  },
   { slug: 'thay-doi-dia-chi', title: 'Change of address' },
   { slug: 'bo-sung-nganh-nghe', title: 'Adding business lines' },
   { slug: 'tang-giam-von-dieu-le', title: 'Increase or decrease of charter capital' },
@@ -228,6 +238,46 @@ const HERO_STATS_EN: Record<string, { value: string; label: string }[]> = {
   ],
 }
 
+/**
+ * Merge nội dung tiếng Anh vào một block VI đã tồn tại, GIỮ NGUYÊN `id` ở mọi
+ * cấp (block cấp ngoài lẫn từng dòng trong mảng con như `rows`/`items`).
+ *
+ * Payload phân biệt "cùng một dòng, khác locale" với "dòng mới" bằng `id`.
+ * Field con trong block đều `localized: true` (xem `blocks.ts`), nên nếu giữ
+ * đúng `id`, update ở `locale: 'en'` sẽ merge đúng dòng đó thay vì bị coi là
+ * xoá dòng cũ + thêm dòng mới (dòng mới thì chỉ có 'en', dòng cũ 'vi' mất theo).
+ *
+ * Ném lỗi khi độ dài mảng con không khớp (dữ liệu VI đã bị sửa tay, khác
+ * DEMO_BODIES) — gọi nơi bắt lỗi này chọn bỏ qua thay vì ghi sai.
+ */
+function mergeBlockKeepingIds(
+  viBlock: Record<string, unknown>,
+  enBlockUnknown: unknown,
+): Record<string, unknown> {
+  const enBlock = enBlockUnknown as Record<string, unknown>
+  const merged: Record<string, unknown> = { ...viBlock, id: viBlock.id }
+
+  for (const [key, enValue] of Object.entries(enBlock)) {
+    if (key === 'id' || key === 'blockType') continue
+
+    const viValue = viBlock[key]
+    if (Array.isArray(enValue) && Array.isArray(viValue)) {
+      if (enValue.length !== viValue.length) {
+        throw new Error(`mảng "${key}" lệch độ dài (VI ${viValue.length}, EN ${enValue.length})`)
+      }
+      merged[key] = viValue.map((viItem, i) =>
+        typeof viItem === 'object' && viItem !== null
+          ? { ...(viItem as Record<string, unknown>), ...(enValue[i] as Record<string, unknown>), id: (viItem as Record<string, unknown>).id }
+          : enValue[i],
+      )
+    } else {
+      merged[key] = enValue
+    }
+  }
+
+  return merged
+}
+
 export async function seedServiceTreeEn(payload: Payload): Promise<void> {
   let filled = 0
 
@@ -272,11 +322,45 @@ export async function seedServiceTreeEn(payload: Payload): Promise<void> {
      * trong /admin — 7 hạng mục mất nội dung. Seed chỉ được vá chỗ trống.
      */
     if (untranslated) {
-      const body = DEMO_BODIES[node.slug]
-      if (body) data.body = body
-
       const stats = HERO_STATS_EN[node.slug]
       if (stats) data.heroStats = stats
+    }
+
+    /**
+     * `body` là field `blocks` KHÔNG `localized` ở cấp cha (chỉ field con bên
+     * trong mỗi block mới `localized`) — Payload coi cả mảng là một cấu trúc
+     * dùng chung giữa các locale, phân biệt từng block bằng `id`. Gán thẳng
+     * `data.body = DEMO_BODIES[...]` như trước đây tạo ra một mảng block MỚI
+     * (không có `id`, nên Payload sinh id khác) và THAY THẾ toàn bộ mảng, xoá
+     * luôn các dòng locale 'vi' mà `seedServiceTree` (chạy trước) đã ghi cho
+     * đúng những block đó.
+     *
+     * Sửa: khi bản VI đã có block (2 node demo, luôn được `seedServiceTree`
+     * tạo trước), GIỮ NGUYÊN mảng block của `viDoc.body` (kể cả `id`) và chỉ
+     * merge các field text của `DEMO_BODIES` (theo đúng thứ tự block) vào —
+     * để Payload cập nhật field con localized bên trong từng block đã tồn tại
+     * thay vì coi là block mới. Nếu số block không khớp giữa DEMO_BODIES và
+     * viDoc.body (dữ liệu VI đổi tay), bỏ qua và log cảnh báo — thà thiếu bản
+     * dịch còn hơn phá dữ liệu.
+     */
+    if (untranslated) {
+      const demoBody = DEMO_BODIES[node.slug]
+      const existingBody = viDoc?.body as Array<Record<string, unknown>> | undefined
+
+      if (demoBody && (!existingBody || existingBody.length === 0)) {
+        // Chưa có block VI nào — an toàn để tạo mới nguyên khối.
+        data.body = demoBody
+      } else if (demoBody && existingBody && existingBody.length === demoBody.length) {
+        try {
+          data.body = existingBody.map((block, i) => mergeBlockKeepingIds(block, demoBody[i]))
+        } catch (err) {
+          console.warn(`[seed] bỏ qua body EN của "${node.slug}": ${(err as Error).message}`)
+        }
+      } else if (demoBody) {
+        console.warn(
+          `[seed] bỏ qua body EN của "${node.slug}": số block VI (${existingBody?.length}) khác DEMO_BODIES (${demoBody.length}).`,
+        )
+      }
     }
 
     await payload.update({
