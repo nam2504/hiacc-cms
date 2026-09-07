@@ -182,6 +182,21 @@ export function MegaMenu({
                 aria-current={item.code === locale ? 'true' : undefined}
                 lang={item.code}
                 hrefLang={item.code}
+                onClick={(e) => {
+                  // Bấm nút chuyển ngôn ngữ LÀ quyết định của khách. Hai việc
+                  // phải làm trước khi rời trang:
+                  // 1. Ghi cookie locale mới ngay — nếu không middleware đọc
+                  //    cookie cũ và rewrite ngược lại ngôn ngữ trước đó.
+                  // 2. Ép hard navigation thay vì để next/link điều hướng
+                  //    client-side: router của App Router không chạy lại
+                  //    middleware cho cùng layout, nên dù cookie đã đổi, URL
+                  //    vẫn kẹt ở locale cũ (bấm VI sau khi đã ở /en không đi
+                  //    đâu cả). Chặn Link, tự set location để browser gửi lại
+                  //    request thật.
+                  e.preventDefault()
+                  document.cookie = `NEXT_LOCALE=${item.code};path=/;max-age=${60 * 60 * 24 * 365}`
+                  window.location.href = localizedHref(current, item.code, DEFAULT_LOCALE)
+                }}
               >
                 {item.code.toUpperCase()}
               </Link>
