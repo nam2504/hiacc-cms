@@ -13,7 +13,16 @@
   padding-block: var(--space-2);
 }
 
-.contacts {
+/*
+ * `.contacts` (trái) và `.links` (phải) dùng chung một luật dàn hàng.
+ *
+ * `.links` từng THIẾU HẲN trong file này: <nav className={styles.links}> nhận
+ * class rỗng nên nav thành block thường, 4 link nằm sát nhau thành một chuỗi
+ * dính ("PricingLegal documentsNewsletterContact"). Chỉ thấy được trên trình
+ * duyệt — HTML vẫn đúng nên curl/grep không bắt.
+ */
+.contacts,
+.links {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2) var(--space-4);
