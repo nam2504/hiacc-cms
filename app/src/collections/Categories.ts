@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { APIError } from 'payload'
 import { slugField, seoField } from './fields'
 import { contentAccess } from '../access'
 
@@ -14,6 +15,34 @@ export const Categories: CollectionConfig = {
   },
   labels: { singular: 'Chuyên mục', plural: 'Chuyên mục' },
   access: contentAccess,
+  hooks: {
+    /**
+     * Chặn xoá chuyên mục còn bài viết.
+     *
+     * Không chặn thì `posts.category` (khai `required: true`) thành NULL trên bài
+     * ĐÃ XUẤT BẢN: bài vẫn hiện ngoài site nhưng không lưu lại được nữa — biên tập
+     * viên mở ra sửa thì Payload báo "The following field is invalid: Chuyên mục"
+     * mà không chỉ ra bài nào đã hỏng.
+     */
+    beforeDelete: [
+      async ({ id, req }) => {
+        const posts = await req.payload.find({
+          collection: 'posts',
+          where: { category: { equals: id } },
+          limit: 0,
+          depth: 0,
+          req,
+        })
+
+        if (posts.totalDocs > 0) {
+          throw new APIError(
+            `Chuyên mục này đang có ${posts.totalDocs} bài viết. Xoá nó sẽ làm các bài đó mất chuyên mục và không lưu lại được nữa. Hãy chuyển các bài sang chuyên mục khác trước, hoặc sửa tên chuyên mục này thay vì xoá.`,
+            400,
+          )
+        }
+      },
+    ],
+  },
   fields: [
     { name: 'name', type: 'text', label: 'Tên chuyên mục', required: true, localized: true },
     slugField,

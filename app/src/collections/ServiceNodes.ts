@@ -24,6 +24,9 @@ import { contentAccess } from '../access'
 const RESERVED_ROOT_SLUGS = new Set([
   'admin',
   'api',
+  // Tiền tố ngôn ngữ: middleware nuốt `/en` trước khi route catch-all thấy, nên
+  // node mang slug này lên menu mà bấm vào chỉ ra trang chủ bản ngôn ngữ đó.
+  'en',
   'gioi-thieu',
   'lien-he',
   'tin-tuc',
@@ -156,6 +159,35 @@ export const ServiceNodes: CollectionConfig = {
   ],
 
   hooks: {
+    /**
+     * Chặn xoá nhóm còn hạng mục con.
+     *
+     * Không chặn thì SQLite set `parent = NULL` cho toàn bộ con: chúng lặng lẽ
+     * thành nhóm cấp cao nhất, nhảy lên thanh menu, và ĐỔI URL công khai — URL cũ
+     * 404, mất thứ hạng Google, admin không báo một chữ nào.
+     *
+     * Đây cũng là đường đi vòng qua `RESERVED_ROOT_SLUGS`: node con được phép mang
+     * slug cấm (nằm dưới cha thì không đụng route cấp 1), xoá cha là nó lên gốc
+     * với slug cấm mà không qua `beforeChange`.
+     */
+    beforeDelete: [
+      async ({ id, req }) => {
+        const children = await req.payload.find({
+          collection: 'service-nodes',
+          where: { parent: { equals: id } },
+          limit: 0,
+          depth: 0,
+          req,
+        })
+
+        if (children.totalDocs > 0) {
+          throw new APIError(
+            `Nhóm này đang chứa ${children.totalDocs} hạng mục. Xoá nhóm sẽ làm đổi đường dẫn của tất cả hạng mục bên trong và mọi link cũ sẽ hỏng. Hãy chuyển chúng sang nhóm khác (sửa ô "Thuộc nhóm" của từng mục) rồi mới xoá nhóm này.`,
+            400,
+          )
+        }
+      },
+    ],
     beforeChange: [
       async ({ data, req, originalDoc, operation }) => {
         const parentId = data?.parent

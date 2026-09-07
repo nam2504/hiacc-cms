@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { APIError } from 'payload'
 import { slugField, seoField } from './fields'
 import { contentAccess } from '../access'
 
@@ -42,7 +43,33 @@ export const Pages: CollectionConfig = {
    * xoá vẫn để admin — xoá một trong hai trang là làm trang đó trống ngoài
    * production, nên chỉ admin được làm.
    */
-  access: { ...contentAccess, create: () => false },
+  /**
+   * Chặn cả tạo lẫn xoá. Hai thao tác này phải đối xứng: `create: false` có từ
+   * trước vì bản ghi mới lưu được nhưng site 404 (route là file tĩnh). Nếu chỉ
+   * chặn tạo mà vẫn cho xoá thì admin xoá `/gioi-thieu` là mất VĨNH VIỄN qua giao
+   * diện — không có đường nào trong /admin tạo lại, phải gọi lập trình viên.
+   *
+   * Đúng hai bản ghi, buộc với hai route tĩnh. Cần sửa nội dung thì sửa tại chỗ.
+   */
+  access: { ...contentAccess, create: () => false, delete: () => false },
+  hooks: {
+    /**
+     * `access.delete` KHÔNG đủ: Local API mặc định `overrideAccess: true` nên mọi
+     * script chạy bằng `payload run` xoá được như thường. Hook thì luôn chạy.
+     *
+     * Đối xứng với `create: false`: hai bản ghi này buộc với hai route file tĩnh
+     * (`/gioi-thieu`, `/lien-he`). Xoá là site 404 và KHÔNG có đường nào trong
+     * /admin tạo lại — phải gọi lập trình viên.
+     */
+    beforeDelete: [
+      () => {
+        throw new APIError(
+          'Không xoá được trang này: nội dung của nó gắn với một địa chỉ cố định của website (/gioi-thieu, /lien-he). Xoá là trang ngoài site báo lỗi 404 và không có cách nào tạo lại trong trang quản trị. Cần sửa nội dung thì sửa trực tiếp tại đây.',
+          400,
+        )
+      },
+    ],
+  },
   fields: [
     { name: 'title', type: 'text', label: 'Tiêu đề trang', required: true, localized: true },
     slugField,
