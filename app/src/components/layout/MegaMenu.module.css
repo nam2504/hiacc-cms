@@ -97,6 +97,17 @@
   padding: 0 0 0.5rem 0.75rem;
 }
 
+/**
+ * Mobile không ẩn panel (danh sách luôn xổ), nên khai báo này không đổi giao diện.
+ * Nó tồn tại ở TOP LEVEL vì class chỉ nằm trong @media thì CSS Modules không export
+ * tên ra JS: `styles.panelOpen` thành undefined và panel desktop không bao giờ mở.
+ * Cùng họ lỗi với `.links` của TopBar (7c768d5).
+ */
+.panelOpen {
+  /* Giá trị thật cho desktop nằm trong @media (min-width: 1024px) bên dưới. */
+  padding: 0 0 0.5rem 0.75rem;
+}
+
 .panelIntro {
   display: none;
 }
@@ -156,6 +167,11 @@
     position: static;
   }
 
+  /* Panel trải hết chiều ngang thanh menu, nên mốc định vị là chính thanh nav. */
+  .nav {
+    position: relative;
+  }
+
   .link {
     position: relative;
     padding: 1.5rem 0;
@@ -194,7 +210,10 @@
     opacity: 0;
     visibility: hidden;
     transform: translateY(-4px);
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+    /* KHÔNG transition `visibility`: nó là thuộc tính rời rạc, trình duyệt giữ
+       nguyên `hidden` suốt thời gian transition rồi mới nhảy — panel không mở.
+       `opacity`/`transform` vẫn cho hiệu ứng mượt như cũ. */
+    transition: opacity 0.15s ease, transform 0.15s ease;
   }
 
   .panelOpen {
