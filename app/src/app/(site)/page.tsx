@@ -115,14 +115,17 @@ export default async function HomePage() {
       <About settings={settings} />
       <ServiceGroups tree={tree} settings={settings} images={groupImages} />
 
+      {/* Dải đỏ CTA nằm TRƯỚC form tư vấn theo đúng thứ tự thật (REQUIREMENTS-hiacc-v2
+          mục A3, video 06/09): ...Lĩnh vực hoạt động → dải đỏ CTA → form tư vấn → footer.
+          Trước đây bị đặt sau form do nhầm thứ tự khi ghép khối 8. */}
+      <CallToAction settings={settings} />
+
       {/* Khối 8 theo spec: form tư vấn ngay trên trang chủ, không bắt người đọc
           bấm sang /lien-he mới gửi được yêu cầu. Dùng lại đúng component của
           trang liên hệ — cùng Server Action, cùng chống spam. */}
       <Section id="tu-van" tone="soft" title={tr('contact.form.title')} subtitle={tr('contact.form.subtitle')}>
         <ContactForm locale={locale} />
       </Section>
-
-      <CallToAction settings={settings} />
     </>
   )
 }
