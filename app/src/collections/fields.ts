@@ -35,6 +35,17 @@ export const seoField: Field = {
 }
 
 /** Slug: nhập tay để giữ URL ổn định (đổi slug = mất thứ hạng Google). */
+/**
+ * Chữ thường, số, nối bằng một dấu gạch ngang; không dấu tiếng Việt, không khoảng
+ * trắng, không `/`.
+ *
+ * Vì sao phải chặn ở đây: không có validate thì Payload nhận mọi thứ, kể cả
+ * "Kế Toán Thuế". Mục hiện lên menu như đã đăng thành công, nhưng khách bấm vào
+ * nhận 404 — và admin không cảnh báo một chữ nào. Người nhập là nhân viên kế toán,
+ * gõ tiếng Việt có dấu là phản xạ tự nhiên.
+ */
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
 export const slugField: Field = {
   name: 'slug',
   type: 'text',
@@ -42,6 +53,15 @@ export const slugField: Field = {
   required: true,
   unique: true,
   index: true,
+  validate: (value: unknown) => {
+    if (typeof value !== 'string' || value.length === 0) {
+      return 'Cần nhập đường dẫn. Ví dụ: ke-toan-tron-goi'
+    }
+    if (!SLUG_PATTERN.test(value)) {
+      return 'Đường dẫn chỉ được dùng chữ thường không dấu, số và dấu gạch ngang. Không dùng khoảng trắng, chữ hoa, dấu tiếng Việt hay dấu "/". Ví dụ đúng: ke-toan-tron-goi'
+    }
+    return true
+  },
   admin: {
     position: 'sidebar',
     description:
