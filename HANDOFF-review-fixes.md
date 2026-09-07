@@ -1,89 +1,123 @@
 # Handoff: đóng finding review site HiACC (đợt 07/09)
 
-## Mục tiêu
-Đóng hết finding chặn bàn giao từ review site, rồi chạy lại 2 reviewer còn thiếu
-(admin + trình duyệt thật). Sau đó test trang chủ bằng Chrome thật.
+## Trạng thái: 3/3 reviewer đã chạy, 7 nhóm finding chặn bàn giao ĐÃ ĐÓNG
 
-## Trạng thái: 6/6 finding chặn ĐÃ ĐÓNG, cây làm việc sạch
-
-Nhánh `feat/tenant-tach-va-cay-dich-vu`, HEAD `a958ce2`. Dev server chạy ở `localhost:3000`.
+Nhánh `feat/tenant-tach-va-cay-dich-vu`, HEAD `e492eac`. Dev server `localhost:3000`,
+admin `admin@gmail.com` / `Admin@123`. Cây làm việc sạch.
 
 | Commit | Nội dung |
 |---|---|
-| `670f725` | B1 canonical `/tin-tuc` + `/chuyen-muc`; B2 link nội bộ giữ ngôn ngữ; B3 `Hero.tsx` |
-| `4d7c38f` | sửa 2 check i18n không bao giờ đỏ |
-| `37f1d90` | bảng màu admin lấy màu logo từ `TENANT` (bỏ ghim cứng HiACC) |
-| `90ddd65` | sinh lại `payload-types.ts` |
-| `77a3793` | B4 `og:url` + JSON-LD trên `/en` |
-| `a958ce2` | B5 trang `/bang-gia` giữ chỗ + 3 trang thiếu trong sitemap + B6 cảnh báo `SITE_URL` |
+| `670f725` … `a958ce2` | đợt 1 — xem mục "đã xác định" bên dưới |
+| `7c768d5` | `TopBar.tsx` dùng class `.links` không tồn tại → 4 link dính liền |
+| `86c7b4d` | handoff đợt 1 |
+| `be670ba` | **mega-menu không bao giờ mở** — `transition: visibility` + neo panel + export class |
+| `732695b` | **chặn đường xoá** — 3 hook `beforeDelete` (service-nodes, Pages, Categories) + `en` vào slug cấm |
+| `e492eac` | **validate slug** — chặn tiếng Việt có dấu, chữ hoa, khoảng trắng, `/` |
 
-## Đã xác định (kết luận, không phải code)
-
-- **Wave i18n từng báo PASS là SAI.** `Hero.tsx` vẫn import `t` đóng băng; script verify của tôi
-  có 2 check grep chuỗi KHÔNG hề render nên luôn xanh. Nay mọi check đều mutation-test.
-  Neo: `runs/verify-i18n.sh:25,30`
-- **Link nội bộ**: đo được 38 → 1 trên `/en`. Số 1 còn lại là `href="/"` — nút chuyển sang bản VI,
-  **đúng thiết kế, đừng "sửa"**. Neo: `runs/FACTS-i18n-locale.md`
-- **`og:url` + JSON-LD**: 14/14 trang đúng nhánh ngôn ngữ. `breadcrumbJsonLd` nay nhận tham số
-  `locale` tuỳ chọn (mặc định VI, không phá nơi gọi cũ). Neo: `app/src/components/seo/JsonLd.tsx:160`
-- **Sitemap thiếu 3 trang** (finding MỚI, không có trong báo cáo reviewer): `/van-ban-phap-luat`,
-  `/cong-cu/tinh-luong`, `/bang-gia` có nội dung thật + canonical đầy đủ nhưng không được khai.
-  126 → 132 URL. Neo: `app/src/app/(site)/sitemap.ts:36`
-- **`NEXT_PUBLIC_SITE_URL` bị nướng cứng lúc `next build`** — set lúc `next start` là đã muộn.
-  Nay `console.error` khi production thiếu biến. Neo: `app/src/lib/seo.ts:11`
-- **Branding tenant**: `tenant.ts` là nguồn chân lý duy nhất; client component nhận màu qua
-  `clientProps` của Payload, KHÔNG qua `NEXT_PUBLIC_*`. Neo: `app/src/globals/Settings.ts:72`
-- **BÁC BỎ finding nghi P0 payroll**: "Lương Gross cần thoả thuận" nằm trong `.srOnly`
-  (`clip: rect(0,0,0,0)`) — reviewer đọc DOM nên thấy node dành cho screen reader, mắt không thấy.
-  81/81 test pass. Neo: `app/src/components/payroll/PayrollCalculator.tsx:253`
-- **`ServiceNodes.ts:33` có `'bang-gia'`** trong `RESERVED_ROOT_SLUGS` — đó là danh sách slug CẤM,
-  giữ nguyên, không phải link chết.
-
-## Gate hiện tại (đã chạy, đều xanh)
+## Gate (đã chạy sau khi sửa, đều xanh)
 ```
-bash runs/verify-i18n.sh all     # PASS, từ điển 214/214
-bash runs/verify-admin.sh        # PASS
-cd app && npm test               # 81 pass, 0 fail
-cd app && npx tsc --noEmit       # rc=0
+cd app && npx tsc --noEmit          # rc=0
+cd app && npm test                  # 81 pass, 0 fail
+bash runs/verify-admin.sh           # PASS
+bash runs/verify-i18n.sh all        # PASS, từ điển 214/214
+# 10/10 route trả 200: / /en /gioi-thieu /lien-he /tin-tuc /chuyen-muc
+#                      /van-ban-phap-luat /ke-toan /cong-cu/tinh-luong /bang-gia
 ```
-
-## Chưa biết / còn mở
-- 5 finding NỢ KỸ THUẬT trong `~/Desktop/hiacc-site-review-2026-09-07.md` chưa phân loại.
-- Báo cáo `~/Desktop/hiacc-admin-review-2026-09-07.md` đã có sẵn (32KB) nhưng CHƯA đọc.
-- Layout 390px chưa đo được (`resize_window` báo thành công nhưng `innerWidth` vẫn 1854).
-- `van-ban-phap-luat`: `localized: true` nhưng `payload.find` không truyền locale;
-  `LEGAL_GROUPS` nhãn VI cứng.
-- Reviewer **admin** và **trình duyệt thật** chết vì rate limit 429, chưa chạy lại.
-  Brief sẵn: `runs/BRIEF-review-{admin,browser}.md`
-
-## Bước tiếp theo
-1. **Mở Chrome test trang chủ** (user yêu cầu) — `/` và `/en`, xem console error, layout, link.
-2. Đọc `~/Desktop/hiacc-admin-review-2026-09-07.md` (đã có sẵn, chưa dùng).
-3. Chạy lại 2 reviewer admin + browser trong CÙNG một response.
 
 ---
 
-## Bổ sung sau khi test bằng Chrome thật (07/09)
+## ⚠️ ĐỌC TRƯỚC KHI ĐỘNG VÀO QUYỀN XOÁ
 
-**Bài học phương pháp: `curl` bỏ lọt cả một lớp lỗi.** Ba thứ dưới đây chỉ lộ ra trên
-trình duyệt, HTML thì vẫn đúng:
+**`access.delete` KHÔNG chặn được xoá.** Local API (`payload run`, seed, mọi script)
+mặc định `overrideAccess: true` nên đi thẳng qua `access`. Chỉ hook `beforeDelete` mới
+luôn chạy.
 
-- **BUG THẬT, đã sửa** (`7c768d5`): `TopBar.tsx` dùng `<nav className={styles.links}>` nhưng
-  **class `.links` không tồn tại** trong `TopBar.module.css`. Nav thành block thường, 4 link
-  dính liền: "PricingLegal documentsNewsletterContact". Đo: gap 0px → 16px sau khi sửa.
-  Neo: `app/src/components/layout/TopBar.module.css:16`
-- **Đã quét toàn repo cùng loại lỗi**: chỉ còn `Footer.tsx` dùng `styles.col` không tồn tại,
-  nhưng `.grid` đã lo hết bố cục (4 cột 264px, gap 32px) nên KHÔNG hỏng gì. Rác vô hại,
-  cố ý không dọn (AI-01). Neo: `app/src/components/layout/Footer.tsx:47`
-- **Cookie `NEXT_LOCALE` làm lệch phép đo**: gõ `/` mà Chrome nhảy sang `/en`. Khi test tay
-  phải set cookie tường minh, nếu không sẽ tưởng trang VI hỏng.
+Tôi học điều này bằng cách **tự xoá mất trang `/lien-he`** khi test `delete: () => false`.
+`versions: { drafts: true }` KHÔNG cứu được — Payload xoá luôn version. Phải khôi phục
+thủ công từ `app/src/seed/data.ts` (`PAGES`, slug `lien-he`), tạo lại đúng 1 bản ghi
+bằng `payload.create` — **không** chạy `npm run seed` (nó reset cả DB).
 
-**11 chuỗi tiếng Việt còn trên `/en` KHÔNG phải bug** — đã xác minh từng cái:
-tên/slogan/mô tả/địa chỉ/copyright (Settings) + 3 tiêu đề bài viết (Posts). Tất cả là nội dung DB.
+Hệ quả cho người sau: muốn chặn xoá ở bất kỳ collection nào, viết hook, đừng viết access.
 
-**Admin ĐÃ có chỗ cho khách dịch** (đo trên `/admin/globals/settings?locale=en`):
-bộ chọn `Locale: Tiếng Việt / English`, field dịch được mang hậu tố `— English`, có nút
-"Copy to locale". Hero: 3/3 field dịch được, đang trống → đó là lý do `/en` hiện tiếng Việt.
-Field cố ý KHÔNG dịch: `Tên website`, `Màu chủ đạo`. Schema DB xác nhận
-(`settings_home_stats` có cột `_locale`).
-=> Việc còn lại là **khách nhập nội dung EN**, không phải việc code.
+---
+
+## Phát hiện xuyên suốt của cả đợt review
+
+**Repo canh đường GHI rất kỹ, không canh đường XOÁ ở đâu cả.**
+Đường ghi có 2 hook (chặn vòng lặp, chặn slug trùng route) + validate trùng slug.
+Đường xoá trước đợt này: trống trơn. Hai reviewer độc lập, cold-start, cùng chỉ vào đó.
+
+Khi xoá node cha, SQLite set `parent = NULL` cho các con → chúng lặng lẽ thành nhóm
+cấp cao nhất, nhảy lên menu chính, **đổi URL công khai**, URL cũ 404. Không màn hình
+xác nhận nào nói "nhóm này đang có 7 hạng mục con".
+
+## Bài học phương pháp (3 cái, đều trả giá thật)
+
+1. **`curl` bỏ lọt cả một lớp lỗi.** HTML đúng mà trang vẫn hỏng: `.links` thiếu ở
+   TopBar (`7c768d5`), mega-menu không mở (`be670ba`). Cả hai chỉ lộ trên trình duyệt thật.
+2. **Đoán nguyên nhân là đắt.** Mega-menu: tôi chẩn đoán sai 2 lần (đoán neo `position`,
+   rồi đoán `styles.panelOpen` undefined) trước khi đo ra thủ phạm thật. Cách tìm ra:
+   đặt `transition: none` rồi xem panel có hiện không — thí nghiệm phân biệt, không phải đọc code.
+3. **`visibility` là thuộc tính RỜI RẠC.** Cho nó vào `transition` thì trình duyệt giữ
+   nguyên `hidden` suốt thời gian transition rồi mới nhảy — panel không bao giờ mở.
+   `opacity`/`transform` transition được, `visibility` thì không.
+
+## Đã xác định (kết luận, đừng kiểm lại)
+
+- **Wave i18n từng báo PASS là SAI** — `Hero.tsx` vẫn import `t` đóng băng; 2 check
+  trong script verify grep chuỗi KHÔNG hề render nên luôn xanh. Nay mọi check đều
+  mutation-test. Neo: `runs/verify-i18n.sh:25,30`
+- **Link nội bộ**: 38 → 1 trên `/en`. Số 1 còn lại là `href="/"` — nút chuyển sang bản VI,
+  **đúng thiết kế, đừng "sửa"**.
+- **`NEXT_PUBLIC_SITE_URL` bị nướng cứng lúc `next build`** — set lúc `next start` là muộn.
+  Nay `console.error` khi production thiếu biến. Neo: `app/src/lib/seo.ts:11`
+- **Branding tenant**: `tenant.ts` là nguồn chân lý duy nhất; client component nhận màu
+  qua `clientProps` của Payload, KHÔNG qua `NEXT_PUBLIC_*`.
+- **BÁC BỎ P0 payroll**: "Lương Gross cần thoả thuận" nằm trong `.srOnly` — reviewer đọc
+  DOM nên thấy node dành cho screen reader, mắt không thấy. 81/81 test pass.
+- **`'bang-gia'` trong `RESERVED_ROOT_SLUGS`** là danh sách slug CẤM, không phải link chết.
+- **`styles.col` thừa ở `Footer.tsx:47`** — `.grid` đã lo hết bố cục. Rác vô hại, cố ý
+  không dọn (AI-01).
+- **11 chuỗi tiếng Việt trên `/en` KHÔNG phải bug** — nội dung DB khách chưa dịch.
+  Admin ĐÃ có chỗ nhập bản EN (`/admin/globals/settings?locale=en`, có nút "Copy to locale").
+  Việc còn lại là khách nhập, không phải việc code.
+- **Hydration error `data-gr-*`** = Grammarly tiêm vào `<body>`. Không phải bug.
+- **Cookie `NEXT_LOCALE` làm lệch phép đo** — gõ `/` mà Chrome nhảy `/en`. Test tay phải
+  set cookie tường minh.
+- **Phân quyền `editor` chặt** (đã test bằng user thật): xoá → 403, sửa Settings → 403,
+  tự nâng role → 403, đọc `/api/users` chỉ trả về chính mình.
+- **Công cụ tính lương đúng tới từng đồng** — kiểm tay cả hai chiều, khứ hồi khớp tuyệt đối.
+  Đây là chỗ rủi ro nhất (tính tiền cho khách hàng cuối) và nó đạt.
+
+---
+
+## Bước tiếp theo (chưa làm)
+
+1. **Đo responsive 360 / 768 / 1440** — CHƯA AI ĐO. `resize_window` báo thành công nhưng
+   `innerWidth` vẫn 1854; reviewer khai không đo được thay vì bịa số. Cần đo tay hoặc máy khác.
+   Mega-menu vừa sửa mới chỉ verify ở desktop (1854px) — **phải kiểm cả mobile**.
+2. **N1 · chuyển ngôn ngữ đổi URL mà không đổi nội dung**: bấm EN/VI thì URL đúng nhưng
+   `<html lang>`, H1, `<title>` giữ nguyên bản cũ; tải thẳng URL thì đúng ⇒ client-side nav
+   không render lại theo locale.
+3. **N4 · form liên hệ gửi xong khách không thấy xác nhận**: thông báo `role="status"` render
+   ở `top:-95px` (trên khung nhìn), trang không tự cuộn tới, form biến mất ⇒ dễ tưởng lỗi và
+   gửi lại.
+4. **Phân loại nợ kỹ thuật**: 5 (browser) + 7 (admin đợt 1) + 7 (admin đợt 2).
+5. **N-01**: comment `Categories.ts:5` ghi "13 chuyên mục", DB có **12**. Chưa truy được.
+6. **Siết `runs/verify-admin.sh`**: `git diff --quiet -- brandStyle.ts` chỉ so working tree
+   → thay đổi ĐÃ COMMIT vào file cấm sẽ pass im lặng.
+
+## Báo cáo review (trên `~/Desktop/`)
+
+| File | Nội dung |
+|---|---|
+| `hiacc-site-review-2026-09-07.md` | site, đợt 1 — finding đã xử ở `T-review-fix` |
+| `hiacc-admin-review-2026-09-07.md` | admin đợt 1 — 4 chặn + 7 nợ + 2 nghi vấn |
+| `hiacc-admin-review-2-2026-09-07.md` | admin đợt 2 (HEAD mới hơn) — 4 chặn + 7 nợ |
+| `hiacc-browser-review-2026-09-07.md` | trình duyệt thật — 1 chặn + 6 nợ |
+
+Brief để chạy lại reviewer: `runs/BRIEF-review-{site,admin,browser}.md`
+
+⚠️ **Đừng chạy 2 reviewer ghi DB song song.** Đợt này reviewer admin dọn dữ liệu test
+giữa lúc reviewer browser đang đo → phép đo tràn ngang của browser hỏng, không kết luận
+được. Cả hai cùng ghi `app/hiacc.db`. Cho browser (read-only) chạy trước, admin sau.
