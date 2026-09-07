@@ -1,4 +1,5 @@
 import type { ServerProps } from 'payload'
+import { ServiceTreeInteractive, type TreeNodeView } from './ServiceTreeInteractive'
 
 /**
  * Sơ đồ cây dịch vụ, gắn phía trên bảng danh sách của collection `service-nodes`
@@ -7,12 +8,20 @@ import type { ServerProps } from 'payload'
  * Vì sao cần: dữ liệu thật là 5 nhóm gốc / 32 hạng mục con. Bảng phẳng 37 dòng
  * — kể cả khi đã `defaultSort: 'parent'` — không cho nhân viên thấy hạng mục nào
  * nằm trong nhóm nào; muốn biết phải đọc từng dòng ở cột "Thuộc nhóm". Khối này
- * vẽ đúng quan hệ cha–con để nhìn một lần là ra cấu trúc.
+ * vẽ đúng quan hệ cha–con để nhìn một lần là ra cấu trúc, xổ/thu được từng nhóm,
+ * và click 1 mục để lọc bảng bên dưới còn đúng dòng đó.
  *
- * Đây là khối CHỈ ĐỌC, cố ý đặt BÊN TRÊN bảng chứ không thay bảng: mọi thao tác
- * sửa/xoá/lọc/phân trang vẫn do bảng gốc của Payload lo. Không tự dựng lại các
- * thao tác đó nghĩa là không có đường nào bỏ qua được hook chặn vòng lặp và
- * chặn slug trùng route ở `ServiceNodes.ts` — mọi thay đổi vẫn đi qua form chuẩn.
+ * Việc XỔ/THU + CLICK LỌC nằm ở `ServiceTreeInteractive` (client component) vì
+ * cần state và router. Component này (server) chỉ lo fetch + build quan hệ
+ * cha–con rồi truyền xuống dạng dữ liệu thuần (id/tên/slug), không truyền hàm
+ * hay JSX phức tạp — giữ ranh giới server/client rõ ràng.
+ *
+ * Đây là khối CHỈ ĐỌC dữ liệu cây, cố ý đặt BÊN TRÊN bảng chứ không thay bảng:
+ * mọi thao tác sửa/xoá/phân trang vẫn do bảng gốc của Payload lo — lọc cũng đi
+ * qua đúng cơ chế URL query (`where[id][equals]`) mà bảng đó tự đọc, không tự
+ * dựng lại bảng hay gọi thêm API. Không có đường nào bỏ qua được hook chặn vòng
+ * lặp và chặn slug trùng route ở `ServiceNodes.ts` — mọi thay đổi vẫn đi qua
+ * form chuẩn.
  *
  * Server component: `payload` lấy thẳng từ ServerProps, không gọi REST nên không
  * cần cookie/token và không thêm một vòng mạng nào.
@@ -63,10 +72,6 @@ const styles = {
   },
   heading: { margin: '0 0 .25rem', fontSize: '1rem' },
   hint: { margin: '0 0 .75rem', fontSize: '.8125rem', color: 'var(--theme-elevation-600)' },
-  list: { margin: 0, padding: 0, listStyle: 'none' },
-  rootRow: { padding: '.3rem 0', fontWeight: 600 },
-  childRow: { padding: '.15rem 0' },
-  slug: { color: 'var(--theme-elevation-500)', fontSize: '.8125rem', marginLeft: '.4rem' },
   orphanNote: {
     marginTop: '.75rem',
     fontSize: '.8125rem',
@@ -114,27 +119,31 @@ const ServiceTree = async ({ payload }: ServerProps) => {
 
   const detached = rows.filter((row) => row.parentId && !knownIds.has(row.parentId)).length
 
-  const renderLevel = (parentId: string | null, depth: number) => {
-    const children = childrenOf.get(parentId)
-    if (!children || depth > MAX_DEPTH) return null
+  /**
+   * Quy `childrenOf` (Map, khoá `null` cho gốc) về dạng thuần Record để truyền
+   * qua props cho client component — gốc dùng khoá chuỗi `'__root__'` vì key
+   * object/`null` không truyền được qua ranh giới server/client. Đồng thời gán
+   * `depth` cho từng node bằng đúng 1 lượt duyệt cây (không đệ quy 2 lần).
+   */
+  const nodes: TreeNodeView[] = []
+  const childrenOfPlain: Record<string, string[]> = {}
 
-    return (
-      <ul style={styles.list}>
-        {children.map((row) => (
-          <li key={String(row.id)} style={{ paddingLeft: depth === 0 ? 0 : '1.25rem' }}>
-            <div style={depth === 0 ? styles.rootRow : styles.childRow}>
-              <span aria-hidden="true" style={{ marginRight: '.4rem' }}>
-                {depth === 0 ? '▸' : '·'}
-              </span>
-              {row.title || '(chưa đặt tên)'}
-              {row.slug ? <span style={styles.slug}>/{row.slug}</span> : null}
-            </div>
-            {renderLevel(String(row.id), depth + 1)}
-          </li>
-        ))}
-      </ul>
-    )
+  const walk = (parentId: string | null, depth: number) => {
+    const children = childrenOf.get(parentId)
+    if (!children || depth > MAX_DEPTH) return
+    const key = parentId ?? '__root__'
+    childrenOfPlain[key] = children.map((row) => String(row.id))
+    for (const row of children) {
+      nodes.push({
+        id: String(row.id),
+        title: row.title || '(chưa đặt tên)',
+        slug: row.slug ?? null,
+        depth,
+      })
+      walk(String(row.id), depth + 1)
+    }
   }
+  walk(null, 0)
 
   const rootCount = childrenOf.get(null)?.length ?? 0
 
@@ -143,13 +152,13 @@ const ServiceTree = async ({ payload }: ServerProps) => {
       <h3 style={styles.heading}>Sơ đồ cây dịch vụ</h3>
       <p style={styles.hint}>
         {rootCount} nhóm cấp cao nhất, tổng {rows.length} mục. Mục thụt vào là hạng mục con của
-        mục ngay trên nó. Đây là bảng nhìn cho dễ — muốn sửa thì bấm vào dòng tương ứng ở bảng
-        bên dưới.
+        mục ngay trên nó. Bấm mũi tên để xổ/thu gọn nhóm, bấm tên mục để lọc bảng bên dưới còn
+        đúng dòng đó.
       </p>
       {rows.length === 0 ? (
         <p style={styles.hint}>Chưa có mục dịch vụ nào.</p>
       ) : (
-        renderLevel(null, 0)
+        <ServiceTreeInteractive nodes={nodes} childrenOf={childrenOfPlain} />
       )}
       {detached > 0 ? (
         <p style={styles.orphanNote}>
