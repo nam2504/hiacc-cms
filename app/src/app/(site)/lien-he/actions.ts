@@ -21,7 +21,14 @@ export type ContactFormState = {
   /** Khoá i18n lỗi theo từng field, để tô đỏ đúng ô. */
   fieldErrors?: Partial<Record<'name' | 'phone' | 'email' | 'message', string>>
   /** Giữ lại dữ liệu người dùng đã gõ khi lỗi — contract yêu cầu không mất chữ. */
-  values?: { name: string; phone: string; email: string; message: string }
+  values?: {
+    salutation: string
+    name: string
+    phone: string
+    email: string
+    fieldOfInterest: string
+    message: string
+  }
 }
 
 /**
@@ -144,11 +151,16 @@ export async function submitContactForm(
   _prev: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
+  const salutationRaw = readField(formData, 'salutation')
+  // Select chỉ có 2 option cố định (xem ContactSubmissions.ts) — giá trị lạ (form
+  // bị can thiệp, hoặc option đổi sau này mà form cache cũ) thì bỏ qua thay vì ghi bậy vào DB.
+  const salutation = salutationRaw === 'anh' || salutationRaw === 'chi' ? salutationRaw : ''
   const name = readField(formData, 'name')
   const phone = readField(formData, 'phone')
   const email = readField(formData, 'email')
+  const fieldOfInterest = readField(formData, 'fieldOfInterest')
   const message = readField(formData, 'message')
-  const values = { name, phone, email, message }
+  const values = { salutation, name, phone, email, fieldOfInterest, message }
 
   // Honeypot: người thật không thấy field này nên không bao giờ điền.
   // Trả về success GIẢ — không ghi DB, không báo lỗi, để bot không học được cách né.
@@ -206,9 +218,11 @@ export async function submitContactForm(
       // Local API với quyền server: form public không có user đăng nhập.
       overrideAccess: true,
       data: {
+        salutation: salutation || undefined,
         name,
         phone: normalizedPhone as string,
         email: email || undefined,
+        fieldOfInterest: fieldOfInterest || undefined,
         message: message || undefined,
       },
     })

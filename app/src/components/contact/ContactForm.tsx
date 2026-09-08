@@ -34,6 +34,9 @@ const FIELD_ORDER = [
   ['message', 'contact-message'],
 ] as const
 
+/** Tuỳ chọn cho select "Lĩnh vực" — tên nhóm dịch vụ, đi vào qua props từ trang cha (đọc cây trong DB). */
+export type FieldOfInterestOption = { value: string; label: string }
+
 /** `t` đi vào qua prop: SubmitButton nằm dưới <form> nên không nhận locale trực tiếp. */
 function SubmitButton({ t }: { t: ReturnType<typeof createTranslator> }) {
   const { pending } = useFormStatus()
@@ -45,7 +48,13 @@ function SubmitButton({ t }: { t: ReturnType<typeof createTranslator> }) {
   )
 }
 
-export function ContactForm({ locale }: { locale: string }) {
+export function ContactForm({
+  locale,
+  fieldOfInterestOptions = [],
+}: {
+  locale: string
+  fieldOfInterestOptions?: FieldOfInterestOption[]
+}) {
   // Client component: không gọi được getRequestLocale() (headers() chỉ chạy phía
   // server) → locale đi vào qua props từ trang cha.
   const t = createTranslator(locale as Parameters<typeof createTranslator>[0])
@@ -127,6 +136,23 @@ export function ContactForm({ locale }: { locale: string }) {
         )}
 
         <div className={styles.field}>
+          <label className={styles.label} htmlFor="contact-salutation">
+            {t('contact.form.salutation.label')}
+            <span className={styles.optional}>{t('contact.form.optional')}</span>
+          </label>
+          <select
+            className={styles.input}
+            id="contact-salutation"
+            name="salutation"
+            defaultValue={values?.salutation ?? ''}
+          >
+            <option value=""></option>
+            <option value="anh">{t('contact.form.salutation.mr')}</option>
+            <option value="chi">{t('contact.form.salutation.ms')}</option>
+          </select>
+        </div>
+
+        <div className={styles.field}>
           <label className={styles.label} htmlFor="contact-name">
             {t('contact.form.name.label')}
             <span className={styles.required} aria-label={t('contact.form.requiredMark')}>
@@ -203,6 +229,28 @@ export function ContactForm({ locale }: { locale: string }) {
             </p>
           )}
         </div>
+
+        {fieldOfInterestOptions.length > 0 && (
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="contact-field-of-interest">
+              {t('contact.form.fieldOfInterest.label')}
+              <span className={styles.optional}>{t('contact.form.optional')}</span>
+            </label>
+            <select
+              className={styles.input}
+              id="contact-field-of-interest"
+              name="fieldOfInterest"
+              defaultValue={values?.fieldOfInterest ?? ''}
+            >
+              <option value="">{t('contact.form.fieldOfInterest.placeholder')}</option>
+              {fieldOfInterestOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className={styles.field}>
           <label className={styles.label} htmlFor="contact-message">

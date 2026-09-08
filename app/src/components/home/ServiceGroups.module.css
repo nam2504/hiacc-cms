@@ -52,15 +52,20 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  /* 5 thẻ trên lưới 3 cột: 3 trên, 2 dưới căn giữa — đúng thiết kế. */
+  /*
+   * 5 thẻ trên lưới 3 cột: 3 trên, 2 dưới căn giữa — đúng thiết kế.
+   * `margin-left: 50%` (cách cũ) đẩy item theo % chiều rộng CỦA CHÍNH Ô
+   * grid-column nó đang đứng (1fr, không phải toàn hàng) → lệch nửa card
+   * và card bị bóp hẹp lại thay vì giữ đúng kích thước như 3 card trên.
+   * Đặt thẳng vào cột 2 và 3 (giữa hàng 3 cột) để 2 card dưới cùng kích
+   * thước, cùng width với hàng trên, chỉ khác vị trí cột.
+   */
   .item:nth-child(4) {
-    grid-column: 1 / 2;
-    margin-left: 50%;
+    grid-column: 2 / 3;
   }
 
   .item:nth-child(5) {
-    grid-column: 2 / 3;
-    margin-left: 50%;
+    grid-column: 3 / 4;
   }
 }
 

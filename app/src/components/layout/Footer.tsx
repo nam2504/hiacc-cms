@@ -7,6 +7,7 @@ import { DEFAULT_LOCALE } from '@/lib/locales'
 import { getRequestLocale } from '@/lib/requestLocale'
 import type { TreeNode } from '@/lib/serviceTree'
 import type { Post, Setting } from '@/payload-types'
+import { Logo } from './Logo'
 import styles from './Footer.module.css'
 
 /**
@@ -45,6 +46,7 @@ export async function Footer({
       <Container>
         <div className={styles.grid}>
           <div className={styles.col}>
+            <Logo settings={settings} className={styles.logo} priority={false} />
             <h3 className={styles.heading}>{headings?.about || tr('footer.about')}</h3>
             {settings?.aboutShort && <p className={styles.text}>{settings.aboutShort}</p>}
             {settings?.companyName && <p className={styles.text}>{settings.companyName}</p>}

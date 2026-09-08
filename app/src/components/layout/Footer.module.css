@@ -11,6 +11,19 @@
   gap: var(--space-6);
 }
 
+/*
+ * `--color-brand` bị Logo.module.css `.text` (chữ fallback khi chưa upload
+ * ảnh logo) dùng làm màu chữ. Header nền sáng thì đỏ hợp; nền tối của footer
+ * thì đỏ lệch tông so với phần còn lại của cột. Logo.module.css không có
+ * biến riêng cho việc này, và CSS Modules không cho file này ghi đè thẳng
+ * class đã hash của Logo.module.css — override qua biến CSS kế thừa xuống
+ * theo cây DOM là cách duy nhất không phải sửa Logo.module.css.
+ */
+.logo {
+  margin-bottom: var(--space-4);
+  --color-brand: var(--color-text-invert);
+}
+
 .heading {
   margin-bottom: var(--space-4);
   color: var(--color-text-invert);

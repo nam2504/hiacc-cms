@@ -9,6 +9,7 @@ import { Section } from '@/components/ui/Section'
 import { createTranslator } from '@/lib/i18n'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { getBranches, getPageBySlug, getSettings } from '@/lib/site'
+import { getServiceTree } from '@/lib/serviceTree'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
 
@@ -76,11 +77,13 @@ export default async function LienHePage() {
   const locale = await getRequestLocale()
   // <ContactForm> là client component → locale phải đi xuống qua props.
   const tr = createTranslator(locale)
-  const [page, settings, branches] = await Promise.all([
+  const [page, settings, branches, tree] = await Promise.all([
     getPageBySlug(SLUG, locale),
     getSettings(locale),
     getBranches(locale),
+    getServiceTree(locale),
   ])
+  const fieldOfInterestOptions = tree.map((group) => ({ value: group.title, label: group.title }))
 
   return (
     <>
@@ -101,7 +104,7 @@ export default async function LienHePage() {
           <div className={styles.body}>
             <PageBody content={page?.content} fallback={false} />
             {/* Chỗ dành cho form liên hệ — gói W7 gắn component form vào đây. */}
-            <ContactForm locale={locale} />
+            <ContactForm locale={locale} fieldOfInterestOptions={fieldOfInterestOptions} />
           </div>
         </div>
       </Section>

@@ -7,9 +7,17 @@
 @media (min-width: 1024px) {
   .sidebar {
     position: sticky;
-    top: 1.5rem;
+    /*
+     * `top: 1.5rem` (cũ) chỉ tính từ đỉnh viewport, nhưng header cũng
+     * `position: sticky; top: 0` với chiều cao thật = TopBar + header
+     * chính (--topbar-height + --header-height), không phải 0. Kết quả:
+     * khi cuộn, sidebar dính vào ngay dưới đỉnh viewport trong khi header
+     * còn đang che phần đó → mất khúc đầu của sidebar (menu bar) sau
+     * header. Offset đúng phải cộng cả hai, cộng thêm khoảng đệm cũ.
+     */
+    top: calc(var(--topbar-height) + var(--header-height) + 1.5rem);
     align-self: start;
-    max-height: calc(100vh - 3rem);
+    max-height: calc(100vh - var(--topbar-height) - var(--header-height) - 3rem);
     overflow-y: auto;
   }
 }

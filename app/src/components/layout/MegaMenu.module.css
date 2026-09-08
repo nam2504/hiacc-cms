@@ -167,10 +167,14 @@
     position: static;
   }
 
-  /* Panel trải hết chiều ngang thanh menu, nên mốc định vị là chính thanh nav. */
-  .nav {
-    position: relative;
-  }
+  /*
+   * Panel phải trải hết chiều ngang HEADER (từ logo đến hết menu), không phải
+   * chỉ chiều ngang `.nav` — `.nav` chỉ là phần bên phải logo vì Header.tsx đặt
+   * Logo và MegaMenu cạnh nhau trong `.inner` (justify-content: space-between).
+   * Nếu mốc định vị là `.nav`, `left:0` của panel chỉ chạm mép trái nav (ngay
+   * sau logo), không chạm mép trái thật của header. Mốc định vị đúng là
+   * `.header` (Header.module.css) — xem `position: relative` ở đó.
+   */
 
   .link {
     position: relative;

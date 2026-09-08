@@ -14,21 +14,35 @@ import styles from './Logo.module.css'
  *
  * ⚠️ Bản logo hiện có là PNG 300×108; đang chờ khách gửi SVG/AI (WS-6 §Chờ khách).
  */
-export async function Logo({ settings }: { settings: Setting | null }) {
+export async function Logo({
+  settings,
+  className = '',
+  priority = true,
+}: {
+  settings: Setting | null
+  /** Ép thêm class (vd biến thể footer nền tối) mà không tách component riêng. */
+  className?: string
+  /** Header cần `priority` (LCP); footer thì không — tránh cảnh báo "quá nhiều ảnh priority". */
+  priority?: boolean
+}) {
   // Logo về trang chủ CÙNG ngôn ngữ: ở /en phải là /en, không phải /.
   const locale = await getRequestLocale()
   const url = mediaUrl(settings?.logo)
   const siteName = brandName(settings?.siteName)
 
   return (
-    <Link href={localizedHref('/', locale, DEFAULT_LOCALE)} className={styles.logo} aria-label={siteName}>
+    <Link
+      href={localizedHref('/', locale, DEFAULT_LOCALE)}
+      className={`${styles.logo} ${className}`}
+      aria-label={siteName}
+    >
       {url ? (
         <Image
           src={url}
           alt={mediaAlt(settings?.logo, siteName)}
           width={150}
           height={54}
-          priority
+          priority={priority}
           className={styles.image}
         />
       ) : (

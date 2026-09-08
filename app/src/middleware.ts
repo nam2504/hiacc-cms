@@ -13,37 +13,16 @@ import { DEFAULT_LOCALE, ENABLED_LOCALES } from '@/lib/locales'
  * trang phải nhớ sửa ở hai chỗ — kiểu lỗi chỉ lộ ra sau vài tháng, khi bản tiếng
  * Anh lặng lẽ tụt lại so với bản tiếng Việt.
  *
- * Chuyển hướng theo trình duyệt CHỈ áp dụng ở trang chủ và chỉ khi khách chưa tự
- * chọn ngôn ngữ. Ở mọi đường dẫn khác thì không: khách nhận link tiếng Việt từ
- * đồng nghiệp mà trình duyệt đặt tiếng Anh sẽ bị đá sang trang khác — link chia
- * sẻ phải mở đúng thứ người gửi nhìn thấy.
+ * ⚠️ Trang chủ KHÔNG còn tự đoán ngôn ngữ theo Accept-Language của trình duyệt
+ * (bỏ 2026-09-08, feedback khách: "ngôn ngữ mặc định phải là VI"). Luôn mở VI
+ * trước; đổi sang EN chỉ qua nút chuyển ngôn ngữ trong menu, giữ nguyên bằng
+ * cookie như trước.
  */
 const COOKIE = 'NEXT_LOCALE'
 const LOCALE_HEADER = 'x-locale'
 
 /** Ngôn ngữ có tiền tố đường dẫn — tức mọi ngôn ngữ trừ mặc định. */
 const PREFIXED = ENABLED_LOCALES.filter((code) => code !== DEFAULT_LOCALE)
-
-/** Đọc Accept-Language, trả mã ngôn ngữ đầu tiên mà site đang bật. */
-function pickLocale(header: string | null): string {
-  if (!header) return DEFAULT_LOCALE
-
-  const ranked = header
-    .split(',')
-    .map((part) => {
-      const [tag, q] = part.trim().split(';q=')
-      return { tag: tag.trim().toLowerCase(), q: q ? Number(q) : 1 }
-    })
-    .filter((item) => item.tag && !Number.isNaN(item.q))
-    .sort((a, b) => b.q - a.q)
-
-  for (const item of ranked) {
-    // "en-GB" cũng tính là "en" — so khớp phần trước dấu gạch.
-    const base = item.tag.split('-')[0]
-    if (ENABLED_LOCALES.includes(base as (typeof ENABLED_LOCALES)[number])) return base
-  }
-  return DEFAULT_LOCALE
-}
 
 /**
  * Ngôn ngữ khách đã TỰ CHỌN, đọc từ cookie. Trả null khi chưa chọn hoặc khi
@@ -95,22 +74,22 @@ export function middleware(request: NextRequest) {
     return response
   }
 
-  // 2. Trang chủ: lựa chọn đã lưu THẮNG Accept-Language; chưa chọn thì theo trình duyệt.
+  // 2. Trang chủ: chỉ chuyển hướng theo lựa chọn khách đã TỰ LƯU (cookie).
+  // Không còn đoán theo Accept-Language — mặc định luôn là VI tại chỗ.
   if (pathname === '/') {
     const chosen = storedLocale(request)
-    const locale = chosen ?? pickLocale(request.headers.get('accept-language'))
 
-    if (locale !== DEFAULT_LOCALE) {
+    if (chosen && chosen !== DEFAULT_LOCALE) {
       const url = request.nextUrl.clone()
-      url.pathname = `/${locale}`
+      url.pathname = `/${chosen}`
       // 307 chứ không 308: đây là gợi ý theo từng người, không phải trang đã dời
       // vĩnh viễn. 308 bị trình duyệt nhớ, khách không quay lại tiếng Việt được.
       return NextResponse.redirect(url, 307)
     }
 
     /**
-     * Đã chọn tiếng Việt: phục vụ tại chỗ, KHÔNG chuyển hướng, và cũng không
-     * ghi lại cookie — giá trị đang đúng rồi.
+     * Chưa chọn, hoặc đã chọn tiếng Việt: phục vụ tại chỗ, KHÔNG chuyển
+     * hướng, không ghi cookie — giá trị mặc định VI đã đúng rồi.
      */
   }
 

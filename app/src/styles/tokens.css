@@ -66,6 +66,10 @@
   --container-max: 1200px;
   --container-narrow: 800px;
   --header-height: 76px;
+  /* Chiều cao dải TopBar (hotline/email/link phụ) phía trên header chính —
+     dùng để tính offset sticky cho sidebar dịch vụ (ServiceSidebar), vì
+     header sticky chiếm topbar + header-height, không phải chỉ header-height. */
+  --topbar-height: 41px;
 
   /* --- Bo góc / đổ bóng --- */
   --radius-sm: 4px;

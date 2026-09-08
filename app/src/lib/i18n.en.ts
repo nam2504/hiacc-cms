@@ -154,6 +154,11 @@ export const en = {
   'news.breadcrumb.label': 'Breadcrumb',
 
   'contact.form.title': 'Request a consultation',
+  'contact.form.salutation.label': 'Title',
+  'contact.form.salutation.mr': 'Mr.',
+  'contact.form.salutation.ms': 'Ms.',
+  'contact.form.fieldOfInterest.label': 'Field of interest',
+  'contact.form.fieldOfInterest.placeholder': 'Select a field of interest',
   'contact.form.subtitle':
     'Leave your details and a {brand} advisor will contact you during business hours.',
   'contact.form.name.label': 'Full name',

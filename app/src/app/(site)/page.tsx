@@ -124,7 +124,10 @@ export default async function HomePage() {
           bấm sang /lien-he mới gửi được yêu cầu. Dùng lại đúng component của
           trang liên hệ — cùng Server Action, cùng chống spam. */}
       <Section id="tu-van" tone="soft" title={tr('contact.form.title')} subtitle={tr('contact.form.subtitle')}>
-        <ContactForm locale={locale} />
+        <ContactForm
+          locale={locale}
+          fieldOfInterestOptions={tree.map((group) => ({ value: group.title, label: group.title }))}
+        />
       </Section>
     </>
   )

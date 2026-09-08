@@ -62,7 +62,7 @@ export const ContactSubmissions: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     group: 'Hệ thống',
-    defaultColumns: ['name', 'phone', 'email', 'handled', 'createdAt'],
+    defaultColumns: ['name', 'phone', 'fieldOfInterest', 'handled', 'createdAt'],
     description:
       'Thông tin khách gửi qua form Liên hệ trên website. Gọi lại xong thì tick "Đã liên hệ lại".',
   },
@@ -75,9 +75,27 @@ export const ContactSubmissions: CollectionConfig = {
     delete: isAdmin, // giữ lại dấu vết khách hàng, chỉ admin được dọn
   },
   fields: [
+    {
+      name: 'salutation',
+      type: 'select',
+      label: 'Anh/Chị',
+      options: [
+        { label: 'Anh', value: 'anh' },
+        { label: 'Chị', value: 'chi' },
+      ],
+    },
     { name: 'name', type: 'text', label: 'Họ tên', required: true },
     { name: 'phone', type: 'text', label: 'Điện thoại', required: true },
     { name: 'email', type: 'email', label: 'Email' },
+    /**
+     * [T-fb1.6] Theo REQUIREMENTS-hiacc-v2.md §3 (form mockup): "Lĩnh vực"
+     * là select chọn 1 trong các nhóm dịch vụ. Lưu TEXT (tên nhóm tại thời
+     * điểm gửi), không phải relationship tới `service-nodes` — nhóm dịch vụ
+     * có thể đổi tên/xoá sau này (T-review-fix-2 đã thêm hook xoá nhóm), khi
+     * đó bản ghi liên hệ cũ vẫn phải giữ nguyên "khách quan tâm gì lúc gửi",
+     * không rơi vào bản ghi mồ côi.
+     */
+    { name: 'fieldOfInterest', type: 'text', label: 'Lĩnh vực quan tâm' },
     { name: 'message', type: 'textarea', label: 'Nội dung' },
     {
       name: 'handled',

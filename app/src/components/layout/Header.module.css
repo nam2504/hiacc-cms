@@ -1,3 +1,14 @@
+/*
+ * `position: sticky` tự làm `.header` thành positioned ancestor (giống
+ * relative) cho mọi absolute descendant — đây là mốc định vị mới cho panel
+ * mega-menu (MegaMenu.module.css `.panel`, absolute left/right:0), thay cho
+ * mốc cũ là `.nav`. `.nav` chỉ là phần bên phải logo (Header.tsx: Logo +
+ * MegaMenu cạnh nhau trong `.inner`), nên panel neo vào `.nav` chỉ trải từ
+ * ngay sau logo, không phải từ mép trái header như thiết kế yêu cầu. Neo
+ * vào `.header` (full chiều rộng viewport) thì panel trải đúng từ logo tới
+ * hết menu; `.panelInner` bên trong tự căn `max-width` + `margin: auto` nên
+ * vẫn thẳng hàng với Container.
+ */
 .header {
   position: sticky;
   top: 0;

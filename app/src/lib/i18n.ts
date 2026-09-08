@@ -171,6 +171,11 @@ const vi: Dict = {
 
   // --- Form liên hệ + bản đồ chi nhánh (W7) ---
   'contact.form.title': 'Gửi yêu cầu tư vấn',
+  'contact.form.salutation.label': 'Anh/Chị',
+  'contact.form.salutation.mr': 'Anh',
+  'contact.form.salutation.ms': 'Chị',
+  'contact.form.fieldOfInterest.label': 'Lĩnh vực',
+  'contact.form.fieldOfInterest.placeholder': 'Chọn lĩnh vực quan tâm',
   'contact.form.subtitle':
     'Để lại thông tin, chuyên viên {brand} sẽ liên hệ lại trong giờ làm việc.',
   'contact.form.name.label': 'Họ và tên',

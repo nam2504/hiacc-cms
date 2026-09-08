@@ -660,9 +660,11 @@ export interface Branch {
  */
 export interface ContactSubmission {
   id: number;
+  salutation?: ('anh' | 'chi') | null;
   name: string;
   phone: string;
   email?: string | null;
+  fieldOfInterest?: string | null;
   message?: string | null;
   /**
    * Tick sau khi đã gọi/gửi mail cho khách, để người khác khỏi gọi trùng.
@@ -1072,9 +1074,11 @@ export interface BranchesSelect<T extends boolean = true> {
  * via the `definition` "contact-submissions_select".
  */
 export interface ContactSubmissionsSelect<T extends boolean = true> {
+  salutation?: T;
   name?: T;
   phone?: T;
   email?: T;
+  fieldOfInterest?: T;
   message?: T;
   handled?: T;
   updatedAt?: T;
