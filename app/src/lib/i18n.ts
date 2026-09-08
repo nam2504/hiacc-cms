@@ -26,6 +26,8 @@ const vi: Dict = {
   'nav.menu.close': 'Đóng menu',
   'nav.skipToContent': 'Bỏ qua, tới nội dung chính',
   'service.requestQuote': 'Yêu cầu báo phí',
+  'service.quickQuote.title': 'Cần báo phí nhanh?',
+  'service.quickQuote.body': 'Gọi trực tiếp hoặc để lại thông tin, HiACC báo phí trong ngày làm việc.',
   'service.viewOwnPage': 'Xem dạng trang riêng',
   'service.related': 'Có thể bạn quan tâm',
   'nav.serviceGroup': 'Nhóm dịch vụ',

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ContactChannels } from '@/components/pages/ContactChannels'
 import { ContactForm } from '@/components/contact/ContactForm'
 import { BranchList } from '@/components/pages/BranchList'
+import { BranchMap } from '@/components/map/BranchMap'
 import { ContactInfo } from '@/components/pages/ContactInfo'
 import { PageBody } from '@/components/pages/PageBody'
 import { PageHero } from '@/components/pages/PageHero'
@@ -84,6 +85,8 @@ export default async function LienHePage() {
     getServiceTree(locale),
   ])
   const fieldOfInterestOptions = tree.map((group) => ({ value: group.title, label: group.title }))
+  // Bản đồ cạnh thông tin trụ sở: chi nhánh đầu tiên khách đã điền mapUrl.
+  const headOfficeMap = branches.find((branch) => Boolean(branch.mapUrl)) ?? null
 
   return (
     <>
@@ -95,15 +98,28 @@ export default async function LienHePage() {
 
       <ContactChannels settings={settings} />
 
+      {/*
+        Bố cục 2 cột theo Liên hệ.png: cột TRÁI là thông tin trụ sở + bản đồ,
+        cột PHẢI là form gửi yêu cầu. Bản trước để form chung cột với PageBody
+        nên form tụt xuống dưới phần nội dung, không đứng cạnh trụ sở như thiết kế.
+        Bản đồ trụ sở lấy từ chi nhánh đầu tiên có mapUrl — chưa chi nhánh nào có
+        thì BranchMap trả null và cột trái chỉ còn thông tin, không hở khung rỗng.
+      */}
       <Section>
         <div className={styles.columns}>
           <div className={styles.info}>
             <ContactInfo settings={settings} />
+            {headOfficeMap ? (
+              <BranchMap
+                mapUrl={headOfficeMap.mapUrl}
+                city={headOfficeMap.city}
+                locale={locale}
+              />
+            ) : null}
+            <PageBody content={page?.content} fallback={false} />
           </div>
 
           <div className={styles.body}>
-            <PageBody content={page?.content} fallback={false} />
-            {/* Chỗ dành cho form liên hệ — gói W7 gắn component form vào đây. */}
             <ContactForm locale={locale} fieldOfInterestOptions={fieldOfInterestOptions} />
           </div>
         </div>

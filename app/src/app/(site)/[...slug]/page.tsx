@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ServiceBody } from '@/components/services/ServiceBody'
 import { ServiceSidebar } from '@/components/services/ServiceSidebar'
+import { QuickQuoteCard } from '@/components/services/QuickQuoteCard'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { Container } from '@/components/ui/Container'
 import { brandName } from '@/config/tenant'
@@ -109,6 +110,8 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
   // `path` trong cây không có tiền tố ngôn ngữ.
   const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE)
   const detail = await getNodeDetail(node.id, locale)
+  // Hotline cho hộp "Cần báo phí nhanh?" ở sidebar — lấy từ Settings, không hardcode.
+  const settings = await getSettings(locale)
 
   /**
    * Node có con (một NHÓM) thì hiện hạng mục đầu tiên ngay trong trang nhóm —
@@ -185,11 +188,14 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
       <Container>
         <div className={styles.layout}>
           {siblings.length > 0 ? (
-            <ServiceSidebar
-              items={siblings}
-              activePath={isGroup ? shown.path : node.path}
-              title={isGroup ? node.title : root.title}
-            />
+            <div className={styles.sidebarCol}>
+              <ServiceSidebar
+                items={siblings}
+                activePath={isGroup ? shown.path : node.path}
+                title={isGroup ? node.title : root.title}
+              />
+              <QuickQuoteCard settings={settings} />
+            </div>
           ) : null}
 
           <div className={styles.content}>

@@ -70,16 +70,6 @@ const bulletList = (items: string[]): LexicalNode => ({
   children: items.map((t, i) => listItem(t, i + 1)),
 })
 
-/** Đoạn văn nhỏ, in nghiêng, dùng làm ghi chú "đây là nội dung mẫu" cuối bài. */
-const sampleNotice = (): LexicalNode => ({
-  type: 'paragraph',
-  version: 1,
-  format: '',
-  indent: 0,
-  direction: 'ltr',
-  children: [textNode('[Nội dung mẫu — khách sẽ thay bằng bài viết chính thức trước khi đăng.]', 2)], // format 2 = italic
-})
-
 /**
  * Build field richText hoàn chỉnh từ danh sách node cấp gốc.
  * Ép kiểu `any`: type Lexical chính thức của Payload rất chặt (union literal cho
@@ -149,7 +139,6 @@ export const SERVICES = [
       paragraph(
         'Quy trình và biểu mẫu cụ thể có thể thay đổi tuỳ loại hình doanh nghiệp và ngành nghề — HiACC sẽ tư vấn chi tiết theo từng trường hợp. [Dẫn văn bản — khách xác nhận số hiệu]',
       ),
-      sampleNotice(),
     ]),
     order: 1,
   },
@@ -177,7 +166,6 @@ export const SERVICES = [
         'Danh sách các khoản thu, chi phát sinh thường xuyên trong hoạt động.',
         'Cơ cấu tổ chức, bộ phận (nếu cần báo cáo theo bộ phận).',
       ]),
-      sampleNotice(),
     ]),
     order: 2,
   },
@@ -200,7 +188,6 @@ export const SERVICES = [
       paragraph(
         'Sau khi soát xét, doanh nghiệp nhận được báo cáo tổng hợp các sai sót/rủi ro đã phát hiện kèm đề xuất hướng xử lý, làm cơ sở để chuẩn bị hồ sơ quyết toán đầy đủ hơn.',
       ),
-      sampleNotice(),
     ]),
     order: 3,
   },
@@ -228,7 +215,6 @@ export const SERVICES = [
       paragraph(
         'Thời hạn và trình tự làm việc cụ thể theo thông báo của cơ quan thuế trong từng đợt quyết toán. [Dẫn văn bản — khách xác nhận số hiệu]',
       ),
-      sampleNotice(),
     ]),
     order: 4,
   },
@@ -254,7 +240,6 @@ export const SERVICES = [
         'Hợp đồng, chứng từ thanh toán qua ngân hàng cho các giao dịch liên quan.',
       ]),
       paragraph('Điều kiện và thủ tục hoàn thuế cụ thể áp dụng theo quy định hiện hành. [Dẫn văn bản — khách xác nhận số hiệu]'),
-      sampleNotice(),
     ]),
     order: 5,
   },
@@ -279,7 +264,6 @@ export const SERVICES = [
         'Biên bản họp/quyết định về việc giải thể của chủ sở hữu hoặc hội đồng thành viên.',
         'Con dấu, giấy chứng nhận đăng ký doanh nghiệp và các giấy phép liên quan.',
       ]),
-      sampleNotice(),
     ]),
     order: 6,
   },
@@ -303,7 +287,6 @@ export const SERVICES = [
         'Việc đối chiếu số liệu nên thực hiện xuyên suốt trong năm thay vì dồn vào cuối kỳ, giúp giảm sai sót và rút ngắn thời gian lập báo cáo. Doanh nghiệp mới thành lập hoặc mới đổi đơn vị kế toán nên rà soát lại số dư đầu kỳ trước khi lập báo cáo.',
       ),
       paragraph('Hạn nộp và mẫu biểu báo cáo cụ thể áp dụng theo quy định hiện hành. [Dẫn văn bản — khách xác nhận số hiệu]'),
-      sampleNotice(),
     ]),
     order: 7,
   },
@@ -344,7 +327,6 @@ export const PAGES = [
       paragraph(
         'Phí báo trước, không phát sinh: biểu phí và lệ phí nhà nước được thông báo bằng văn bản trước khi thực hiện thủ tục.',
       ),
-      sampleNotice(),
     ]),
   },
   {
@@ -354,7 +336,6 @@ export const PAGES = [
       paragraph(
         'Quý khách có thể liên hệ HiACC qua thông tin chi nhánh gần nhất hoặc để lại thông tin qua biểu mẫu liên hệ trên website, đội ngũ sẽ phản hồi trong thời gian sớm nhất.',
       ),
-      sampleNotice(),
     ]),
   },
 ] as const
@@ -395,7 +376,6 @@ export const POSTS = [
       paragraph(
         'Doanh nghiệp nên chủ động rà soát sổ sách và nghĩa vụ thuế trước khi quyết định giải thể, để tránh phát sinh vướng mắc kéo dài thời gian xử lý.',
       ),
-      sampleNotice(),
     ]),
   },
   {
@@ -429,7 +409,6 @@ export const POSTS = [
         'Thiếu chứng từ gốc kèm theo bút toán.',
         'Không đối chiếu định kỳ giữa sổ chi tiết và sổ cái.',
       ]),
-      sampleNotice(),
     ]),
   },
   {
@@ -454,7 +433,6 @@ export const POSTS = [
         'Bảng kê cần khớp với chứng từ gốc (hợp đồng, biên bản nghiệm thu, hoá đơn) để tránh sai lệch khi đối chiếu sổ sách. Nên lưu kèm bản mềm và bản giấy đã ký để thuận tiện tra cứu sau này.',
       ),
       paragraph('Mẫu biểu và hướng dẫn điền cụ thể theo quy định/hợp đồng áp dụng. [Dẫn văn bản — khách xác nhận số hiệu]'),
-      sampleNotice(),
     ]),
   },
   {
@@ -485,7 +463,6 @@ export const POSTS = [
       paragraph(
         'Doanh nghiệp nên xây dựng song song hai hệ thống ngay từ đầu, thay vì chỉ dựa vào sổ sách thuế, để tránh bị động khi cần ra quyết định nhanh.',
       ),
-      sampleNotice(),
     ]),
   },
   {
@@ -513,7 +490,6 @@ export const POSTS = [
       paragraph(
         'Với doanh nghiệp có nhiều giao dịch phức tạp hoặc chuẩn bị cho đợt thanh tra, kiểm tra, việc soát xét độc lập trước khi nộp báo cáo giúp giảm rủi ro phải giải trình, điều chỉnh sau này.',
       ),
-      sampleNotice(),
     ]),
   },
   {
@@ -543,7 +519,6 @@ export const POSTS = [
       paragraph(
         'Bàn giao rõ ràng ngay từ đầu giúp tránh tình trạng thiếu chứng từ khi quyết toán cuối năm, đồng thời giúp đơn vị kế toán mới nắm bắt tình hình doanh nghiệp nhanh hơn.',
       ),
-      sampleNotice(),
     ]),
   },
   {
@@ -568,7 +543,6 @@ export const POSTS = [
         'Mỗi loại thuế có kỳ kê khai và thời hạn nộp riêng. Theo dõi sát lịch giúp doanh nghiệp tránh bị động và có đủ thời gian chuẩn bị hồ sơ, chứng từ liên quan.',
       ),
       paragraph('Mức thuế suất, ngưỡng áp dụng và thời hạn cụ thể theo quy định hiện hành. [Dẫn văn bản — khách xác nhận số hiệu]'),
-      sampleNotice(),
     ]),
   },
   {
@@ -592,7 +566,6 @@ export const POSTS = [
       paragraph(
         'Phát hiện sai sót trước khi cơ quan thuế vào cuộc giúp doanh nghiệp chủ động điều chỉnh, tránh bị truy thu và mất thời gian giải trình kéo dài.',
       ),
-      sampleNotice(),
     ]),
   },
   {
@@ -617,7 +590,6 @@ export const POSTS = [
         'Hồ sơ nên được cập nhật ngay khi có biến động nhân sự thay vì dồn lại xử lý sau, để tránh sai lệch giữa thực tế và số liệu đã đăng ký với cơ quan bảo hiểm xã hội.',
       ),
       paragraph('Thủ tục và mẫu biểu cụ thể theo quy định hiện hành. [Dẫn văn bản — khách xác nhận số hiệu]'),
-      sampleNotice(),
     ]),
   },
 ] as const

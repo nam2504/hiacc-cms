@@ -253,3 +253,10 @@
   line-height: 1.55;
   color: var(--color-text-muted);
 }
+
+/* Cột trái: danh sách hạng mục + hộp "Cần báo phí nhanh?" (Chi tiết dịch vụ.png).
+   Bọc thành một cột riêng để hộp báo phí bám ngay dưới sidebar thay vì rơi
+   xuống dưới phần nội dung khi lưới đổi sang 2 cột. */
+.sidebarCol {
+  min-width: 0;
+}

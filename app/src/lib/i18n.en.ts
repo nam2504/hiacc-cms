@@ -21,6 +21,8 @@ export const en = {
   'nav.menu.close': 'Close menu',
   'nav.skipToContent': 'Skip to main content',
   'service.requestQuote': 'Request a quote',
+  'service.quickQuote.title': 'Need a quick quote?',
+  'service.quickQuote.body': 'Call us or leave your details — HiACC replies with a quote within the working day.',
   'service.viewOwnPage': 'View as separate page',
   'service.related': 'You may also need',
   'nav.serviceGroup': 'Service group',

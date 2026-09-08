@@ -5,18 +5,23 @@
   align-items: start;
 }
 
-/* Từ lg: cột thông tin hẹp bên trái, phần nội dung + (sau này) form bên phải */
+/* Từ lg: hai cột gần bằng nhau theo Liên hệ.png — trái là trụ sở + bản đồ,
+   phải là form. Bản trước để cột trái cố định 380px cho một khối chữ; giờ cột
+   đó còn chứa bản đồ nên cần rộng tương đương cột form. */
 @media (min-width: 1024px) {
   .columns {
-    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: var(--space-7);
   }
 }
 
-.info {
+.body {
   min-width: 0;
 }
 
-.body {
-  min-width: 0;
+/* Các khối trong cột trái xếp dọc, cách đều nhau. */
+.info {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
 }
