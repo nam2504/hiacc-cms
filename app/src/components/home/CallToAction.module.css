@@ -52,6 +52,8 @@
 
 .primary:hover {
   background: var(--color-brand-tint);
+  /* Giữ chữ đỏ: là thẻ <a> nên `a:hover` toàn cục sẽ tự đổi màu chữ. */
+  color: var(--color-brand);
 }
 
 /* Nút phụ: viền trắng, nền trong suốt — theo thiết kế khách. */

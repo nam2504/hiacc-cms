@@ -85,6 +85,9 @@
 
 .cta:hover {
   background: var(--color-brand-dark);
+  /* Phải set lại color: .cta là thẻ <a> nên rule toàn cục `a:hover` trong
+     globals.css đổi chữ sang màu đỏ — chữ đỏ trên nền đỏ là tàng hình. */
+  color: var(--color-text-invert);
 }
 
 .cta:focus-visible {
