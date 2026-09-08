@@ -60,6 +60,16 @@ export const Settings: GlobalConfig = {
               admin: { description: 'Câu ngắn dưới logo, ví dụ "Dịch vụ kế toán trọn gói".' },
             },
             {
+              name: 'businessField',
+              type: 'text',
+              label: 'Lĩnh vực hoạt động',
+              localized: true,
+              admin: {
+                description:
+                  'Hiện ở bảng "Hồ sơ công ty" trang Giới thiệu. Mặc định: Kế toán, thuế, thủ tục pháp lý doanh nghiệp.',
+              },
+            },
+            {
               name: 'primaryColor',
               type: 'text',
               label: 'Màu chủ đạo',

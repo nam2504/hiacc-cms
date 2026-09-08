@@ -291,6 +291,8 @@ export const en = {
   'about.profile.taxCode': 'Tax code',
   'about.profile.headOffice': 'Head office',
   'about.profile.field': 'Sector',
+  'about.profile.fieldValue': 'Accounting, tax and corporate legal procedures',
+  'about.profile.slogan': 'Slogan',
   'about.principles.title': 'How we work',
 
 } as const

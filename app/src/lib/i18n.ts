@@ -319,6 +319,8 @@ const vi: Dict = {
   'about.profile.taxCode': 'Mã số thuế',
   'about.profile.headOffice': 'Trụ sở',
   'about.profile.field': 'Lĩnh vực',
+  'about.profile.fieldValue': 'Kế toán, thuế, thủ tục pháp lý doanh nghiệp',
+  'about.profile.slogan': 'Slogan',
   'about.principles.title': 'Nguyên tắc hành nghề',
 
 }

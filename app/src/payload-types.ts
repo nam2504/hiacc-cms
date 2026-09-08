@@ -1173,6 +1173,10 @@ export interface Setting {
    */
   tagline?: string | null;
   /**
+   * Hiện ở bảng "Hồ sơ công ty" trang Giới thiệu. Mặc định: Kế toán, thuế, thủ tục pháp lý doanh nghiệp.
+   */
+  businessField?: string | null;
+  /**
    * Bấm một ô trong bảng màu, hoặc gõ mã dạng #RRGGBB. Bỏ trống thì dùng màu mặc định của site (#CC1420). Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.
    */
   primaryColor?: string | null;
@@ -1434,6 +1438,7 @@ export interface SettingsSelect<T extends boolean = true> {
   logo?: T;
   heroImage?: T;
   tagline?: T;
+  businessField?: T;
   primaryColor?: T;
   hotline?: T;
   hotline2?: T;

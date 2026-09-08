@@ -36,7 +36,14 @@ export function CompanyProfile({
     },
     { label: tr('about.profile.taxCode'), value: settings?.taxCode },
     { label: tr('about.profile.headOffice'), value: settings?.headOfficeAddress },
-    { label: tr('about.profile.field'), value: settings?.tagline },
+    // Lĩnh vực có field RIÊNG. Trước đây ô này lấy settings.tagline nên trang
+    // Giới thiệu hiện slogan ("Đồng hành cùng doanh nghiệp Việt") ở dòng
+    // "Lĩnh vực" — sai nhãn. Figma có cả hai dòng, tách ra đúng như vậy.
+    {
+      label: tr('about.profile.field'),
+      value: settings?.businessField || tr('about.profile.fieldValue'),
+    },
+    { label: tr('about.profile.slogan'), value: settings?.tagline },
   ]
 
   const principles = settings?.principles ?? []

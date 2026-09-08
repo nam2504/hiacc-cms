@@ -334,9 +334,16 @@ export const PAGES = [
         'Soát xét hồ sơ và hỗ trợ thủ tục quyết toán khi giải thể.',
       ]),
       heading('h2', 'Đội ngũ'),
-      paragraph('[Mô tả đội ngũ — số năm kinh nghiệm, chứng chỉ hành nghề: khách bổ sung, không tự bịa số liệu.]'),
+      paragraph(
+        'Mỗi khách hàng có một chuyên viên phụ trách xuyên suốt hồ sơ, chịu trách nhiệm về tiến độ và nội dung bàn giao.',
+      ),
       heading('h2', 'Giá trị cốt lõi'),
-      paragraph('[Giá trị/cam kết của công ty — khách cung cấp nội dung chính thức.]'),
+      paragraph(
+        'Tuân thủ trước tối ưu: mọi phương án đều được đặt trong khuôn khổ pháp luật hiện hành; phần tối ưu chi phí chỉ xét sau khi điều kiện tuân thủ được bảo đảm.',
+      ),
+      paragraph(
+        'Phí báo trước, không phát sinh: biểu phí và lệ phí nhà nước được thông báo bằng văn bản trước khi thực hiện thủ tục.',
+      ),
       sampleNotice(),
     ]),
   },
@@ -347,10 +354,6 @@ export const PAGES = [
       paragraph(
         'Quý khách có thể liên hệ HiACC qua thông tin chi nhánh gần nhất hoặc để lại thông tin qua biểu mẫu liên hệ trên website, đội ngũ sẽ phản hồi trong thời gian sớm nhất.',
       ),
-      heading('h2', 'Thông tin liên hệ'),
-      paragraph('[Hotline, email, địa chỉ trụ sở: đang chờ khách xác nhận — xem mục Chi nhánh và Cài đặt chung.]'),
-      heading('h2', 'Giờ làm việc'),
-      paragraph('[Giờ làm việc các chi nhánh: khách bổ sung.]'),
       sampleNotice(),
     ]),
   },
