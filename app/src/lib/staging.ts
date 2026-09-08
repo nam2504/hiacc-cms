@@ -41,3 +41,23 @@
 export function isStaging(): boolean {
   return process.env.IS_STAGING === 'true'
 }
+
+/**
+ * Cờ RIÊNG cho dải nhãn "bản dùng thử" hiển thị trên đầu trang.
+ *
+ * Vì sao tách khỏi isStaging(): lúc demo/bàn giao cho khách, mình cần GIẤU
+ * dải nhãn nhưng VẪN phải chặn Google đánh chỉ mục bản nháp. Nếu dùng chung
+ * một cờ, tắt nhãn = mở cửa cho Google index staging, đúng cái bẫy mô tả ở
+ * đầu file này.
+ *
+ * Mặc định bám theo isStaging() để mọi môi trường đang chạy không đổi hành vi.
+ * Chỉ khi đặt SHOW_STAGING_BANNER='false' thì nhãn mới bị tắt riêng, các lớp
+ * chặn index vẫn nguyên.
+ *
+ * Cùng ràng buộc build-time như IS_STAGING: trang chủ được prerender, nên cờ
+ * này phải có mặt ở [build.args] của fly.toml, không chỉ [env].
+ */
+export function showStagingBanner(): boolean {
+  if (process.env.SHOW_STAGING_BANNER === 'false') return false
+  return isStaging()
+}

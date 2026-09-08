@@ -40,6 +40,11 @@ primary_region = 'sin'          # Singapore — gần Việt Nam nhất trong c�
     # dưới có đặt IS_STAGING — đã đo thật.
     IS_STAGING = 'true'
 
+    # Tắt RIÊNG dải nhãn "bản dùng thử" để demo/bàn giao cho khách, trong khi
+    # 3 lớp chặn index (robots, meta noindex, sitemap rỗng) vẫn bật nguyên.
+    # Đặt lại 'true' (hoặc xoá dòng này) khi muốn nhãn hiện lại.
+    SHOW_STAGING_BANNER = 'false'
+
 [env]
   # Cổng app lắng nghe bên trong máy ảo, khớp EXPOSE trong Dockerfile.
   PORT = '3000'
@@ -59,6 +64,9 @@ primary_region = 'sin'          # Singapore — gần Việt Nam nhất trong c�
   # trang tĩnh (robots.txt, sitemap.xml, trang chủ) đã cố định từ lúc build.
   # Giữ cả hai chỗ, và khi đổi thì đổi cả hai.
   IS_STAGING = 'true'
+
+  # Bản runtime của cờ tắt nhãn — xem [build.args] bên trên, phải khớp nhau.
+  SHOW_STAGING_BANNER = 'false'
 
   # Ảnh upload nằm trên volume, KHÔNG trong lớp ghi của container.
   # Để mặc định (public/media) thì mỗi lần `fly deploy` là mất hết ảnh, mà bản

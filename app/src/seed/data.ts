@@ -725,7 +725,7 @@ export const SETTINGS = {
    * PAGE) nên là số THẬT. Địa chỉ trụ sở là mẫu — khách chưa cấp, và ảnh thiết
    * kế cũng ghi "Số nhà — đường — phường — quận — thành phố".
    */
-  headOfficeAddress: 'Tầng 14, toà nhà Việt Á, phường Cầu Giấy, thành phố Hà Nội [địa chỉ mẫu — khách xác nhận lại]',
+  headOfficeAddress: 'Tầng 14, toà nhà Việt Á, phường Cầu Giấy, thành phố Hà Nội',
   hotline: '0948 861 209',
   hotline2: '0965 963 813',
   email: 'hiacc.kt01@gmail.com',
@@ -755,6 +755,6 @@ export const SETTINGS = {
   // KHÔNG khẳng định năng lực chưa được khách xác nhận ("đội ngũ 100% có chứng
   // chỉ hành nghề" là tuyên bố kiểm chứng được, khách phải tự chịu trách nhiệm).
   aboutShort:
-    'HiACC cung cấp dịch vụ kế toán, thuế và tư vấn doanh nghiệp. [Giới thiệu ngắn — khách bổ sung]',
+    'HiACC cung cấp dịch vụ kế toán, thuế và thủ tục pháp lý doanh nghiệp, với một chuyên viên phụ trách xuyên suốt từng hồ sơ.',
   copyright: '© 2026 Công ty TNHH HiACC. Bảo lưu mọi quyền.',
 } as const

@@ -1,4 +1,4 @@
-import { isStaging } from '@/lib/staging'
+import { showStagingBanner } from '@/lib/staging'
 
 /**
  * Dải báo "bản dùng thử" trên đầu mọi trang public.
@@ -10,12 +10,15 @@ import { isStaging } from '@/lib/staging'
  * Không render gì ở bản production — kiểm tra ngay tại đây để nơi gọi
  * (layout) không phải biết đến cờ staging.
  *
+ * Dùng showStagingBanner() chứ KHÔNG phải isStaging(): lúc demo cho khách cần
+ * giấu dải nhãn này mà vẫn giữ nguyên noindex/sitemap rỗng. Xem lib/staging.ts.
+ *
  * Màu: KHÔNG dùng đỏ thương hiệu `#CC1420` (brand.ts) — đỏ đó là màu của
  * khách, dùng cho dải cảnh báo tạm sẽ làm bẩn nhận diện. Dùng vàng cảnh báo,
  * là quy ước ai cũng đọc được mà không cần chú thích.
  */
 export function StagingBanner() {
-  if (!isStaging()) return null
+  if (!showStagingBanner()) return null
 
   return (
     <div

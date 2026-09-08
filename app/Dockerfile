@@ -52,6 +52,12 @@ ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL
 ARG IS_STAGING
 ENV IS_STAGING=$IS_STAGING
 
+# Cờ tắt RIÊNG dải nhãn "bản dùng thử" (giữ nguyên noindex). Cùng lý do
+# build-time như IS_STAGING: trang chủ prerender, thiếu ARG là nhãn vẫn hiện
+# dù fly.toml [env] có đặt.
+ARG SHOW_STAGING_BANNER
+ENV SHOW_STAGING_BANNER=$SHOW_STAGING_BANNER
+
 RUN npm run build
 
 # ⚠️ THỨ TỰ STAGE CÓ Ý NGHĨA: `docker build` không kèm `--target` sẽ dựng stage
