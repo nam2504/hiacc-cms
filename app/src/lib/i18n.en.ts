@@ -43,6 +43,7 @@ export const en = {
   'footer.contact': 'Contact',
   'footer.followUs': 'Follow us',
 
+  'home.hero.eyebrow': 'Welcome to HiACC',
   'home.hero.tagline': 'Your partner for Vietnamese business',
   'home.hero.lead':
     'Full-service accounting, tax and business advisory for small and medium enterprises.',

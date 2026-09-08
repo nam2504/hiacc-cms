@@ -16,8 +16,11 @@ import styles from "./Hero.module.css";
  * Khối rating (điểm sao + số lượng khách hàng) đã gỡ: số chép từ site tham chiếu,
  * không kiểm chứng được. Chỉ dựng lại khi khách cung cấp số thật và chịu trách nhiệm.
  *
- * Logo lấy từ Settings; chưa upload hoặc settings null thì hiện tên site dạng chữ
- * (giống Logo của W0) — trang vẫn dựng được khi DB rỗng.
+ * Dòng eyebrow trên slogan là CHỮ, không phải logo. Bản trước render
+ * Settings.logo ở đây; khi khách upload logo thật (08/09) nó thành ra logo hiện
+ * hai lần trong cùng khung nhìn (header + hero) và mất dòng eyebrow của Figma.
+ * Figma đặt ở đây một dòng chữ ngắn ("Welcom to HiAcc" trong file gốc), nên chỗ
+ * này bám chữ; logo chỉ còn ở header/footer.
  *
  * Bố cục 2 cột (chữ trái / ảnh phải) từ 768px trở lên, CHỈ khi có heroImage.
  * Không có ảnh thì rơi về 1 cột căn giữa như cũ — khách xoá ảnh trong admin
@@ -28,7 +31,6 @@ export async function Hero({ settings }: { settings: Setting | null }) {
   const locale = await getRequestLocale();
   const t = createTranslator(locale);
   const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE);
-  const logo = mediaUrl(settings?.logo);
   const heroImage = mediaUrl(settings?.heroImage);
   const siteName = brandName(settings?.siteName);
   // Tagline ưu tiên nội dung khách sửa trong admin, không có thì rơi về khoá dịch.
@@ -39,24 +41,16 @@ export async function Hero({ settings }: { settings: Setting | null }) {
   const lead = home?.heroLead || t("home.hero.lead");
   const cta = home?.heroCta || t("home.hero.cta");
   const ctaSecondary = home?.heroCtaSecondary || t("home.hero.ctaSecondary");
+  // Eyebrow: ô trống trong admin thì rơi về khoá dịch, khoá dịch để trống nữa
+  // thì dùng tên site — không bao giờ để hở một dòng rỗng trên đầu hero.
+  const eyebrow = home?.heroEyebrow || t("home.hero.eyebrow") || siteName;
 
   return (
     <section className={styles.hero}>
       <Container>
         <div className={heroImage ? styles.innerSplit : styles.inner}>
           <div className={styles.copy}>
-            {logo ? (
-              <Image
-                className={styles.logo}
-                src={logo}
-                alt={mediaAlt(settings?.logo, siteName)}
-                width={220}
-                height={80}
-                priority
-              />
-            ) : (
-              <p className={styles.siteName}>{siteName}</p>
-            )}
+            <p className={styles.siteName}>{eyebrow}</p>
 
             <h1 className={styles.tagline}>{tagline}</h1>
             <p className={styles.lead}>{lead}</p>

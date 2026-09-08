@@ -53,6 +53,7 @@ const vi: Dict = {
   // khách hàng, các mức phần trăm ở khối Stats) đã bị GỠ: không có nguồn nào kiểm
   // chứng được, mà tuyên bố định lượng của một công ty kế toán sai là rủi ro pháp lý.
   // Chỉ đưa lại khi khách tự cung cấp số thật kèm nguồn và chịu trách nhiệm về số đó.
+  'home.hero.eyebrow': 'Welcome to HiACC',
   'home.hero.tagline': 'Đồng hành cùng doanh nghiệp Việt',
   // Không lặp lại cụm của tagline ("đồng hành cùng doanh nghiệp Việt") — hai dòng
   // đứng sát nhau trong hero, lặp nguyên cụm đọc rất lộ.

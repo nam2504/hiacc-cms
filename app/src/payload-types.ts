@@ -1230,6 +1230,10 @@ export interface Setting {
   zaloQr?: (number | null) | Media;
   home?: {
     /**
+     * Mặc định: Welcome to HiACC
+     */
+    heroEyebrow?: string | null;
+    /**
      * Đoạn văn dưới slogan. Mặc định: "Dịch vụ kế toán trọn gói…". Slogan sửa ở tab Thương hiệu.
      */
     heroLead?: string | null;
@@ -1453,6 +1457,7 @@ export interface SettingsSelect<T extends boolean = true> {
   home?:
     | T
     | {
+        heroEyebrow?: T;
         heroLead?: T;
         heroCta?: T;
         heroCtaSecondary?: T;

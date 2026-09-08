@@ -208,6 +208,13 @@ export const Settings: GlobalConfig = {
                   admin: { initCollapsed: true },
                   fields: [
                     {
+                      name: 'heroEyebrow',
+                      type: 'text',
+                      label: 'Dòng chữ nhỏ trên slogan',
+                      localized: true,
+                      admin: { description: 'Mặc định: Welcome to HiACC' },
+                    },
+                    {
                       name: 'heroLead',
                       type: 'textarea',
                       label: 'Đoạn mô tả',
