@@ -84,6 +84,16 @@ export const ServiceNodes: CollectionConfig = {
         position: 'sidebar',
         description:
           'Bỏ trống = nhóm cấp cao nhất, hiện trên thanh menu. Chọn một mục = nằm bên trong mục đó.',
+        /**
+         * Ô rỗng mặc định hiện `<No Thuộc nhóm>` — đọc như dữ liệu bị thiếu,
+         * trong khi bỏ trống ở đây là trạng thái ĐÚNG (nhóm cấp cao nhất).
+         * Cell riêng hiện chữ "root" cho đúng nghĩa.
+         *
+         * ⚠️ Đổi đường dẫn này thì PHẢI chạy lại `npm run generate:importmap`.
+         */
+        components: {
+          Cell: '@/components/admin/ParentCell',
+        },
       },
     },
     {
