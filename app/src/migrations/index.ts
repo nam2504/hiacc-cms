@@ -6,6 +6,8 @@ import * as migration_20260906_134710_them_nguyen_tac_hanh_nghe from './20260906
 import * as migration_20260908_140000_them_hero_eyebrow from './20260908_140000_them_hero_eyebrow';
 import * as migration_20260909_090000_them_business_field from './20260909_090000_them_business_field';
 
+import * as migration_20260909_120000_them_footer_head_office from './20260909_120000_them_footer_head_office';
+
 export const migrations = [
   {
     up: migration_20260901_084542_initial.up,
@@ -41,5 +43,10 @@ export const migrations = [
     up: migration_20260909_090000_them_business_field.up,
     down: migration_20260909_090000_them_business_field.down,
     name: '20260909_090000_them_business_field',
+  },
+  {
+    up: migration_20260909_120000_them_footer_head_office.up,
+    down: migration_20260909_120000_them_footer_head_office.down,
+    name: '20260909_120000_them_footer_head_office',
   },
 ];

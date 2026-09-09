@@ -46,8 +46,9 @@ export const en = {
   'footer.about': 'About us',
   'footer.quickLinks': 'Quick links',
   'footer.recentPosts': 'Recent posts',
+  'footer.headOffice': 'Head office',
   'footer.contact': 'Contact',
-  'footer.followUs': 'Follow us',
+  'footer.followUs': 'HiACC channels',
 
   'home.hero.eyebrow': 'Welcome to HiACC',
   'home.hero.tagline': 'Your partner for Vietnamese business',

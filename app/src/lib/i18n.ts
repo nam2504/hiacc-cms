@@ -51,8 +51,9 @@ const vi: Dict = {
   'footer.about': 'Về chúng tôi',
   'footer.quickLinks': 'Liên kết nhanh',
   'footer.recentPosts': 'Bài viết gần đây',
+  'footer.headOffice': 'Trụ sở',
   'footer.contact': 'Liên hệ',
-  'footer.followUs': 'Theo dõi chúng tôi',
+  'footer.followUs': 'Kênh của HiACC',
 
   // --- Trang chủ (W1) — AUDIT §3, khối 2–8 ---
   // Mọi số liệu marketing chép từ site tham chiếu site tham chiếu (điểm sao, số lượng

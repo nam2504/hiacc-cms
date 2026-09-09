@@ -8,7 +8,7 @@ import { createTranslator } from '@/lib/i18n'
 import { getRequestLocale } from '@/lib/requestLocale'
 import { localePath, ogImages, SITE_URL } from '@/lib/seo'
 import { isStaging } from '@/lib/staging'
-import { getRecentPosts, getSettings } from '@/lib/site'
+import { getSettings } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
 import { brandName } from '@/config/tenant'
 import '@/styles/tokens.css'
@@ -75,11 +75,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   // Một lần fetch cho cả layout — trang con không phải gọi lại
   const locale = await getRequestLocale()
-  const [settings, recentPosts, tree] = await Promise.all([
-    getSettings(locale),
-    getRecentPosts(3, locale),
-    getServiceTree(locale),
-  ])
+  // `tree` vẫn cần cho Header. Footer 4 cột theo Figma không còn khối "Bài viết
+  // gần đây" nên bỏ luôn truy vấn getRecentPosts — mỗi trang tiết kiệm 1 query.
+  const [settings, tree] = await Promise.all([getSettings(locale), getServiceTree(locale)])
   const tr = createTranslator(locale)
 
   // Màu thương hiệu đè lúc chạy: Settings (khách sửa trong /admin) → tenant.
@@ -96,7 +94,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <StagingBanner />
         <Header settings={settings} tree={tree} locale={locale} />
         <main id="main-content">{children}</main>
-        <Footer settings={settings} recentPosts={recentPosts} tree={tree} />
+        <Footer settings={settings} />
       </body>
     </html>
   )

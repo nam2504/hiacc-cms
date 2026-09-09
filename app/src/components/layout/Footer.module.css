@@ -7,8 +7,32 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  /* Mobile: xếp dọc. Từ 768px mới thành 4 cột như Figma — `auto-fit` cũ cho ra
+     số cột tuỳ chiều rộng nên hàng cuối bị kéo giãn không đều. */
+  grid-template-columns: 1fr;
   gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: 1.4fr 1fr 1fr 0.8fr;
+  }
+}
+
+/* Logo và tên công ty nằm ngang, ngăn bằng vạch dọc — theo Figma. */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.companyName {
+  margin: 0;
+  padding-left: var(--space-3);
+  border-left: 1px solid rgb(255 255 255 / 0.25);
+  font-weight: var(--weight-semibold);
+  line-height: 1.35;
 }
 
 /*
@@ -20,7 +44,6 @@
  * theo cây DOM là cách duy nhất không phải sửa Logo.module.css.
  */
 .logo {
-  margin-bottom: var(--space-4);
   --color-brand: var(--color-text-invert);
 }
 
@@ -62,21 +85,9 @@
   color: var(--color-brand-light);
 }
 
-.date {
-  display: block;
-  color: rgb(255 255 255 / 0.5);
-  font-size: var(--text-xs);
-}
-
-.socials {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-top: var(--space-3);
-}
-
 .social {
   color: rgb(255 255 255 / 0.78);
+  text-decoration: underline;
 }
 
 .social:hover {

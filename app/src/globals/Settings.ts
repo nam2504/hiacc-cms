@@ -477,24 +477,17 @@ export const Settings: GlobalConfig = {
                       admin: { width: '50%', description: 'Mặc định: Về chúng tôi' },
                     },
                     {
-                      name: 'quickLinks',
+                      name: 'headOffice',
                       type: 'text',
-                      label: 'Cột liên kết',
+                      label: 'Cột trụ sở',
                       localized: true,
-                      admin: { width: '50%', description: 'Mặc định: Liên kết nhanh' },
+                      admin: { width: '50%', description: 'Mặc định: Trụ sở' },
                     },
                   ],
                 },
                 {
                   type: 'row',
                   fields: [
-                    {
-                      name: 'recentPosts',
-                      type: 'text',
-                      label: 'Cột bài viết',
-                      localized: true,
-                      admin: { width: '50%', description: 'Mặc định: Bài viết gần đây' },
-                    },
                     {
                       name: 'contact',
                       type: 'text',
@@ -507,9 +500,9 @@ export const Settings: GlobalConfig = {
                 {
                   name: 'followUs',
                   type: 'text',
-                  label: 'Tiêu đề khối mạng xã hội',
+                  label: 'Cột kênh liên kết',
                   localized: true,
-                  admin: { description: 'Mặc định: Theo dõi chúng tôi' },
+                  admin: { description: 'Mặc định: Kênh của HiACC' },
                 },
               ],
             },

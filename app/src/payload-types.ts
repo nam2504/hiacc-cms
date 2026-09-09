@@ -1330,19 +1330,15 @@ export interface Setting {
      */
     about?: string | null;
     /**
-     * Mặc định: Liên kết nhanh
+     * Mặc định: Trụ sở
      */
-    quickLinks?: string | null;
-    /**
-     * Mặc định: Bài viết gần đây
-     */
-    recentPosts?: string | null;
+    headOffice?: string | null;
     /**
      * Mặc định: Liên hệ
      */
     contact?: string | null;
     /**
-     * Mặc định: Theo dõi chúng tôi
+     * Mặc định: Kênh của HiACC
      */
     followUs?: string | null;
   };
@@ -1500,8 +1496,7 @@ export interface SettingsSelect<T extends boolean = true> {
     | T
     | {
         about?: T;
-        quickLinks?: T;
-        recentPosts?: T;
+        headOffice?: T;
         contact?: T;
         followUs?: T;
       };
