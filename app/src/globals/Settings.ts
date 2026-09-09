@@ -13,6 +13,18 @@ export const Settings: GlobalConfig = {
     group: 'Cấu hình',
     description:
       'Thông tin dùng chung cho toàn website: logo, hotline, địa chỉ, mạng xã hội. Chỉ Quản trị viên sửa được.',
+    /**
+     * Nút "Làm mới cache website" — các trang public dùng ISR 10 phút nên nội
+     * dung vừa sửa có thể chậm hiện; nút này xoá cache ngay.
+     *
+     * ⚠️ Đổi đường dẫn này thì PHẢI chạy lại `npm run generate:importmap`,
+     * nếu không admin chết "Module not found".
+     */
+    components: {
+      elements: {
+        Description: '@/components/admin/RefreshCacheButton',
+      },
+    },
   },
   // `read` public: mọi trang ngoài gọi getSettings() không kèm user — giữ nguyên.
   access: { read: isPublic, update: isAdmin },
