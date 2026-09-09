@@ -77,14 +77,28 @@ export function ServiceTreeInteractive({
   /** id cha (chuỗi, gốc dùng khoá `'__root__'`) → danh sách id con đã sắp sẵn. */
   childrenOf: Record<string, string[]>
 }) {
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  /**
+   * Mặc định THU GỌN mọi nhóm: cây thật là 5 nhóm / 32 hạng mục, xổ hết ngay từ
+   * đầu thì phải cuộn mới thấy hết 5 nhóm và mất luôn cái nhìn tổng thể — thứ
+   * mà sơ đồ này sinh ra để cho. Xổ từng nhóm khi cần.
+   *
+   * Khởi tạo bằng hàm (lazy init) để chỉ tính một lần lúc mount, không tính lại
+   * mỗi lần render.
+   */
+  const [collapsed, setCollapsed] = useState<Set<string>>(
+    () => new Set(Object.keys(childrenOf).filter((key) => key !== '__root__')),
+  )
   const { handleWhereChange, query } = useListQuery()
 
   // `query.where` là where-clause CHUẨN của Payload (object), không phải chuỗi
   // query string — khác hẳn cú pháp `where[id][equals]` hiện trên URL, cú pháp
   // đó chỉ là cách `qs` mã hoá object này để nhét vào URL.
-  const whereIdEquals = (query?.where as { id?: { equals?: unknown } } | undefined)?.id?.equals
-  const selectedId = whereIdEquals === undefined || whereIdEquals === null ? null : String(whereIdEquals)
+  // Phần tử đầu của `in` là chính node được click (xem `descendantsOf`), phần
+  // còn lại là con cháu — dùng nó để tô đậm đúng dòng đang chọn.
+  const whereId = (query?.where as { id?: { in?: unknown; equals?: unknown } } | undefined)?.id
+  const whereIn = Array.isArray(whereId?.in) ? (whereId?.in as unknown[]) : null
+  const rawSelected = whereIn?.[0] ?? whereId?.equals
+  const selectedId = rawSelected === undefined || rawSelected === null ? null : String(rawSelected)
   const hasFilter = selectedId !== null
 
   const toggle = (id: string) => {
@@ -96,8 +110,34 @@ export function ServiceTreeInteractive({
     })
   }
 
+  /**
+   * Click một nhóm thì bảng phải hiện CẢ nhóm đó VÀ mọi hạng mục bên trong —
+   * lọc còn đúng một dòng cha là vô dụng: xem một nhóm nghĩa là muốn xem những
+   * gì nó chứa. Node lá không có con nên vẫn ra đúng một dòng như trước.
+   *
+   * Dùng `in` thay cho `equals`: đây là where-clause chuẩn của Payload, `qs` tự
+   * mã hoá thành `where[id][in][]=...` trên URL.
+   */
+  const descendantsOf = (id: string): string[] => {
+    const out: string[] = [id]
+    // Duyệt theo ngăn xếp, không đệ quy: dữ liệu hỏng (cha trỏ vòng) sẽ làm
+    // đệ quy tràn stack, còn ở đây `seen` chặn lại.
+    const seen = new Set<string>([id])
+    const stack = [id]
+    while (stack.length > 0) {
+      const current = stack.pop() as string
+      for (const kid of childrenOf[current] ?? []) {
+        if (seen.has(kid)) continue
+        seen.add(kid)
+        out.push(kid)
+        stack.push(kid)
+      }
+    }
+    return out
+  }
+
   const selectNode = (id: string) => {
-    void handleWhereChange?.({ id: { equals: id } })
+    void handleWhereChange?.({ id: { in: descendantsOf(id) } })
   }
 
   const clearFilter = () => {

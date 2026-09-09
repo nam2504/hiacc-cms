@@ -151,9 +151,9 @@ const ServiceTree = async ({ payload }: ServerProps) => {
     <div style={styles.wrap}>
       <h3 style={styles.heading}>Sơ đồ cây dịch vụ</h3>
       <p style={styles.hint}>
-        {rootCount} nhóm cấp cao nhất, tổng {rows.length} mục. Mục thụt vào là hạng mục con của
-        mục ngay trên nó. Bấm mũi tên để xổ/thu gọn nhóm, bấm tên mục để lọc bảng bên dưới còn
-        đúng dòng đó.
+        {rootCount} nhóm cấp cao nhất, tổng {rows.length} mục. Các nhóm đang thu gọn — bấm mũi
+        tên để xổ ra. Bấm tên một nhóm để lọc bảng bên dưới còn nhóm đó và toàn bộ hạng mục
+        trong nó; bấm tên một hạng mục để lọc còn đúng dòng đó.
       </p>
       {rows.length === 0 ? (
         <p style={styles.hint}>Chưa có mục dịch vụ nào.</p>
