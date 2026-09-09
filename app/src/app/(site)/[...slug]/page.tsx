@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cache } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ServiceBody } from '@/components/services/ServiceBody'
@@ -36,12 +37,29 @@ import { getRequestLocale } from '@/lib/requestLocale'
  * `force-dynamic` giữ đúng lý do đã ghi ở các trang khác: build-time DB rỗng,
  * nướng tĩnh sẽ ship ra trang trắng trả 200.
  */
-export const dynamic = 'force-dynamic'
+/**
+ * ISR 10 phút thay cho `force-dynamic` (09/09, khách báo click menu chậm).
+ * Đo được TTFB 1.0–3.0s vì mỗi click render lại từ đầu + gọi DB. Trang này là
+ * nội dung tĩnh theo phiên, không có gì riêng theo người dùng, nên phục vụ bản
+ * đã dựng sẵn và dựng lại nền mỗi 600s.
+ *
+ * Khách sửa trong /admin sẽ thấy chậm nhất sau 10 phút — đánh đổi đã chốt.
+ * Vẫn KHÔNG prerender lúc build (build-time DB rỗng sẽ nướng ra trang trắng
+ * trả 200): `dynamicParams`/không có generateStaticParams giữ trang dựng theo
+ * request đầu tiên rồi mới cache.
+ */
+export const revalidate = 600
 
 type Params = { slug: string[] }
 
-/** Đọc phần nội dung đầy đủ của node — cây chỉ giữ phần nhẹ để dựng menu. */
-async function getNodeDetail(id: string, locale: LocaleCode): Promise<ServiceNode | null> {
+/**
+ * Đọc phần nội dung đầy đủ của node — cây chỉ giữ phần nhẹ để dựng menu.
+ *
+ * `cache()`: generateMetadata và chính page đều gọi cho cùng một node, và trang
+ * NHÓM còn gọi thêm cho hạng mục hiển thị. Không dedupe thì mỗi lượt tải là
+ * 3–4 lượt findByID.
+ */
+const getNodeDetail = cache(async (id: string, locale: LocaleCode): Promise<ServiceNode | null> => {
   try {
     const payload = await getPayloadClient()
     return (await payload.findByID({
@@ -54,7 +72,7 @@ async function getNodeDetail(id: string, locale: LocaleCode): Promise<ServiceNod
     console.error('[service-node] không đọc được chi tiết mục:', id, error)
     return null
   }
-}
+})
 
 export async function generateMetadata({
   params,

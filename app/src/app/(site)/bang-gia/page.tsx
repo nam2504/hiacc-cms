@@ -24,7 +24,18 @@ import { getSettings } from '@/lib/site'
  *
  * Đọc Settings nên phải dynamic; xem chú thích cùng loại ở /chuyen-muc.
  */
-export const dynamic = 'force-dynamic'
+/**
+ * ISR 10 phút thay cho `force-dynamic` (09/09, khách báo click menu chậm).
+ * Đo được TTFB 1.0–3.0s vì mỗi click render lại từ đầu + gọi DB. Trang này là
+ * nội dung tĩnh theo phiên, không có gì riêng theo người dùng, nên phục vụ bản
+ * đã dựng sẵn và dựng lại nền mỗi 600s.
+ *
+ * Khách sửa trong /admin sẽ thấy chậm nhất sau 10 phút — đánh đổi đã chốt.
+ * Vẫn KHÔNG prerender lúc build (build-time DB rỗng sẽ nướng ra trang trắng
+ * trả 200): `dynamicParams`/không có generateStaticParams giữ trang dựng theo
+ * request đầu tiên rồi mới cache.
+ */
+export const revalidate = 600
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()

@@ -4,6 +4,7 @@
  * payload.findGlobal và tuyệt đối không hardcode — khách chốt 30/08 là mọi
  * thông tin liên hệ phải sửa được trong admin (AUDIT §5.5).
  */
+import { cache } from 'react'
 import { getPayload, type Where } from 'payload'
 import configPromise from '@payload-config'
 import { DEFAULT_LOCALE, type LocaleCode } from './locales'
@@ -26,18 +27,28 @@ export async function getPayloadClient() {
  * Settings có thể chưa được tạo lần đầu (DB trống) → trả null thay vì ném lỗi,
  * để trang vẫn render được lúc mới cài. Component phải chịu được null.
  */
-export async function getSettings(
-  locale: LocaleCode = DEFAULT_LOCALE,
-): Promise<Setting | null> {
-  try {
-    const payload = await getPayloadClient()
-    return (await payload.findGlobal({ slug: 'settings', locale: asPayloadLocale(locale), depth: 1 })) as Setting
-  } catch (error) {
-    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
-    console.error('[site] getSettings không đọc được dữ liệu:', error)
-    return null
-  }
-}
+/**
+ * Bọc `cache()` như getServiceTree: layout (Header + Footer) và page đều gọi
+ * getSettings trong CÙNG một request. Không dedupe thì mỗi lượt tải trang là
+ * 2–3 lần đọc global settings — đo được TTFB 1.0–3.0s trên staging (09/09).
+ * Cache chỉ sống trong phạm vi một request nên khách sửa admin vẫn thấy ngay.
+ */
+export const getSettings = cache(
+  async (locale: LocaleCode = DEFAULT_LOCALE): Promise<Setting | null> => {
+    try {
+      const payload = await getPayloadClient()
+      return (await payload.findGlobal({
+        slug: 'settings',
+        locale: asPayloadLocale(locale),
+        depth: 1,
+      })) as Setting
+    } catch (error) {
+      // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
+      console.error('[site] getSettings không đọc được dữ liệu:', error)
+      return null
+    }
+  },
+)
 
 export async function getBranches(locale: LocaleCode = DEFAULT_LOCALE): Promise<Branch[]> {
   try {
