@@ -124,7 +124,8 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
 
   // Danh sách cho sidebar: các anh em cùng nhóm (hoặc con của chính nó nếu là nhóm).
   const siblings = isGroup ? node.children : findSiblings(tree, trail)
-  const heroStats = detail?.heroStats ?? []
+  // Trang NHÓM giữ dải số của nhóm; trang HẠNG MỤC suy 4 ô theo Figma.
+  const heroStats = isGroup ? (detail?.heroStats ?? []) : leafStats(detail, tr)
   const heroImage = mediaUrl(detail?.image)
   const related = tree.filter((item) => item.id !== root.id)
 
@@ -238,6 +239,60 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
       </Container>
     </>
   )
+}
+
+/**
+ * Dải số liệu cho trang HẠNG MỤC (trang lá) — 4 ô theo Figma:
+ * THỜI GIAN · PHÍ DỊCH VỤ TỪ · SỐ PHẦN NỘI DUNG · CẬP NHẬT.
+ *
+ * Vì sao tự suy thay vì bắt khách gõ tay vào `heroStats`: 3/4 ô đã nằm sẵn
+ * trong dữ liệu (bảng giá, số khối nội dung, ngày sửa gần nhất). Bắt nhập tay
+ * nghĩa là mỗi lần khách sửa bảng giá lại phải nhớ sửa ô "phí từ" — chắc chắn
+ * sẽ lệch. Ô THỜI GIAN không suy được nên vẫn đọc từ `heroStats` nếu khách nhập.
+ *
+ * `heroStats` khách tự nhập LUÔN được ưu tiên: đây chỉ là giá trị mặc định.
+ */
+function leafStats(
+  detail: ServiceNode | null,
+  tr: ReturnType<typeof createTranslator>,
+): { value: string; label: string; id?: string | null }[] {
+  if (!detail) return []
+  const custom = detail.heroStats ?? []
+  const byLabel = new Map(custom.map((s) => [s.label, s.value]))
+
+  const body = detail.body ?? []
+  const pricing = body.find((b) => b.blockType === 'pricingTable')
+  // Phí thấp nhất trong bảng giá. `fee` là chữ ("từ 3.000.000 / tháng") nên bóc
+  // cụm số đầu tiên ra để so sánh; ô nào không có số ("liên hệ") thì bỏ qua.
+  let cheapest: { text: string; num: number } | null = null
+  if (pricing && 'rows' in pricing) {
+    for (const row of pricing.rows ?? []) {
+      const raw = row.fee ?? ''
+      const m = raw.match(/[\d][\d.,]*/)
+      if (!m) continue
+      const num = Number(m[0].replace(/[.,]/g, ''))
+      if (!Number.isFinite(num)) continue
+      if (!cheapest || num < cheapest.num) cheapest = { text: m[0], num }
+    }
+  }
+
+  const updated = detail.updatedAt ? new Date(detail.updatedAt) : null
+  const stats: { value: string; label: string; id?: string | null }[] = []
+  const push = (label: string, fallback: string | null) => {
+    const value = byLabel.get(label) ?? fallback
+    if (value) stats.push({ value, label })
+  }
+
+  push(tr('service.stat.duration'), null)
+  push(tr('service.stat.feeFrom'), cheapest?.text ?? null)
+  push(tr('service.stat.sections'), body.length > 0 ? String(body.length) : null)
+  push(
+    tr('service.stat.updated'),
+    updated
+      ? `${String(updated.getMonth() + 1).padStart(2, '0')} / ${updated.getFullYear()}`
+      : null,
+  )
+  return stats
 }
 
 /** Các mục cùng cấp với node đang xem (để sidebar hiện đủ hạng mục của nhóm). */
