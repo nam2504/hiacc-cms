@@ -9,6 +9,7 @@ import * as migration_20260909_090000_them_business_field from './20260909_09000
 import * as migration_20260909_120000_them_footer_head_office from './20260909_120000_them_footer_head_office';
 import * as migration_20260909_150000_them_footer_theme from './20260909_150000_them_footer_theme';
 import * as migration_20260912_100000_them_bang_gia from './20260912_100000_them_bang_gia';
+import * as migration_20260912_110000_them_salutation_field_of_interest from './20260912_110000_them_salutation_field_of_interest';
 
 export const migrations = [
   {
@@ -60,5 +61,10 @@ export const migrations = [
     up: migration_20260912_100000_them_bang_gia.up,
     down: migration_20260912_100000_them_bang_gia.down,
     name: '20260912_100000_them_bang_gia',
+  },
+  {
+    up: migration_20260912_110000_them_salutation_field_of_interest.up,
+    down: migration_20260912_110000_them_salutation_field_of_interest.down,
+    name: '20260912_110000_them_salutation_field_of_interest',
   },
 ];
