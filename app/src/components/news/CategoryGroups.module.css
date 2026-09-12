@@ -74,3 +74,25 @@
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
 }
+
+/* Số bài đẩy xuống đáy thẻ để mọi thẻ trong hàng thẳng chân nhau, kể cả khi
+   phần mô tả dài ngắn khác nhau (.card đã là flex-column + height:100%). */
+.count,
+.countEmpty {
+  margin-top: auto;
+  padding-top: var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.count {
+  color: var(--color-brand);
+}
+
+/* Chuyên mục rỗng vẫn bấm được (khách chốt giữ đủ 12), chỉ làm nhạt đi để
+   phân biệt — không dùng màu lỗi, đây là "chưa viết" chứ không phải hỏng. */
+.countEmpty {
+  color: var(--color-text-muted);
+  font-weight: var(--weight-normal);
+  font-style: italic;
+}

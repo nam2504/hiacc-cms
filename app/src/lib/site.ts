@@ -8,6 +8,8 @@ import { cache } from 'react'
 import { getPayload, type Where } from 'payload'
 import configPromise from '@payload-config'
 import { DEFAULT_LOCALE, type LocaleCode } from './locales'
+import { createTranslator } from './i18n'
+import { TENANT } from '@/config/tenant'
 import type { Branch, Category, Config, Page, Post, Service, Setting } from '@/payload-types'
 
 /**
@@ -49,6 +51,33 @@ export const getSettings = cache(
     }
   },
 )
+
+/**
+ * Tên site để hiển thị, ĐÚNG theo ngôn ngữ đang xem (09/09, khách báo trang EN
+ * hiện tiêu đề tiếng Việt).
+ *
+ * Vì sao cần hàm riêng thay vì `brandName()` trong config/tenant.ts:
+ * field `siteName` trong CMS KHÔNG localized (collections/Settings.ts:39) — một
+ * giá trị chung cho mọi ngôn ngữ. Khách bỏ trống thì phải dựng tên theo locale từ
+ * chuỗi i18n `seo.siteName` ('Kế toán {brand}' / '{brand} Accounting'), còn
+ * brandName() trả thẳng TENANT.name nên trang EN luôn ra tên tiếng Việt.
+ *
+ * Hai lỗi cũ mà hàm này gom lại một chỗ:
+ *  - `brandName(settings?.siteName) || t('seo.siteName')` — brandName() không bao
+ *    giờ rỗng nên vế sau là code chết.
+ *  - `settings?.siteName || t('seo.siteName')` — quên truyền {brand}, CMS trống
+ *    thì in ra nguyên chữ "{brand}".
+ *
+ * Đặt ở đây (không ở config/tenant.ts) để tránh vòng phụ thuộc config ↔ i18n.
+ */
+export function siteDisplayName(
+  settings: Pick<Setting, 'siteName'> | null | undefined,
+  locale: LocaleCode = DEFAULT_LOCALE,
+): string {
+  const fromCms = settings?.siteName?.trim()
+  if (fromCms) return fromCms
+  return createTranslator(locale)('seo.siteName', { brand: TENANT.name })
+}
 
 export async function getBranches(locale: LocaleCode = DEFAULT_LOCALE): Promise<Branch[]> {
   try {
@@ -147,6 +176,50 @@ export async function getCategories(locale: LocaleCode = DEFAULT_LOCALE): Promis
     return []
   }
 }
+
+/**
+ * Số bài ĐÃ XUẤT BẢN của từng chuyên mục, khoá theo slug.
+ *
+ * Dùng để đánh dấu chuyên mục rỗng ngay ở danh sách (09/09): 7/12 chuyên mục
+ * chưa có bài nào, nếu không báo trước thì khách bấm vào 7 thẻ rồi mới biết
+ * là trống — trông như site hỏng chứ không như nội dung chưa viết.
+ *
+ * Đếm bằng MỘT truy vấn depth=0 lấy riêng cột category rồi gom ở tầng app,
+ * KHÔNG phải 12 truy vấn count song song: số bài (9, cỡ vài trăm khi khách
+ * viết thật) nhỏ hơn nhiều so với số chuyên mục × chi phí round-trip.
+ *
+ * cache() để trang chủ và /chuyen-muc trong cùng một request dùng chung kết quả.
+ */
+export const getPostCountsByCategory = cache(
+  async (locale: LocaleCode = DEFAULT_LOCALE): Promise<Record<string, number>> => {
+    try {
+      const payload = await getPayloadClient()
+      const res = await payload.find({
+        collection: 'posts',
+        locale: asPayloadLocale(locale),
+        where: { _status: { equals: 'published' } },
+        limit: 1000,
+        depth: 1,
+        select: { category: true },
+      })
+      const counts: Record<string, number> = {}
+      for (const doc of res.docs as Post[]) {
+        // depth:1 → category là object; nhưng bài chưa gán chuyên mục thì null,
+        // và nếu Payload trả về id thô thì không có slug để gom → bỏ qua cả hai.
+        const category = doc.category
+        const slug =
+          category && typeof category === 'object' ? (category as Category).slug : null
+        if (!slug) continue
+        counts[slug] = (counts[slug] ?? 0) + 1
+      }
+      return counts
+    } catch (error) {
+      // DB chết thì trang vẫn render (chỉ mất nhãn "chưa có bài"), không 500.
+      console.error('[site] getPostCountsByCategory không đọc được dữ liệu:', error)
+      return {}
+    }
+  },
+)
 
 /**
  * Lấy 1 bản ghi theo slug. Không tìm thấy → null, để trang gọi notFound().

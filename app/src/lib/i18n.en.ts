@@ -16,6 +16,7 @@ export const en = {
   'nav.tools.payroll': 'Gross ↔ Net Salary Calculator',
   'nav.contact': 'Contact',
   'nav.news': 'News',
+  'nav.categories': 'Categories',
 
   'nav.menu.open': 'Open menu',
   'nav.menu.close': 'Close menu',
@@ -142,6 +143,8 @@ export const en = {
   'news.categories.subtitle': 'Articles and legal updates organised by category.',
   'news.categories.empty.title': 'No categories yet',
   'news.categories.empty.body': 'Categories are being updated — please check back later.',
+  'news.categories.count': '{count} articles',
+  'news.categories.empty.badge': 'No articles yet',
 
   'news.empty.icon': 'newspaper',
   'news.empty.title': 'No articles yet',
@@ -196,8 +199,7 @@ export const en = {
     'You’ve sent quite a few requests. Please try again in a few minutes or call our hotline.',
   'contact.form.error.duplicate': 'This request was just submitted — no need to send it again.',
   'contact.form.error.generic': 'We couldn’t send your request right now. Please try again later.',
-  'contact.form.error.phoneFormat.v2':
-    'Invalid phone number. We accept mobile numbers (0912345678), landlines (02838221234) and hotlines (19006192).',
+  'contact.form.error.phoneFormat.v2': 'Invalid phone number format.',
   'contact.form.error.summary': 'Your request could not be sent. Please check the highlighted fields.',
 
   'branches.map.title': 'Branch map',
@@ -293,6 +295,10 @@ export const en = {
     'Fees for each service are being finalised. In the meantime, call our hotline or send a request to get a quote matched to the size of your business.',
   'nav.legalDocs': 'Legal documents',
   'nav.newsletter': 'Newsletter',
+  'legalDocs.kicker': 'Library',
+  'legalDocs.title': 'Legal framework',
+  'legalDocs.subtitle':
+    'Laws, decrees and circulars covering accounting, tax, social insurance, labour, business registration, investment and commerce.',
   'about.profile.title': 'Company profile',
   'about.profile.companyName': 'Company name',
   'about.profile.taxCode': 'Tax code',

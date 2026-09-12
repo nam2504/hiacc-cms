@@ -16,6 +16,11 @@ import styles from './TopBar.module.css'
  */
 /** Nhãn giữ dạng KHOÁ, dịch lúc render — hằng số ở tầng module không biết
     người đang xem dùng ngôn ngữ nào. */
+/**
+ * 12/09: khách feedback chỉ muốn MỘT khái niệm "Bản tin", không tách riêng
+ * "Chuyên mục". Đổi lại về 'nav.newsletter' → /tin-tuc như trước 09/09 —
+ * link trùng đích với "Tin tức" ở footer nhưng đó là chủ ý của khách.
+ */
 const SECONDARY_LINKS = [
   { labelKey: 'nav.pricing', href: '/bang-gia' },
   { labelKey: 'nav.legalDocs', href: '/van-ban-phap-luat' },

@@ -3,14 +3,14 @@ import { Be_Vietnam_Pro } from 'next/font/google'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { StagingBanner } from '@/components/layout/StagingBanner'
-import { brandStyle } from '@/lib/brandStyle'
+import { brandStyle, footerStyle } from '@/lib/brandStyle'
 import { createTranslator } from '@/lib/i18n'
 import { getRequestLocale } from '@/lib/requestLocale'
 import { localePath, ogImages, SITE_URL } from '@/lib/seo'
 import { isStaging } from '@/lib/staging'
 import { getSettings } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
-import { brandName } from '@/config/tenant'
+import { TENANT } from '@/config/tenant'
 import '@/styles/tokens.css'
 import '@/styles/globals.css'
 
@@ -31,7 +31,19 @@ const beVietnamPro = Be_Vietnam_Pro({
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
   const settings = await getSettings(locale)
-  const siteName = brandName(settings?.siteName) || createTranslator(locale)('seo.siteName')
+  /**
+   * `siteName` trong CMS KHÔNG localized (Settings.ts:39) — một giá trị dùng chung
+   * cho cả hai ngôn ngữ. Nên khi khách bỏ trống, tên site phải dựng theo locale từ
+   * chuỗi i18n `seo.siteName` ('Kế toán {brand}' / '{brand} Accounting') với
+   * {brand} = tên tenant, thay vì lấy thẳng TENANT.name.
+   *
+   * Trước 09/09 dòng này là `brandName(settings?.siteName) || t('seo.siteName')`.
+   * brandName() đã tự trả TENANT.name khi rỗng nên vế `||` không bao giờ chạy:
+   * trang /en hiện tiêu đề 'Kế toán HiACC' dù bản dịch EN đã có sẵn (khách báo).
+   */
+  const siteName =
+    settings?.siteName?.trim() ||
+    createTranslator(locale)('seo.siteName', { brand: TENANT.name })
   const description = settings?.tagline || undefined
   const images = ogImages(settings?.logo)
 
@@ -82,7 +94,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   // Màu thương hiệu đè lúc chạy: Settings (khách sửa trong /admin) → tenant.
   // Nhờ vậy field "Màu chủ đạo" có tác dụng thật, không cần build lại.
-  const brandCss = brandStyle(settings?.primaryColor)
+  const brandCss = brandStyle(settings?.primaryColor) + footerStyle(settings?.footerBg)
 
   return (
     <html lang={locale} className={beVietnamPro.variable}>

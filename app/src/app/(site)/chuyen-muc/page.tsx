@@ -5,7 +5,7 @@ import { EmptyState } from '@/components/news/EmptyState'
 import { PageHero } from '@/components/news/PageHero'
 import { createTranslator } from '@/lib/i18n'
 import { localeAlternates, localePath } from '@/lib/seo'
-import { getCategories } from '@/lib/site'
+import { getCategories, getPostCountsByCategory } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
 
@@ -56,7 +56,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function CategoryListPage() {
   const locale = await getRequestLocale()
   const t = createTranslator(locale)
-  const categories = await getCategories(locale)
+  // Hai truy vấn độc lập → chạy song song, đừng để chúng nối đuôi nhau.
+  const [categories, postCounts] = await Promise.all([
+    getCategories(locale),
+    getPostCountsByCategory(locale),
+  ])
 
   return (
     <>
@@ -69,7 +73,7 @@ export default async function CategoryListPage() {
       <div className={styles.body}>
         <Container>
           {categories.length > 0 ? (
-            <CategoryGroups categories={categories} />
+            <CategoryGroups categories={categories} postCounts={postCounts} />
           ) : (
             <EmptyState
               title={t('news.categories.empty.title')}

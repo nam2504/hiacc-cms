@@ -9,7 +9,7 @@ import { Stats } from '@/components/home/Stats'
 import { JsonLd, accountingServiceJsonLd } from '@/components/seo/JsonLd'
 import { createTranslator } from '@/lib/i18n'
 import { absoluteMediaUrl, localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
-import { getBranches, getSettings } from '@/lib/site'
+import { getBranches, getSettings, siteDisplayName } from '@/lib/site'
 import { getNodeImages, getServiceTree } from '@/lib/serviceTree'
 import { getRequestLocale } from '@/lib/requestLocale'
 
@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
   const tr = createTranslator(locale)
   const settings = await getSettings(locale)
-  const siteName = settings?.siteName || tr('seo.siteName')
+  const siteName = siteDisplayName(settings, locale)
   const description = settings?.tagline || settings?.aboutShort || undefined
   const images = ogImages(settings?.logo)
 
@@ -95,7 +95,7 @@ export default async function HomePage() {
    * là schema đổi theo, không có chuỗi nào hardcode ở đây (AUDIT §5.5).
    */
   const jsonLd = accountingServiceJsonLd({
-    siteName: settings?.siteName || tr('seo.siteName'),
+    siteName: siteDisplayName(settings, locale),
     description: settings?.tagline || settings?.aboutShort,
     logoUrl: absoluteMediaUrl(settings?.logo),
     hotlines: [settings?.hotline, settings?.hotline2],

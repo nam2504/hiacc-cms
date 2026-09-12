@@ -1,8 +1,8 @@
 import { Container } from '@/components/ui/Container'
-import { brandName } from '@/config/tenant'
 import { createTranslator } from '@/lib/i18n'
 import type { Setting } from '@/payload-types'
 import styles from './CompanyProfile.module.css'
+import { siteDisplayName } from '@/lib/site'
 
 /**
  * Hai cột trang Giới thiệu: bảng hồ sơ công ty (trái) và nguyên tắc hành nghề
@@ -32,7 +32,8 @@ export function CompanyProfile({
   const rows = [
     {
       label: tr('about.profile.companyName'),
-      value: settings?.companyName || brandName(settings?.siteName),
+      value: settings?.companyName ||
+        siteDisplayName(settings, locale as Parameters<typeof createTranslator>[0]),
     },
     { label: tr('about.profile.taxCode'), value: settings?.taxCode },
     { label: tr('about.profile.headOffice'), value: settings?.headOfficeAddress },

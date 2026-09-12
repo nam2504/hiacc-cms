@@ -16,7 +16,14 @@ const GROUPS = [
   { value: 'legal-hr', title: 'home.knowledge.group.legal-hr' },
 ] as const
 
-export async function CategoryGroups({ categories }: { categories: Category[] }) {
+export async function CategoryGroups({
+  categories,
+  postCounts = {},
+}: {
+  categories: Category[]
+  /** Số bài đã xuất bản theo slug chuyên mục; thiếu khoá nào coi như 0. */
+  postCounts?: Record<string, number>
+}) {
   // Link bài/chuyên mục phải giữ ngôn ngữ đang xem; bản EN dùng path thô
   // là bấm vào rơi thẳng về trang tiếng Việt.
   const locale = await getRequestLocale()
@@ -32,16 +39,27 @@ export async function CategoryGroups({ categories }: { categories: Category[] })
           <section key={group.value} className={styles.group}>
             <h2 className={styles.groupTitle}>{t(group.title)}</h2>
             <ul className={styles.list}>
-              {items.map((category) => (
-                <li key={category.id}>
-                  <Link className={styles.card} href={localizedHref(`/chuyen-muc/${category.slug}`, locale, DEFAULT_LOCALE)}>
-                    <span className={styles.name}>{category.name}</span>
-                    {category.description && (
-                      <span className={styles.description}>{category.description}</span>
-                    )}
-                  </Link>
-                </li>
-              ))}
+              {items.map((category) => {
+                const count = postCounts[category.slug] ?? 0
+                return (
+                  <li key={category.id}>
+                    <Link className={styles.card} href={localizedHref(`/chuyen-muc/${category.slug}`, locale, DEFAULT_LOCALE)}>
+                      <span className={styles.name}>{category.name}</span>
+                      {category.description && (
+                        <span className={styles.description}>{category.description}</span>
+                      )}
+                      {/* Khách chốt 09/09: giữ đủ 12 chuyên mục kể cả chuyên mục
+                          rỗng, nhưng nói trước là rỗng — bấm vào rồi mới thấy
+                          trống trông như site hỏng. */}
+                      <span className={count > 0 ? styles.count : styles.countEmpty}>
+                        {count > 0
+                          ? t('news.categories.count', { count: String(count) })
+                          : t('news.categories.empty.badge')}
+                      </span>
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
           </section>
         )

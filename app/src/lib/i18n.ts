@@ -21,6 +21,7 @@ const vi: Dict = {
   'nav.tools.payroll': 'Tính lương Gross ↔ Net',
   'nav.contact': 'Liên hệ',
   'nav.news': 'Tin tức',
+  'nav.categories': 'Chuyên mục',
 
   'nav.menu.open': 'Mở menu',
   'nav.menu.close': 'Đóng menu',
@@ -157,6 +158,8 @@ const vi: Dict = {
   'news.categories.subtitle': 'Bài viết và văn bản pháp luật chia theo từng chuyên mục.',
   'news.categories.empty.title': 'Chưa có chuyên mục nào',
   'news.categories.empty.body': 'Danh mục đang được cập nhật, bạn quay lại sau nhé.',
+  'news.categories.count': '{count} bài viết',
+  'news.categories.empty.badge': 'Chưa có bài viết',
 
   // V2 (REVIEW-visual.md §7①): khoá icon SVG ('newspaper' trong Icon.tsx), không còn emoji.
   'news.empty.icon': 'newspaper',
@@ -213,11 +216,10 @@ const vi: Dict = {
     'Bạn vừa gửi khá nhiều yêu cầu. Vui lòng thử lại sau ít phút hoặc gọi hotline.',
   'contact.form.error.duplicate': 'Yêu cầu này vừa được gửi rồi, bạn không cần gửi lại.',
   'contact.form.error.generic': 'Không gửi được yêu cầu lúc này. Vui lòng thử lại sau.',
-  // [B1] Thay cho error.phoneFormat khi báo lỗi định dạng: nêu rõ cả số bàn và
-  // tổng đài đều nhận được, để khách doanh nghiệp không tưởng mình gõ nhầm.
-  // Khoá cũ `contact.form.error.phoneFormat` giữ nguyên, không xoá.
-  'contact.form.error.phoneFormat.v2':
-    'Số điện thoại chưa đúng. Nhận số di động (0912345678), số bàn (02838221234) và tổng đài (19006192).',
+  // Khách feedback 12/09: bản .v2 cũ liệt kê cả số bàn/tổng đài quá dài dòng —
+  // rút ngắn về một câu báo lỗi đơn giản. Khoá cũ `contact.form.error.phoneFormat`
+  // giữ nguyên, không xoá.
+  'contact.form.error.phoneFormat.v2': 'Số điện thoại chưa đúng định dạng.',
   // [B3] Câu tóm tắt đọc cho trình đọc màn hình sau khi bấm Gửi mà form còn lỗi.
   'contact.form.error.summary': 'Yêu cầu chưa gửi được. Vui lòng kiểm tra lại các ô được đánh dấu.',
 
@@ -321,6 +323,10 @@ const vi: Dict = {
     'Biểu phí từng dịch vụ đang được hoàn thiện. Trong lúc chờ, gọi hotline hoặc gửi yêu cầu để nhận báo giá đúng theo quy mô doanh nghiệp của bạn.',
   'nav.legalDocs': 'Văn bản pháp luật',
   'nav.newsletter': 'Bản tin',
+  'legalDocs.kicker': 'Thư viện',
+  'legalDocs.title': 'Hệ thống văn bản pháp luật',
+  'legalDocs.subtitle':
+    'Luật, nghị định và thông tư liên quan đến kế toán, thuế, bảo hiểm xã hội, lao động, đăng ký kinh doanh, đầu tư và thương mại.',
   'about.profile.title': 'Hồ sơ công ty',
   'about.profile.companyName': 'Tên công ty',
   'about.profile.taxCode': 'Mã số thuế',

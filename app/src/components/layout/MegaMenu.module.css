@@ -122,7 +122,9 @@
 }
 
 .panelLink {
-  display: block;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
   padding: 0.5rem 0;
   color: var(--color-text-muted);
   text-decoration: none;
@@ -131,6 +133,14 @@
 }
 
 .panelLink:hover {
+  color: var(--color-brand);
+}
+
+.panelLinkIndex {
+  flex: none;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   color: var(--color-brand);
 }
 

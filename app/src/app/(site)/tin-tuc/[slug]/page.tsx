@@ -13,7 +13,7 @@ import {
   ogImages,
   ogLocale,
 } from '@/lib/seo'
-import { getPostBySlug, getSettings } from '@/lib/site'
+import { getPostBySlug, getSettings, siteDisplayName } from '@/lib/site'
 import type { Category } from '@/payload-types'
 import { getRequestLocale } from '@/lib/requestLocale'
 
@@ -23,7 +23,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const locale = await getRequestLocale()
   const t = createTranslator(locale)
   const { slug } = await params
-  const [post, settings] = await Promise.all([getPostBySlug(slug), getSettings(locale)])
+  // Thiếu `locale` ở đây thì getPostBySlug rơi về DEFAULT_LOCALE: trang /en đọc
+  // bản tiếng Việt dù bản dịch EN đã có trong CMS (khách báo 09/09).
+  const [post, settings] = await Promise.all([getPostBySlug(slug, locale), getSettings(locale)])
   if (!post) return { title: t('error.notFound.title') }
 
   const base = seoMetadata(post.seo, post.title, post.excerpt)
@@ -38,7 +40,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       type: 'article',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
       url: localePath(path, locale),
-      siteName: settings?.siteName || t('seo.siteName'),
+      siteName: siteDisplayName(settings, locale),
       locale: ogLocale(locale),
       title: base.title as string,
       description: base.description ?? undefined,
@@ -64,13 +66,15 @@ export default async function PostDetailPage({ params }: { params: Params }) {
   const locale = await getRequestLocale()
   const t = createTranslator(locale)
   const { slug } = await params
-  const [post, settings] = await Promise.all([getPostBySlug(slug), getSettings(locale)])
+  // Thiếu `locale` ở đây thì getPostBySlug rơi về DEFAULT_LOCALE: trang /en đọc
+  // bản tiếng Việt dù bản dịch EN đã có trong CMS (khách báo 09/09).
+  const [post, settings] = await Promise.all([getPostBySlug(slug, locale), getSettings(locale)])
   if (!post) notFound()
 
   const category = typeof post.category === 'object' ? (post.category as Category) : null
 
   // Bài viết chưa có field tác giả trong schema → đứng tên site (contract §5).
-  const authorName = settings?.siteName || t('seo.siteName')
+  const authorName = siteDisplayName(settings, locale)
   const jsonLd = [
     articleJsonLd({
       headline: post.title,

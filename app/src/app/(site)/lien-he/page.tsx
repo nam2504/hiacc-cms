@@ -9,7 +9,7 @@ import { PageHero } from '@/components/pages/PageHero'
 import { Section } from '@/components/ui/Section'
 import { createTranslator } from '@/lib/i18n'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
-import { getBranches, getPageBySlug, getSettings } from '@/lib/site'
+import { getBranches, getPageBySlug, getSettings, siteDisplayName } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -70,7 +70,7 @@ export async function generateMetadata(): Promise<Metadata> {
       type: 'website',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
       url: localePath(`/${SLUG}`, locale),
-      siteName: settings?.siteName || tr('seo.siteName'),
+      siteName: siteDisplayName(settings, locale),
       locale: ogLocale(locale),
       title,
       description,

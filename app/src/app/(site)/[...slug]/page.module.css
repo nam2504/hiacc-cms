@@ -260,3 +260,27 @@
 .sidebarCol {
   min-width: 0;
 }
+
+/*
+ * Sticky đặt ở CỘT, không ở .sidebar bên trong (09/09).
+ *
+ * Cột chứa hai khối: danh sách hạng mục + hộp "Cần báo phí nhanh?". Trước đây
+ * chỉ danh sách dính, nên khi cuộn nó rời dòng chảy bố cục và trôi đè lên hộp
+ * báo phí (hộp vẫn đứng ở vị trí gốc) — chữ chồng chữ, khách báo bằng ảnh.
+ * Dính cả cột thì hai khối giữ nguyên khoảng cách với nhau.
+ *
+ * Offset phải cộng chiều cao TopBar + header: cả hai cũng sticky top:0, nếu
+ * chỉ để 1.5rem thì khúc đầu cột chui xuống dưới header.
+ *
+ * Chỉ từ 1024px — dưới ngưỡng đó cột nằm trên nội dung theo luồng thường.
+ */
+@media (min-width: 1024px) {
+  .sidebarCol {
+    position: sticky;
+    top: calc(var(--topbar-height) + var(--header-height) + 1.5rem);
+    align-self: start;
+    /* Cột dài hơn màn hình thì tự cuộn bên trong, không tràn ra ngoài. */
+    max-height: calc(100vh - var(--topbar-height) - var(--header-height) - 3rem);
+    overflow-y: auto;
+  }
+}

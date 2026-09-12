@@ -144,9 +144,12 @@ export function MegaMenu({
                         </Link>
                       </div>
                       <ul className={styles.panelList}>
-                        {group.children.map((child) => (
+                        {group.children.map((child, index) => (
                           <li key={child.id}>
                             <Link className={styles.panelLink} href={href(child.path)}>
+                              <span className={styles.panelLinkIndex} aria-hidden="true">
+                                {String(index + 1).padStart(2, '0')}
+                              </span>
                               {child.title}
                             </Link>
                           </li>

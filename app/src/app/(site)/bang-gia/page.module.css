@@ -1,0 +1,92 @@
+.group {
+  margin-bottom: 3.5rem;
+}
+
+.group:last-child {
+  margin-bottom: 0;
+}
+
+.groupTitle {
+  margin: 0 0 1.5rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: var(--weight-bold, 800);
+  color: var(--color-text);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  background: var(--color-bg);
+}
+
+.cardFeatured {
+  border-color: var(--color-brand);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 7%);
+}
+
+.cardName {
+  margin: 0;
+  font-size: var(--text-lg, 1.125rem);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.cardPrice {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: 800;
+  color: var(--color-brand);
+}
+
+.cardSummary {
+  margin: 0;
+  font-size: var(--text-sm, 0.875rem);
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+
+.cardFeatures {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cardFeatures li {
+  padding-left: 1.25rem;
+  position: relative;
+  font-size: var(--text-sm, 0.875rem);
+  color: var(--color-text);
+}
+
+.cardFeatures li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-brand);
+  font-weight: 700;
+}

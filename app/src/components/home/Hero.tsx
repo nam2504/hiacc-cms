@@ -1,12 +1,11 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { brandName } from "@/config/tenant";
 import { createTranslator } from "@/lib/i18n";
 import { DEFAULT_LOCALE } from "@/lib/locales";
 import { localizedHref } from "@/lib/nav";
 import { getRequestLocale } from "@/lib/requestLocale";
-import { mediaAlt, mediaUrl } from "@/lib/site";
+import { mediaAlt, mediaUrl, siteDisplayName } from "@/lib/site";
 import type { Setting } from "@/payload-types";
 import styles from "./Hero.module.css";
 
@@ -32,7 +31,7 @@ export async function Hero({ settings }: { settings: Setting | null }) {
   const t = createTranslator(locale);
   const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE);
   const heroImage = mediaUrl(settings?.heroImage);
-  const siteName = brandName(settings?.siteName);
+  const siteName = siteDisplayName(settings, locale);
   // Tagline ưu tiên nội dung khách sửa trong admin, không có thì rơi về khoá dịch.
   const tagline = settings?.tagline || t("home.hero.tagline");
   // Cùng quy tắc cho phần chữ còn lại: ô trống trong admin = dùng bản mặc định,

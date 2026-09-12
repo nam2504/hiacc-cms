@@ -1,6 +1,20 @@
+/*
+ * Bảng màu footer đo từ Figma (ảnh khách gửi 09/09) — footer NỀN SÁNG, không
+ * phải nền tối. Bản trước dùng --color-bg-dark (#16302f, xanh lá đậm) — một giá
+ * trị không thuộc bảng màu nào của dự án, cũng không khớp Figma.
+ *
+ * Khai qua biến riêng (không dùng thẳng token chung) để hai việc cùng chạy được:
+ * khách đổi màu nền footer trong /admin (Settings → footerBg, xem lib/brandStyle.ts)
+ * chỉ cần đè 3 biến này, không đụng tới token toàn site.
+ */
 .footer {
-  background: var(--color-bg-dark);
-  color: var(--color-text-invert);
+  --footer-bg: #ffffff;
+  --footer-text: #201e1d;         /* chữ chính, đo từ Figma */
+  --footer-text-muted: #605d5d;   /* heading cột + copyright */
+  --footer-border: #a6a5a5;       /* đường kẻ ngang */
+
+  background: var(--footer-bg);
+  color: var(--footer-text);
   padding-block: var(--space-7) var(--space-5);
   font-size: var(--text-sm);
 }
@@ -30,26 +44,23 @@
 .companyName {
   margin: 0;
   padding-left: var(--space-3);
-  border-left: 1px solid rgb(255 255 255 / 0.25);
+  border-left: 1px solid color-mix(in srgb, var(--footer-text) 25%, transparent);
   font-weight: var(--weight-semibold);
   line-height: 1.35;
 }
 
 /*
- * `--color-brand` bị Logo.module.css `.text` (chữ fallback khi chưa upload
- * ảnh logo) dùng làm màu chữ. Header nền sáng thì đỏ hợp; nền tối của footer
- * thì đỏ lệch tông so với phần còn lại của cột. Logo.module.css không có
- * biến riêng cho việc này, và CSS Modules không cho file này ghi đè thẳng
- * class đã hash của Logo.module.css — override qua biến CSS kế thừa xuống
- * theo cây DOM là cách duy nhất không phải sửa Logo.module.css.
+ * KHÔNG còn ép logo sang trắng. Bản cũ đè `--color-brand` vì footer nền tối làm
+ * chữ logo đỏ lệch tông; footer giờ nền sáng (Figma) nên logo giữ nguyên màu đỏ
+ * thương hiệu — đúng như ảnh khách gửi.
+ *
+ * Vẫn giữ class rỗng làm móc: footer nền tối (khách đổi trong admin) cần ép lại
+ * màu logo, xem `.footerDark .logo` cuối file.
  */
-.logo {
-  --color-brand: var(--color-text-invert);
-}
 
 .heading {
   margin-bottom: var(--space-4);
-  color: var(--color-text-invert);
+  color: var(--footer-text-muted);
   font-size: var(--text-base);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -66,7 +77,7 @@
 
 .text {
   margin-bottom: var(--space-2);
-  color: rgb(255 255 255 / 0.78);
+  color: var(--footer-text);
 }
 
 .list {
@@ -78,7 +89,7 @@
 }
 
 .link {
-  color: rgb(255 255 255 / 0.78);
+  color: var(--footer-text);
 }
 
 .link:hover {
@@ -86,7 +97,8 @@
 }
 
 .social {
-  color: rgb(255 255 255 / 0.78);
+  /* Figma: link mạng xã hội màu đỏ thương hiệu + gạch chân (đo được #b22820). */
+  color: var(--color-brand);
   text-decoration: underline;
 }
 
@@ -97,12 +109,41 @@
 .bottom {
   margin-top: var(--space-6);
   padding-top: var(--space-4);
-  border-top: 1px solid rgb(255 255 255 / 0.12);
+  border-top: 1px solid var(--footer-border);
   text-align: center;
 }
 
 .copyright {
   margin: 0;
-  color: rgb(255 255 255 / 0.6);
+  color: var(--footer-text-muted);
   font-size: var(--text-xs);
+}
+
+/*
+ * Chế độ nền tối — bật khi khách chọn trong /admin (Settings → "Nền chân trang").
+ * Chỉ đảo 4 biến ở `.footer`, mọi rule bên trên dùng biến nên không phải viết lại.
+ */
+.footerDark {
+  --footer-bg: var(--color-ink);
+  --footer-text: rgb(255 255 255 / 0.82);
+  --footer-text-muted: rgb(255 255 255 / 0.6);
+  --footer-border: rgb(255 255 255 / 0.15);
+}
+
+/*
+ * Trên nền tối, chữ logo fallback (Logo.module.css `.text` dùng --color-brand)
+ * và link mạng xã hội đỏ đều chìm. Ép sang trắng qua biến kế thừa theo cây DOM —
+ * CSS Modules không cho file này chạm vào class đã hash của Logo.module.css.
+ */
+.footerDark .logo {
+  --color-brand: var(--color-text-invert);
+}
+
+.footerDark .social {
+  color: var(--footer-text);
+}
+
+/* Nền tối thì vạch đỏ dưới heading chìm — dùng màu sáng của dải brand. */
+.footerDark .heading::after {
+  background: var(--color-brand-light);
 }

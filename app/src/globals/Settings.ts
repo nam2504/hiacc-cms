@@ -117,6 +117,30 @@ export const Settings: GlobalConfig = {
                 },
               },
             },
+            {
+              name: 'footerTheme',
+              type: 'select',
+              label: 'Nền chân trang',
+              defaultValue: 'light',
+              options: [
+                { label: 'Sáng — nền trắng, chữ đen (theo thiết kế)', value: 'light' },
+                { label: 'Tối — nền đậm, chữ trắng', value: 'dark' },
+              ],
+              admin: {
+                description:
+                  'Chọn tông chân trang. "Sáng" là bản đúng thiết kế khách duyệt. Muốn màu nền khác hai lựa chọn này thì điền ô "Màu nền chân trang" bên dưới.',
+              },
+            },
+            {
+              name: 'footerBg',
+              type: 'text',
+              label: 'Màu nền chân trang',
+              // Không đặt defaultValue: bỏ trống = dùng tông đã chọn ở "Nền chân trang".
+              admin: {
+                description:
+                  'Không bắt buộc. Gõ mã dạng #RRGGBB để dùng màu nền riêng cho chân trang, ví dụ #1F4141. Bỏ trống thì theo lựa chọn "Nền chân trang" ở trên. Màu chữ tự đổi sáng/tối cho dễ đọc.',
+              },
+            },
           ],
         },
         {

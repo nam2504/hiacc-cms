@@ -39,6 +39,45 @@ function shade(hex: string, ratio: number): string {
 }
 
 /**
+ * Độ sáng cảm nhận (WCAG relative luminance, bản rút gọn đủ dùng để chọn
+ * chữ đen hay trắng). Ngưỡng 0.55 chọn theo thử nghiệm: #1f4141 và #b22820
+ * đều ra chữ trắng, #f8f4f4 ra chữ đen.
+ */
+function isLight(hex: string): boolean {
+  const num = parseInt(hex.slice(1), 16)
+  const [r, g, b] = [(num >> 16) & 255, (num >> 8) & 255, num & 255].map((c) => {
+    const s = c / 255
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+  })
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.55 * 0.5
+}
+
+/**
+ * CSS đè màu nền chân trang khi khách điền `Settings.footerBg`.
+ *
+ * Vì sao không để khách tự lo màu chữ: gõ nền đậm mà chữ vẫn đen là không đọc
+ * được, mà admin không có chỗ nhập màu chữ. Ở đây tự chọn đen/trắng theo độ
+ * sáng của nền, nên mọi mã màu hợp lệ đều ra footer đọc được.
+ *
+ * Trả chuỗi rỗng khi bỏ trống hoặc mã sai định dạng → footer giữ nguyên tông
+ * `footerTheme` (class `.footerDark` trong Footer.module.css lo phần đó).
+ *
+ * Biến ở đây khớp tên với `.footer` trong Footer.module.css. Đặt trên `:root`
+ * để đè được giá trị khai trong class đã hash của CSS Module.
+ */
+export function footerStyle(footerBg?: string | null): string {
+  const bg = footerBg ? normalize(footerBg) : null
+  if (!bg) return ''
+
+  const light = isLight(bg)
+  const text = light ? '#201e1d' : 'rgb(255 255 255 / 0.82)'
+  const muted = light ? '#605d5d' : 'rgb(255 255 255 / 0.6)'
+  const border = light ? '#a6a5a5' : 'rgb(255 255 255 / 0.15)'
+
+  return `:root{--footer-bg:${bg};--footer-text:${text};--footer-text-muted:${muted};--footer-border:${border}}`
+}
+
+/**
  * Trả về nội dung thẻ <style> đè màu, hoặc chuỗi rỗng khi không cần đè
  * (màu trùng mặc định của tenant → để tokens.css tự lo, tránh thẻ style thừa).
  *

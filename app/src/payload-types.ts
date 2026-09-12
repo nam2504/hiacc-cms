@@ -72,6 +72,7 @@ export interface Config {
     services: Service;
     'service-nodes': ServiceNode;
     'legal-documents': LegalDocument;
+    'pricing-plans': PricingPlan;
     categories: Category;
     media: Media;
     branches: Branch;
@@ -89,6 +90,7 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     'service-nodes': ServiceNodesSelect<false> | ServiceNodesSelect<true>;
     'legal-documents': LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
+    'pricing-plans': PricingPlansSelect<false> | PricingPlansSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     branches: BranchesSelect<false> | BranchesSelect<true>;
@@ -621,6 +623,50 @@ export interface LegalDocument {
   createdAt: string;
 }
 /**
+ * Các gói giá hiện ở trang Bảng giá, nhóm theo dịch vụ. Thứ tự hiển thị: theo "Thuộc nhóm dịch vụ", trong nhóm theo "Thứ tự".
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing-plans".
+ */
+export interface PricingPlan {
+  id: number;
+  /**
+   * Ví dụ: Kế toán trọn gói, Gói cơ bản.
+   */
+  name: string;
+  /**
+   * Nhóm dịch vụ cấp cao nhất mà gói này thuộc về (kế toán, thuế, BHXH...). Quyết định gói hiện ở bảng giá của nhóm nào. Chỉ hiện các nhóm gốc, không hiện hạng mục con.
+   */
+  serviceGroup: number | ServiceNode;
+  /**
+   * Chữ hiển thị cho giá, không bắt buộc là số — ví dụ "1.500.000đ/tháng", "Liên hệ báo giá".
+   */
+  price: string;
+  /**
+   * Một câu ngắn dưới tên gói, giải thích gói này dành cho ai.
+   */
+  summary?: string | null;
+  /**
+   * Danh sách gạch đầu dòng hiện trong thẻ gói giá.
+   */
+  features?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Bật để gói này hiện nổi bật (viền/nền khác) trong bảng giá của nhóm.
+   */
+  featured?: boolean | null;
+  /**
+   * Số nhỏ hiện trước trong nhóm.
+   */
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Danh sách văn phòng hiển thị ở chân trang và trang Liên hệ. Chỉ Quản trị viên sửa được.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -748,6 +794,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'legal-documents';
         value: number | LegalDocument;
+      } | null)
+    | ({
+        relationTo: 'pricing-plans';
+        value: number | PricingPlan;
       } | null)
     | ({
         relationTo: 'categories';
@@ -985,6 +1035,26 @@ export interface LegalDocumentsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing-plans_select".
+ */
+export interface PricingPlansSelect<T extends boolean = true> {
+  name?: T;
+  serviceGroup?: T;
+  price?: T;
+  summary?: T;
+  features?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  featured?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
@@ -1180,6 +1250,14 @@ export interface Setting {
    * Bấm một ô trong bảng màu, hoặc gõ mã dạng #RRGGBB. Bỏ trống thì dùng màu mặc định của site (#CC1420). Đổi màu này đổi toàn bộ nút và tiêu đề trên site, nên hỏi trước khi sửa.
    */
   primaryColor?: string | null;
+  /**
+   * Chọn tông chân trang. "Sáng" là bản đúng thiết kế khách duyệt. Muốn màu nền khác hai lựa chọn này thì điền ô "Màu nền chân trang" bên dưới.
+   */
+  footerTheme?: ('light' | 'dark') | null;
+  /**
+   * Không bắt buộc. Gõ mã dạng #RRGGBB để dùng màu nền riêng cho chân trang, ví dụ #1F4141. Bỏ trống thì theo lựa chọn "Nền chân trang" ở trên. Màu chữ tự đổi sáng/tối cho dễ đọc.
+   */
+  footerBg?: string | null;
   /**
    * Số chính hiện trên thanh đầu trang. Bỏ trống thì tự ẩn.
    */
@@ -1436,6 +1514,8 @@ export interface SettingsSelect<T extends boolean = true> {
   tagline?: T;
   businessField?: T;
   primaryColor?: T;
+  footerTheme?: T;
+  footerBg?: T;
   hotline?: T;
   hotline2?: T;
   email?: T;

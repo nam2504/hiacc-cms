@@ -2,25 +2,23 @@ import type { Metadata } from 'next'
 import { Container } from '@/components/ui/Container'
 import { EmptyState } from '@/components/news/EmptyState'
 import { PageHero } from '@/components/news/PageHero'
-import { brandName } from '@/config/tenant'
 import { createTranslator } from '@/lib/i18n'
 import { localizedHref } from '@/lib/nav'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { getRequestLocale } from '@/lib/requestLocale'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
-import { getSettings } from '@/lib/site'
+import { getPayloadClient, getSettings, siteDisplayName } from '@/lib/site'
+import { getServiceTree } from '@/lib/serviceTree'
+import type { PricingPlan } from '@/payload-types'
+import styles from './page.module.css'
 
 /**
- * /bang-gia — trang giữ chỗ.
+ * /bang-gia — khách feedback 12/09: cần nơi tự set nội dung trong admin.
  *
- * Vì sao tồn tại: mục "Bảng giá" nằm cố định trên TopBar của 100% trang, cả hai
- * ngôn ngữ, nên người dùng thật bấm vào được. Trước khi có trang này, cú bấm đó
- * rơi thẳng vào 404 (review site 07/09, finding B5).
- *
- * ⚠️ ĐÂY KHÔNG PHẢI TRANG BẢNG GIÁ THẬT. Khách chưa gửi biểu phí (WS-6 T-price),
- * và không được bịa số tiền dịch vụ. Khi có nội dung thật thì thay toàn bộ phần
- * thân trang bên dưới — `generateMetadata` và route giữ nguyên để không mất URL
- * đã nằm trong sitemap.
+ * Đọc `pricing-plans` (collection mới, mỗi gói gắn với một nhóm dịch vụ cấp
+ * cao nhất) rồi nhóm theo `serviceGroup`. Nhóm dịch vụ nào chưa có gói giá thì
+ * không dựng bảng rỗng. Toàn trang chưa có gói nào (khách chưa nhập liệu) thì
+ * vẫn giữ `EmptyState` như bản giữ chỗ cũ, không hiện trang trắng.
  *
  * Đọc Settings nên phải dynamic; xem chú thích cùng loại ở /chuyen-muc.
  */
@@ -52,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
       type: 'website',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
       url: localePath('/bang-gia', locale),
-      siteName: brandName(settings?.siteName),
+      siteName: siteDisplayName(settings, locale),
       locale: ogLocale(locale),
       title,
       description,
@@ -61,9 +59,42 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
+/** `serviceGroup` là quan hệ tới `service-nodes` — depth 0 chỉ trả id, cần depth 1 lấy tên nhóm. */
+async function getPlans(locale: string): Promise<PricingPlan[]> {
+  try {
+    const payload = await getPayloadClient()
+    const res = await payload.find({
+      collection: 'pricing-plans',
+      limit: 200,
+      depth: 1,
+      sort: 'order',
+      locale: locale as Parameters<typeof payload.find>[0]['locale'],
+    })
+    return res.docs as PricingPlan[]
+  } catch (error) {
+    console.error('[pricing-plans] không đọc được bảng giá:', error)
+    return []
+  }
+}
+
 export default async function PricingPage() {
   const locale = await getRequestLocale()
   const t = createTranslator(locale)
+  const [plans, tree] = await Promise.all([getPlans(locale), getServiceTree(locale)])
+
+  const groups = tree
+    .map((node) => ({
+      id: node.id,
+      title: node.title,
+      plans: plans.filter((plan) => {
+        const groupId =
+          plan.serviceGroup && typeof plan.serviceGroup === 'object'
+            ? plan.serviceGroup.id
+            : plan.serviceGroup
+        return String(groupId) === String(node.id)
+      }),
+    }))
+    .filter((group) => group.plans.length > 0)
 
   return (
     <>
@@ -72,12 +103,39 @@ export default async function PricingPage() {
         crumbs={[{ label: t('seo.breadcrumb.home'), href: localizedHref('/', locale, DEFAULT_LOCALE) }]}
       />
       <Container>
-        <EmptyState
-          title={t('pricing.pending.title')}
-          body={t('pricing.pending.body')}
-          actionHref={localizedHref('/lien-he', locale, DEFAULT_LOCALE)}
-          actionLabel={t('nav.contact')}
-        />
+        {groups.length === 0 ? (
+          <EmptyState
+            title={t('pricing.pending.title')}
+            body={t('pricing.pending.body')}
+            actionHref={localizedHref('/lien-he', locale, DEFAULT_LOCALE)}
+            actionLabel={t('nav.contact')}
+          />
+        ) : (
+          groups.map((group) => (
+            <section className={styles.group} key={group.id}>
+              <h2 className={styles.groupTitle}>{group.title}</h2>
+              <div className={styles.grid}>
+                {group.plans.map((plan) => (
+                  <article
+                    className={`${styles.card} ${plan.featured ? styles.cardFeatured : ''}`}
+                    key={plan.id}
+                  >
+                    <h3 className={styles.cardName}>{plan.name}</h3>
+                    <p className={styles.cardPrice}>{plan.price}</p>
+                    {plan.summary && <p className={styles.cardSummary}>{plan.summary}</p>}
+                    {plan.features && plan.features.length > 0 && (
+                      <ul className={styles.cardFeatures}>
+                        {plan.features.map((feature, index) => (
+                          <li key={feature.id ?? index}>{feature.text}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </section>
+          ))
+        )}
       </Container>
     </>
   )

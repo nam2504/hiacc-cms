@@ -7,13 +7,12 @@ import { ServiceSidebar } from '@/components/services/ServiceSidebar'
 import { QuickQuoteCard } from '@/components/services/QuickQuoteCard'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { Container } from '@/components/ui/Container'
-import { brandName } from '@/config/tenant'
 import { createTranslator } from '@/lib/i18n'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { localizedHref } from '@/lib/nav'
 import { findByPath, getServiceTree, type TreeNode } from '@/lib/serviceTree'
 import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
-import { getSettings, mediaUrl, toPayloadLocale } from '@/lib/site'
+import { getSettings, mediaUrl, siteDisplayName, toPayloadLocale } from '@/lib/site'
 import { getPayloadClient } from '@/lib/site'
 import type { ServiceNode } from '@/payload-types'
 import styles from './page.module.css'
@@ -98,7 +97,7 @@ export async function generateMetadata({
       type: 'website',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
       url: localePath(match.node.path, locale),
-      siteName: brandName(settings?.siteName),
+      siteName: siteDisplayName(settings, locale),
       locale: ogLocale(locale),
       title,
       description,

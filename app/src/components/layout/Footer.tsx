@@ -1,10 +1,10 @@
 import { Container } from '@/components/ui/Container'
-import { brandName } from '@/config/tenant'
 import { createTranslator } from '@/lib/i18n'
 import { getRequestLocale } from '@/lib/requestLocale'
 import type { Setting } from '@/payload-types'
 import { Logo } from './Logo'
 import styles from './Footer.module.css'
+import { siteDisplayName } from '@/lib/site'
 
 /**
  * Chân trang 4 cột theo Figma: thương hiệu · trụ sở · liên hệ · kênh liên kết.
@@ -27,11 +27,18 @@ export async function Footer({ settings }: { settings: Setting | null }) {
   ].filter((s): s is { href: string; label: string } => Boolean(s.href))
 
   const year = new Date().getFullYear()
+  /**
+   * Tông chân trang khách chọn trong /admin. Mặc định sáng — đúng thiết kế
+   * Figma khách duyệt. `footerBg` (màu tuỳ ý) đè lên tông này qua biến CSS
+   * sinh ở layout, xem lib/brandStyle.ts `footerStyle()`.
+   */
+  const footerClass =
+    settings?.footerTheme === 'dark' ? `${styles.footer} ${styles.footerDark}` : styles.footer
   // Tiêu đề cột: ô trống trong admin thì dùng nhãn mặc định của cột đó.
   const headings = settings?.footerHeadings
 
   return (
-    <footer className={styles.footer}>
+    <footer className={footerClass}>
       <Container>
         <div className={styles.grid}>
           <div className={styles.col}>
@@ -97,7 +104,7 @@ export async function Footer({ settings }: { settings: Setting | null }) {
 
         <div className={styles.bottom}>
           <p className={styles.copyright}>
-            {settings?.copyright || `© ${year} ${brandName(settings?.siteName)}`}
+            {settings?.copyright || `© ${year} ${siteDisplayName(settings, locale)}`}
           </p>
         </div>
       </Container>

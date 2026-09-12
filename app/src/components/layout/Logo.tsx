@@ -1,10 +1,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { brandName } from '@/config/tenant'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
-import { mediaAlt, mediaUrl } from '@/lib/site'
+import { mediaAlt, mediaUrl, siteDisplayName } from '@/lib/site'
 import type { Setting } from '@/payload-types'
 import styles from './Logo.module.css'
 
@@ -28,7 +27,7 @@ export async function Logo({
   // Logo về trang chủ CÙNG ngôn ngữ: ở /en phải là /en, không phải /.
   const locale = await getRequestLocale()
   const url = mediaUrl(settings?.logo)
-  const siteName = brandName(settings?.siteName)
+  const siteName = siteDisplayName(settings, locale)
 
   return (
     <Link

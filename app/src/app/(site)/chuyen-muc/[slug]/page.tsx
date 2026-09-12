@@ -9,7 +9,7 @@ import { readPage, seoMetadata, type SearchParams } from '@/components/news/para
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { createTranslator } from '@/lib/i18n'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
-import { getCategoryBySlug, getPosts, getSettings } from '@/lib/site'
+import { getCategoryBySlug, getPosts, getSettings, siteDisplayName } from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
 
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       type: 'website',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
       url: localePath(path, locale),
-      siteName: settings?.siteName || t('seo.siteName'),
+      siteName: siteDisplayName(settings, locale),
       locale: ogLocale(locale),
       title: base.title as string,
       description: base.description ?? undefined,

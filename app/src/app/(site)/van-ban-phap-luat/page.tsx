@@ -1,18 +1,20 @@
 import type { Metadata } from 'next'
 import { Container } from '@/components/ui/Container'
 import { LEGAL_GROUPS } from '@/collections/LegalDocuments'
-import { brandName } from '@/config/tenant'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
-import { getPayloadClient, getSettings } from '@/lib/site'
+import { getPayloadClient, getSettings, siteDisplayName } from '@/lib/site'
 import type { LegalDocument } from '@/payload-types'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
+import { createTranslator } from '@/lib/i18n'
+import { LegalDocTabs } from './LegalDocTabs'
 
 /**
  * /van-ban-phap-luat — thư viện văn bản, thiết kế khách 06/09.
  *
- * Tabs 7 nhóm dựng bằng LINK + `#anchor` chứ không phải JavaScript: mỗi nhóm là
- * một mục có thể chia sẻ được, và trang vẫn dùng được khi JS chưa tải xong.
+ * Tabs 7 nhóm là tab THẬT (state, client component `LegalDocTabs`) — khách
+ * feedback 12/09: bản trước dùng LINK + `#anchor` xếp dọc cả 7 bảng trên DOM
+ * và cuộn tới, không phải tab thật.
  *
  * ⚠️ Cột cuối chỉ có "Xem nguồn" trỏ ra trang của cơ quan ban hành. KHÔNG có nút
  * tải file — yêu cầu rõ của khách, xem chú thích trong collection.
@@ -30,27 +32,34 @@ import { getRequestLocale } from '@/lib/requestLocale'
  */
 export const revalidate = 600
 
-const TITLE = 'Hệ thống văn bản pháp luật'
-const SUBTITLE =
-  'Luật, nghị định và thông tư liên quan đến kế toán, thuế, bảo hiểm xã hội, lao động, đăng ký kinh doanh, đầu tư và thương mại.'
+/*
+ * Tiêu đề trang lấy từ i18n, KHÔNG hằng số module (09/09).
+ *
+ * Bản trước để `const TITLE = 'Hệ thống văn bản pháp luật'` ở tầng module: chuỗi
+ * cố định một ngôn ngữ, nên /en/van-ban-phap-luat hiện tiêu đề tiếng Việt cả ở
+ * thẻ <title>, og:title lẫn <h1>. Dịch phải diễn ra TRONG hàm, nơi có locale.
+ */
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const settings = await getSettings(locale)
   const images = ogImages(settings?.logo)
+  const title = t('legalDocs.title')
+  const subtitle = t('legalDocs.subtitle')
 
   return {
-    title: TITLE,
-    description: SUBTITLE,
+    title,
+    description: subtitle,
     alternates: localeAlternates('/van-ban-phap-luat', locale),
     openGraph: {
       type: 'website',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
       url: localePath('/van-ban-phap-luat', locale),
-      siteName: brandName(settings?.siteName),
+      siteName: siteDisplayName(settings, locale),
       locale: ogLocale(locale),
-      title: TITLE,
-      description: SUBTITLE,
+      title,
+      description: subtitle,
       images,
     },
   }
@@ -80,8 +89,9 @@ async function getDocuments(locale: string): Promise<LegalDocument[]> {
 
 export default async function LegalDocumentsPage() {
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const [docs, settings] = await Promise.all([getDocuments(locale), getSettings(locale)])
-  const siteName = brandName(settings?.siteName)
+  const siteName = siteDisplayName(settings, locale)
 
   const byGroup = LEGAL_GROUPS.map((group) => ({
     ...group,
@@ -94,9 +104,9 @@ export default async function LegalDocumentsPage() {
     <>
       <section className={styles.hero}>
         <Container>
-          <p className={styles.kicker}>Thư viện</p>
-          <h1 className={styles.title}>{TITLE}</h1>
-          <p className={styles.subtitle}>{SUBTITLE}</p>
+          <p className={styles.kicker}>{t('legalDocs.kicker')}</p>
+          <h1 className={styles.title}>{t('legalDocs.title')}</h1>
+          <p className={styles.subtitle}>{t('legalDocs.subtitle')}</p>
         </Container>
       </section>
 
@@ -105,58 +115,7 @@ export default async function LegalDocumentsPage() {
           <p className={styles.empty}>Danh mục văn bản đang được cập nhật.</p>
         ) : (
           <>
-            <nav className={styles.tabs} aria-label="Nhóm văn bản">
-              {groupsWithItems.map((group) => (
-                <a key={group.value} className={styles.tab} href={`#${group.value}`}>
-                  {group.label}
-                </a>
-              ))}
-            </nav>
-
-            {groupsWithItems.map((group) => (
-              <section className={styles.group} key={group.value} id={group.value}>
-                <h2 className={styles.groupTitle}>{group.label}</h2>
-                <p className={styles.groupCount}>{group.items.length} văn bản trong nhóm này.</p>
-
-                <div className={styles.tableWrap}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <th scope="col">Số hiệu</th>
-                        <th scope="col">Tên văn bản</th>
-                        <th scope="col">Cơ quan ban hành</th>
-                        <th scope="col">Hiệu lực</th>
-                        <th scope="col">Liên kết</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {group.items.map((doc) => (
-                        <tr key={doc.id}>
-                          <td className={styles.code}>{doc.code}</td>
-                          <td className={styles.name}>{doc.title}</td>
-                          <td>{doc.issuer}</td>
-                          <td>{doc.effectiveYear}</td>
-                          <td>
-                            {doc.sourceUrl ? (
-                              <a
-                                className={styles.source}
-                                href={doc.sourceUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                Xem nguồn →
-                              </a>
-                            ) : (
-                              <span className={styles.noSource}>Đang cập nhật</span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            ))}
+            <LegalDocTabs groups={groupsWithItems} />
 
             <p className={styles.note}>
               Danh mục dẫn tới văn bản trên trang của cơ quan ban hành. {siteName} không

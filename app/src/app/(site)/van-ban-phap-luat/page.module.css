@@ -47,7 +47,11 @@
   font-weight: var(--weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  border: none;
   border-bottom: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .tab:hover {
@@ -58,6 +62,11 @@
 .tab:focus-visible {
   outline: 2px solid var(--color-brand);
   outline-offset: 2px;
+}
+
+.tabActive {
+  color: var(--color-brand);
+  border-bottom-color: var(--color-brand);
 }
 
 /* --- Nhóm văn bản --- */
