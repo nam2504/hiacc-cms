@@ -114,6 +114,12 @@ const vi: Dict = {
 
   // Khối CTA cuối trang: trước đây toàn bộ trang chủ chỉ có 2 nút, cả hai nằm
   // trong Hero — 88% chiều dài trang không có điểm hành động nào.
+  // [QC 13/09] Cột trái khối "Đăng ký tư vấn" trang chủ (Trang chủ.png) — khác
+  // 'contact.form.title' vì đó là tiêu đề của form ở cột phải, không phải cột này.
+  'home.consult.eyebrow': 'Đăng ký tư vấn',
+  'home.consult.title': 'Tư vấn miễn phí',
+  'home.consult.subtitle':
+    'Để lại thông tin, chuyên viên {brand} liên hệ trong giờ làm việc để tư vấn thủ tục và báo phí dịch vụ trước khi thực hiện.',
   'home.cta.title': 'Cần tư vấn cho doanh nghiệp của bạn?',
   'home.cta.subtitle':
     'Gửi yêu cầu hoặc gọi trực tiếp, chúng tôi phản hồi trong ngày làm việc.',

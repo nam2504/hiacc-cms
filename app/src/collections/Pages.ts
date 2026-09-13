@@ -36,7 +36,9 @@ export const Pages: CollectionConfig = {
       'Chỗ sửa chữ và ảnh của ĐÚNG HAI trang: Giới thiệu và Liên hệ. Đây không phải nơi tạo trang mới — cố ý không có nút "Create new", vì một trang chỉ hiện ra ngoài web khi lập trình viên đã làm sẵn đường dẫn cho nó; bản ghi tự thêm sẽ lưu được nhưng mở ra là lỗi 404. Cần thêm trang dịch vụ thì dùng "Cây dịch vụ" (tự sinh đường dẫn). Cần một trang khác hẳn thì báo lập trình viên.',
     preview: (doc) => (typeof doc?.slug === 'string' ? `/${doc.slug}` : null),
   },
-  labels: { singular: 'Trang', plural: 'Trang' },
+  // Đổi tên hiển thị từ "Trang" → "Trang tĩnh" (13/09, Nam báo khó phân biệt với
+  // "Cây dịch vụ" trong sidebar) — chỉ đổi label, slug/API/route giữ nguyên.
+  labels: { singular: 'Trang tĩnh', plural: 'Trang tĩnh' },
   versions: { drafts: true },
   /**
    * Không cho tạo mới: xem lý do ở đầu file. Sửa và đọc vẫn theo quyền chung,
@@ -70,43 +72,30 @@ export const Pages: CollectionConfig = {
       },
     ],
   },
+  // Bỏ bọc `type: 'tabs'` (13/09, Nam báo phải bấm chọn tab mới thấy field, bất
+  // tiện khi sửa) — để phẳng, form edit hiện hết field một lần, cuộn xuống là thấy.
   fields: [
     { name: 'title', type: 'text', label: 'Tiêu đề trang', required: true, localized: true },
     slugField,
     {
-      type: 'tabs',
-      tabs: [
-        {
-          label: 'Nội dung',
-          description: 'Những gì hiện ra ngoài trang. Việc cần sửa hằng ngày nằm ở đây.',
-          fields: [
-            {
-              name: 'heroImage',
-              type: 'upload',
-              relationTo: 'media',
-              label: 'Ảnh đầu trang',
-              admin: {
-                description: 'Ảnh lớn hiển thị trên cùng. Nên ảnh ngang, tối thiểu 1600 px chiều rộng.',
-              },
-            },
-            {
-              name: 'content',
-              type: 'richText',
-              label: 'Nội dung',
-              localized: true,
-              admin: {
-                description:
-                  'Soạn thảo như Word. Bôi đen chữ để in đậm/đặt link. Dán từ Word nên dùng Ctrl+Shift+V để không mang theo định dạng lỗi.',
-              },
-            },
-          ],
-        },
-        {
-          label: 'SEO & nâng cao',
-          description: 'Ít khi cần đụng — chỉ ảnh hưởng cách trang hiện trên Google/Facebook.',
-          fields: [seoField],
-        },
-      ],
+      name: 'heroImage',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Ảnh đầu trang',
+      admin: {
+        description: 'Ảnh lớn hiển thị trên cùng. Nên ảnh ngang, tối thiểu 1600 px chiều rộng.',
+      },
     },
+    {
+      name: 'content',
+      type: 'richText',
+      label: 'Nội dung',
+      localized: true,
+      admin: {
+        description:
+          'Soạn thảo như Word. Bôi đen chữ để in đậm/đặt link. Dán từ Word nên dùng Ctrl+Shift+V để không mang theo định dạng lỗi.',
+      },
+    },
+    seoField,
   ],
 }

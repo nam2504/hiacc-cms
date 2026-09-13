@@ -12,6 +12,7 @@ import { absoluteMediaUrl, localeAlternates, localePath, ogImages, ogLocale } fr
 import { getBranches, getSettings, siteDisplayName } from '@/lib/site'
 import { getNodeImages, getServiceTree } from '@/lib/serviceTree'
 import { getRequestLocale } from '@/lib/requestLocale'
+import styles from './page.module.css'
 
 /**
  * Trang này đọc dữ liệu từ DB → PHẢI dynamic.
@@ -89,6 +90,10 @@ export default async function HomePage() {
   const groupImages = await getNodeImages(tree.map((group) => group.id))
 
   const tr = createTranslator(locale)
+  // Cột trái khối "Đăng ký tư vấn" — cùng cách lọc hotline rỗng như ContactInfo.tsx.
+  const consultHotlines = [settings?.hotline, settings?.hotline2].filter(
+    (v): v is string => typeof v === 'string' && v.trim() !== '',
+  )
 
   /**
    * Dữ liệu có cấu trúc lấy TOÀN BỘ từ Settings + Branches — khách sửa trong admin
@@ -133,12 +138,40 @@ export default async function HomePage() {
 
       {/* Khối 8 theo spec: form tư vấn ngay trên trang chủ, không bắt người đọc
           bấm sang /lien-he mới gửi được yêu cầu. Dùng lại đúng component của
-          trang liên hệ — cùng Server Action, cùng chống spam. */}
-      <Section id="tu-van" tone="soft" title={tr('contact.form.title')} subtitle={tr('contact.form.subtitle')}>
-        <ContactForm
-          locale={locale}
-          fieldOfInterestOptions={tree.map((group) => ({ value: group.title, label: group.title }))}
-        />
+          trang liên hệ — cùng Server Action, cùng chống spam.
+          [QC 13/09] Trước đây nhúng thẳng <ContactForm> không có cột trái nên
+          xuống 1 cột dọc, dài hơn Trang chủ.png. Cột trái dùng khoá riêng
+          (home.consult.*) — khác 'contact.form.title' là tiêu đề của form ở
+          cột phải, tránh 2 tiêu đề giống hệt nhau. */}
+      <Section id="tu-van" tone="soft">
+        <div className={styles.consultColumns}>
+          <div className={styles.consultInfo}>
+            <p className={styles.consultEyebrow}>{tr('home.consult.eyebrow')}</p>
+            <h2 className={styles.consultTitle}>{tr('home.consult.title')}</h2>
+            <p className={styles.consultSubtitle}>{tr('home.consult.subtitle')}</p>
+            {(consultHotlines.length > 0 || settings?.email) && (
+              <p className={styles.consultContact}>
+                {consultHotlines.length > 0 && (
+                  <span>
+                    {tr('common.hotline')}: {consultHotlines.join(' / ')}
+                  </span>
+                )}
+                {settings?.email && (
+                  <span>
+                    {tr('common.email')}: <a href={`mailto:${settings.email}`}>{settings.email}</a>
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
+
+          <div className={styles.consultBody}>
+            <ContactForm
+              locale={locale}
+              fieldOfInterestOptions={tree.map((group) => ({ value: group.title, label: group.title }))}
+            />
+          </div>
+        </div>
       </Section>
     </>
   )

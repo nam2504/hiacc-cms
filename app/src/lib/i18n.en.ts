@@ -102,6 +102,11 @@ export const en = {
 
   'home.services.viewAll': 'View all services',
 
+  'home.consult.eyebrow': 'Free consultation',
+  'home.consult.title': 'Get a free consultation',
+  'home.consult.subtitle':
+    'Leave your details — a {brand} specialist will contact you during working hours to advise on procedures and fees before starting.',
+
   'home.cta.title': 'Need advice for your business?',
   'home.cta.subtitle':
     'Send a request or call us directly — we respond within the working day.',

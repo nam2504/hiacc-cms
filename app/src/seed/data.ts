@@ -706,6 +706,15 @@ export const SETTINGS = {
   email: 'hiacc.kt01@gmail.com',
   workingHours: '08:00 – 17:30, thứ Hai – thứ Sáu',
   /**
+   * Mạng xã hội: khách CHƯA cấp link thật, khác nhóm hotline/email/taxCode ở
+   * trên vốn lấy từ tài liệu khách gửi. Đây là LINK MẪU chỉ để footer đủ 4
+   * cột khi test local — không seed lên staging/production, khách tự điền
+   * link thật trong /admin khi có.
+   */
+  facebook: 'https://facebook.com/hiacc.placeholder',
+  tiktok: 'https://tiktok.com/@hiacc.placeholder',
+  youtube: 'https://youtube.com/@hiacc.placeholder',
+  /**
    * Nguyên tắc hành nghề: nội dung MẪU cho trang Giới thiệu. Ba mục này mô tả
    * cách làm việc, không phải tuyên bố năng lực kiểm chứng được (chứng chỉ, giải
    * thưởng, số khách hàng) — loại đó phải do khách cấp và chịu trách nhiệm.

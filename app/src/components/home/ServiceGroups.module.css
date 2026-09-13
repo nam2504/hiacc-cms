@@ -41,28 +41,50 @@
   gap: 1.5rem;
 }
 
+/*
+ * Số nhóm dịch vụ đọc từ DB, không chia hết cho 2 hay 3 cột — hàng cuối để lại
+ * ô trống và card rơi vào đó lệch/hẹp hơn hàng trên (bug QC 13/09, ảnh chụp
+ * khoảng 640-959px: 2 cột, card thứ 5 một mình chiếm cột 1, cột 2 trống).
+ *
+ * Yêu cầu QC: hàng cuối khi thiếu item không co lại bằng 1 cột rồi đứng giữa
+ * để trống viền — mà GIÃN ĐỀU lấp hết chiều rộng dãy (vd 3 cột dư 2 item thì
+ * mỗi item hàng cuối = 1.5× item bình thường). Kỹ thuật CSS "leftover items":
+ * `:nth-child` chọn đúng các item thuộc hàng cuối theo phép chia dư của tổng
+ * số item cho số cột N, chỉ áp khi CÓ dư (`:nth-child(N+1)` loại trường hợp
+ * chia hết — lúc đó không có hàng lẻ để giãn). Chỉ phụ thuộc số cột (hằng số
+ * theo breakpoint), không phụ thuộc số lượng item cụ thể — khách thêm/bớt
+ * nhóm dịch vụ trong admin vẫn tự đúng, không phải sửa CSS.
+ */
 @media (min-width: 640px) {
   .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .item {
+    flex: 0 0 calc((100% - 1.5rem) / 2);
+  }
+
+  /* 2 cột: dư 1 item ở hàng cuối → item đó giãn full chiều rộng dãy. */
+  .item:nth-child(2n+1):last-child {
+    flex-basis: 100%;
   }
 }
 
 @media (min-width: 960px) {
-  /*
-   * 5 thẻ, 3 cột: 3 trên (grid), 2 dưới CĂN GIỮA thật (không dồn phải).
-   * Cách cũ đặt thẳng item 4/5 vào cột 2/3 của grid 3 cột — cột 1 hàng dưới
-   * bỏ trống nên 2 card lệch hẳn sang phải thay vì nằm giữa. Chuyển .grid
-   * sang flex-wrap + justify-content: center để trình duyệt tự canh giữa
-   * bất kể hàng dưới còn bao nhiêu item, không phụ thuộc nth-child cứng.
-   */
-  .grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
   .item {
     flex: 0 0 calc((100% - 2 * 1.5rem) / 3);
+  }
+
+  /* 3 cột: dư 1 item ở hàng cuối → giãn full chiều rộng dãy. */
+  .item:nth-child(3n+1):nth-last-child(1) {
+    flex-basis: 100%;
+  }
+
+  /* 3 cột: dư 2 item ở hàng cuối → mỗi item giãn 1/2 chiều rộng dãy. */
+  .item:nth-child(3n+1):nth-last-child(2),
+  .item:nth-child(3n+2):nth-last-child(1) {
+    flex-basis: calc((100% - 1.5rem) / 2);
   }
 }
 
