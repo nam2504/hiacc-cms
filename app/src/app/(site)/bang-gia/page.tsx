@@ -4,22 +4,27 @@ import { EmptyState } from '@/components/news/EmptyState'
 import { PageHero } from '@/components/news/PageHero'
 import { createTranslator } from '@/lib/i18n'
 import { localizedHref } from '@/lib/nav'
-import { DEFAULT_LOCALE } from '@/lib/locales'
+import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
 import { getRequestLocale } from '@/lib/requestLocale'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
-import { getPayloadClient, getSettings, siteDisplayName } from '@/lib/site'
-import { getServiceTree } from '@/lib/serviceTree'
+import { getPayloadClient, getSettings, siteDisplayName, toPayloadLocale } from '@/lib/site'
+import { getServiceTree, type TreeNode } from '@/lib/serviceTree'
 import { logger } from '@/lib/observability/logger'
-import type { PricingPlan } from '@/payload-types'
+import type { ServiceNode } from '@/payload-types'
 import styles from './page.module.css'
 
 /**
- * /bang-gia — khách feedback 12/09: cần nơi tự set nội dung trong admin.
+ * /bang-gia — khách feedback 13/09: trang tổng hợp đang đọc collection riêng
+ * `pricing-plans` (khách chưa từng nhập data thật vào đó), trong khi bảng giá
+ * THẬT đã được khách nhập trực tiếp vào từng hạng mục dịch vụ qua khối
+ * "Bảng giá dịch vụ" (`service-nodes.body`, block `pricingTable` — xem
+ * `collections/blocks.ts`), hiện đúng ở trang chi tiết (vd /ke-toan/ke-toan-tron-goi)
+ * nhưng KHÔNG được trang này gom lại. Đổi nguồn: gộp mọi dòng `pricingTable`
+ * của mọi hạng mục con vào một bảng theo NHÓM GỐC (đúng bố cục figma khách
+ * duyệt — "01 Kế toán" là một bảng duy nhất, không tách theo hạng mục con).
  *
- * Đọc `pricing-plans` (collection mới, mỗi gói gắn với một nhóm dịch vụ cấp
- * cao nhất) rồi nhóm theo `serviceGroup`. Nhóm dịch vụ nào chưa có gói giá thì
- * không dựng bảng rỗng. Toàn trang chưa có gói nào (khách chưa nhập liệu) thì
- * vẫn giữ `EmptyState` như bản giữ chỗ cũ, không hiện trang trắng.
+ * `pricing-plans` (collection cũ) không còn được đọc ở đây nữa, nhưng KHÔNG
+ * xoá collection — có thể còn nơi khác tham chiếu, ngoài phạm vi việc này.
  *
  * Đọc Settings nên phải dynamic; xem chú thích cùng loại ở /chuyen-muc.
  */
@@ -60,42 +65,55 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-/** `serviceGroup` là quan hệ tới `service-nodes` — depth 0 chỉ trả id, cần depth 1 lấy tên nhóm. */
-async function getPlans(locale: string): Promise<PricingPlan[]> {
+type PricingRow = { id: string; item: string; scope?: string | null; fee?: string | null }
+
+/**
+ * Đọc `body` của MỌI hạng mục (select riêng, không dùng `getServiceTree()` —
+ * cây đó cố tình bỏ `body` vì chạy ở layout, xem chú thích ở serviceTree.ts).
+ * Trả về map nodeId → các dòng `pricingTable.rows` gộp từ mọi block giá của
+ * node đó (một node có thể có nhiều khối giá, dù hiếm).
+ */
+async function getPricingRowsByNodeId(locale: LocaleCode): Promise<Map<string, PricingRow[]>> {
+  const rowsByNode = new Map<string, PricingRow[]>()
   try {
     const payload = await getPayloadClient()
     const res = await payload.find({
-      collection: 'pricing-plans',
-      limit: 200,
-      depth: 1,
-      sort: 'order',
-      locale: locale as Parameters<typeof payload.find>[0]['locale'],
+      collection: 'service-nodes',
+      limit: 500,
+      depth: 0,
+      select: { body: true },
+      locale: toPayloadLocale(locale),
     })
-    return res.docs as PricingPlan[]
+    for (const doc of res.docs as ServiceNode[]) {
+      const rows: PricingRow[] = []
+      for (const block of doc.body ?? []) {
+        if (block.blockType !== 'pricingTable') continue
+        for (const row of block.rows ?? []) {
+          rows.push({ id: row.id ?? `${doc.id}-${rows.length}`, item: row.item, scope: row.scope, fee: row.fee })
+        }
+      }
+      if (rows.length > 0) rowsByNode.set(String(doc.id), rows)
+    }
   } catch (error) {
-    logger.error('[pricing-plans] không đọc được bảng giá:', error)
-    return []
+    logger.error('[bang-gia] không đọc được khối bảng giá:', error)
   }
+  return rowsByNode
 }
 
 export default async function PricingPage() {
   const locale = await getRequestLocale()
   const t = createTranslator(locale)
-  const [plans, tree] = await Promise.all([getPlans(locale), getServiceTree(locale)])
+  const [rowsByNode, tree] = await Promise.all([getPricingRowsByNodeId(locale), getServiceTree(locale)])
+
+  /** Gộp bảng giá của node và toàn bộ hậu duệ vào nhóm gốc — khớp figma (1 bảng/nhóm). */
+  const collectRows = (node: TreeNode): PricingRow[] => [
+    ...(rowsByNode.get(node.id) ?? []),
+    ...node.children.flatMap(collectRows),
+  ]
 
   const groups = tree
-    .map((node) => ({
-      id: node.id,
-      title: node.title,
-      plans: plans.filter((plan) => {
-        const groupId =
-          plan.serviceGroup && typeof plan.serviceGroup === 'object'
-            ? plan.serviceGroup.id
-            : plan.serviceGroup
-        return String(groupId) === String(node.id)
-      }),
-    }))
-    .filter((group) => group.plans.length > 0)
+    .map((root) => ({ id: root.id, title: root.title, rows: collectRows(root) }))
+    .filter((group) => group.rows.length > 0)
 
   return (
     <>
@@ -128,20 +146,11 @@ export default async function PricingPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {group.plans.map((plan) => (
-                      <tr className={plan.featured ? styles.rowFeatured : ''} key={plan.id}>
-                        <td>{plan.name}</td>
-                        <td>
-                          {plan.summary}
-                          {plan.features && plan.features.length > 0 && (
-                            <ul className={styles.features}>
-                              {plan.features.map((feature, index) => (
-                                <li key={feature.id ?? index}>{feature.text}</li>
-                              ))}
-                            </ul>
-                          )}
-                        </td>
-                        <td className={styles.price}>{plan.price}</td>
+                    {group.rows.map((row) => (
+                      <tr key={row.id}>
+                        <td>{row.item}</td>
+                        <td>{row.scope}</td>
+                        <td className={styles.price}>{row.fee}</td>
                       </tr>
                     ))}
                   </tbody>
