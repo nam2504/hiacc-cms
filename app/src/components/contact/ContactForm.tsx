@@ -1,5 +1,6 @@
 'use client'
 
+import type { KeyboardEvent } from 'react'
 import { useEffect, useRef } from 'react'
 import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
@@ -36,6 +37,19 @@ const FIELD_ORDER = [
 
 /** Tuỳ chọn cho select "Lĩnh vực" — tên nhóm dịch vụ, đi vào qua props từ trang cha (đọc cây trong DB). */
 export type FieldOfInterestOption = { value: string; label: string }
+
+/**
+ * [QC 13/09] Khách gõ xong SĐT rồi bấm Enter theo thói quen — trình duyệt tự
+ * submit form ngay (hành vi mặc định của <form> khi Enter trong input không
+ * phải textarea), trước khi khách kịp mở dropdown "Lĩnh vực". Bản ghi lọt vào
+ * admin thiếu field_of_interest, trông như thể field "không lưu được", nhưng
+ * thực ra form đã bị gửi quá sớm. Chặn Enter ở mọi input text/tel/email/select
+ * (không chặn ở textarea, nơi Enter dùng để xuống dòng) — khách phải bấm nút
+ * "Gửi yêu cầu" tường minh.
+ */
+function blockEnterSubmit(e: KeyboardEvent<HTMLInputElement | HTMLSelectElement>) {
+  if (e.key === 'Enter') e.preventDefault()
+}
 
 /** `t` đi vào qua prop: SubmitButton nằm dưới <form> nên không nhận locale trực tiếp. */
 function SubmitButton({ t }: { t: ReturnType<typeof createTranslator> }) {
@@ -149,99 +163,107 @@ export function ContactForm({
           </p>
         )}
 
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="contact-salutation">
-            {t('contact.form.salutation.label')}
-            <span className={styles.optional}>{t('contact.form.optional')}</span>
-          </label>
-          <select
-            className={styles.input}
-            id="contact-salutation"
-            name="salutation"
-            defaultValue={values?.salutation ?? ''}
-          >
-            <option value=""></option>
-            <option value="anh">{t('contact.form.salutation.mr')}</option>
-            <option value="chi">{t('contact.form.salutation.ms')}</option>
-          </select>
-        </div>
+        {/* [QC 13/09] 4 ô đầu xếp lưới 2x2 theo figma (Anh/Chị+Tên, SĐT+Mail),
+            thay vì 4 hàng dọc như trước — chỉ đổi layout, không đổi field. */}
+        <div className={styles.grid2x2}>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="contact-salutation">
+              {t('contact.form.salutation.label')}
+              <span className={styles.optional}>{t('contact.form.optional')}</span>
+            </label>
+            <select
+              className={styles.input}
+              id="contact-salutation"
+              name="salutation"
+              defaultValue={values?.salutation ?? ''}
+              onKeyDown={blockEnterSubmit}
+            >
+              <option value=""></option>
+              <option value="anh">{t('contact.form.salutation.mr')}</option>
+              <option value="chi">{t('contact.form.salutation.ms')}</option>
+            </select>
+          </div>
 
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="contact-name">
-            {t('contact.form.name.label')}
-            <span className={styles.required} aria-label={t('contact.form.requiredMark')}>
-              *
-            </span>
-          </label>
-          <input
-            className={styles.input}
-            id="contact-name"
-            name="name"
-            type="text"
-            required
-            maxLength={120}
-            autoComplete="name"
-            placeholder={t('contact.form.name.placeholder')}
-            defaultValue={values?.name}
-            aria-invalid={Boolean(fieldErrors.name)}
-            aria-describedby={fieldErrors.name ? 'contact-name-error' : undefined}
-          />
-          {fieldErrors.name && (
-            <p className={styles.fieldError} id="contact-name-error">
-              {t(fieldErrors.name)}
-            </p>
-          )}
-        </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="contact-name">
+              {t('contact.form.name.label')}
+              <span className={styles.required} aria-label={t('contact.form.requiredMark')}>
+                *
+              </span>
+            </label>
+            <input
+              className={styles.input}
+              id="contact-name"
+              name="name"
+              type="text"
+              required
+              maxLength={120}
+              autoComplete="name"
+              placeholder={t('contact.form.name.placeholder')}
+              defaultValue={values?.name}
+              aria-invalid={Boolean(fieldErrors.name)}
+              aria-describedby={fieldErrors.name ? 'contact-name-error' : undefined}
+              onKeyDown={blockEnterSubmit}
+            />
+            {fieldErrors.name && (
+              <p className={styles.fieldError} id="contact-name-error">
+                {t(fieldErrors.name)}
+              </p>
+            )}
+          </div>
 
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="contact-phone">
-            {t('contact.form.phone.label')}
-            <span className={styles.required} aria-label={t('contact.form.requiredMark')}>
-              *
-            </span>
-          </label>
-          <input
-            className={styles.input}
-            id="contact-phone"
-            name="phone"
-            type="tel"
-            required
-            maxLength={20}
-            autoComplete="tel"
-            placeholder={t('contact.form.phone.placeholder')}
-            defaultValue={values?.phone}
-            aria-invalid={Boolean(fieldErrors.phone)}
-            aria-describedby={fieldErrors.phone ? 'contact-phone-error' : undefined}
-          />
-          {fieldErrors.phone && (
-            <p className={styles.fieldError} id="contact-phone-error">
-              {t(fieldErrors.phone)}
-            </p>
-          )}
-        </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="contact-phone">
+              {t('contact.form.phone.label')}
+              <span className={styles.required} aria-label={t('contact.form.requiredMark')}>
+                *
+              </span>
+            </label>
+            <input
+              className={styles.input}
+              id="contact-phone"
+              name="phone"
+              type="tel"
+              required
+              maxLength={20}
+              autoComplete="tel"
+              placeholder={t('contact.form.phone.placeholder')}
+              defaultValue={values?.phone}
+              aria-invalid={Boolean(fieldErrors.phone)}
+              aria-describedby={fieldErrors.phone ? 'contact-phone-error' : undefined}
+              onKeyDown={blockEnterSubmit}
+            />
+            {fieldErrors.phone && (
+              <p className={styles.fieldError} id="contact-phone-error">
+                {t(fieldErrors.phone)}
+              </p>
+            )}
+          </div>
 
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="contact-email">
-            {t('contact.form.email.label')}
-            <span className={styles.optional}>{t('contact.form.optional')}</span>
-          </label>
-          <input
-            className={styles.input}
-            id="contact-email"
-            name="email"
-            type="email"
-            maxLength={200}
-            autoComplete="email"
-            placeholder={t('contact.form.email.placeholder')}
-            defaultValue={values?.email}
-            aria-invalid={Boolean(fieldErrors.email)}
-            aria-describedby={fieldErrors.email ? 'contact-email-error' : undefined}
-          />
-          {fieldErrors.email && (
-            <p className={styles.fieldError} id="contact-email-error">
-              {t(fieldErrors.email)}
-            </p>
-          )}
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="contact-email">
+              {t('contact.form.email.label')}
+              <span className={styles.optional}>{t('contact.form.optional')}</span>
+            </label>
+            <input
+              className={styles.input}
+              id="contact-email"
+              name="email"
+              type="email"
+              maxLength={200}
+              autoComplete="email"
+              placeholder={t('contact.form.email.placeholder')}
+              defaultValue={values?.email}
+              aria-invalid={Boolean(fieldErrors.email)}
+              aria-describedby={fieldErrors.email ? 'contact-email-error' : undefined}
+              onKeyDown={blockEnterSubmit}
+            />
+            {fieldErrors.email && (
+              <p className={styles.fieldError} id="contact-email-error">
+                {t(fieldErrors.email)}
+              </p>
+            )}
+          </div>
         </div>
 
         {fieldOfInterestOptions.length > 0 && (

@@ -298,6 +298,9 @@ export const en = {
   'pricing.pending.title': 'Our price list is being updated',
   'pricing.pending.body':
     'Fees for each service are being finalised. In the meantime, call our hotline or send a request to get a quote matched to the size of your business.',
+  'pricing.table.item': 'Item',
+  'pricing.table.scope': 'Scope of work',
+  'pricing.table.price': 'Fee (VND)',
   'nav.legalDocs': 'Legal documents',
   'nav.newsletter': 'Newsletter',
   'legalDocs.kicker': 'Library',

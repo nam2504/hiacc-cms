@@ -8,13 +8,15 @@
  * chỉ cần đè 3 biến này, không đụng tới token toàn site.
  */
 .footer {
-  --footer-bg: #ffffff;
-  --footer-text: #201e1d;         /* chữ chính, đo từ Figma */
-  --footer-text-muted: #605d5d;   /* heading cột + copyright */
-  --footer-border: #a6a5a5;       /* đường kẻ ngang */
-
-  background: var(--footer-bg);
-  color: var(--footer-text);
+  /*
+   * [QC 13/09] KHÔNG khai `--footer-bg: #ffffff` trực tiếp trên .footer nữa —
+   * làm vậy tự tạo ra giá trị cục bộ luôn thắng biến cùng tên set trên :root
+   * (brandStyle.ts footerStyle()), nên khách điền "Màu nền chân trang" trong
+   * admin không bao giờ có tác dụng. Đưa mặc định vào tham số 2 của var() —
+   * dùng khi :root chưa set, nhường quyền override khi :root có set.
+   */
+  background: var(--footer-bg, #ffffff);
+  color: var(--footer-text, #201e1d);
   padding-block: var(--space-7) var(--space-5);
   font-size: var(--text-sm);
 }
@@ -60,7 +62,7 @@
 
 .heading {
   margin-bottom: var(--space-4);
-  color: var(--footer-text-muted);
+  color: var(--footer-text-muted, #605d5d);
   font-size: var(--text-base);
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -77,7 +79,7 @@
 
 .text {
   margin-bottom: var(--space-2);
-  color: var(--footer-text);
+  color: var(--footer-text, #201e1d);
 }
 
 .list {
@@ -89,7 +91,7 @@
 }
 
 .link {
-  color: var(--footer-text);
+  color: var(--footer-text, #201e1d);
 }
 
 .link:hover {
@@ -109,13 +111,13 @@
 .bottom {
   margin-top: var(--space-6);
   padding-top: var(--space-4);
-  border-top: 1px solid var(--footer-border);
+  border-top: 1px solid var(--footer-border, #a6a5a5);
   text-align: center;
 }
 
 .copyright {
   margin: 0;
-  color: var(--footer-text-muted);
+  color: var(--footer-text-muted, #605d5d);
   font-size: var(--text-xs);
 }
 

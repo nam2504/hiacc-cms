@@ -327,6 +327,9 @@ const vi: Dict = {
   'pricing.pending.title': 'Bảng giá đang được cập nhật',
   'pricing.pending.body':
     'Biểu phí từng dịch vụ đang được hoàn thiện. Trong lúc chờ, gọi hotline hoặc gửi yêu cầu để nhận báo giá đúng theo quy mô doanh nghiệp của bạn.',
+  'pricing.table.item': 'Hạng mục',
+  'pricing.table.scope': 'Phạm vi công việc',
+  'pricing.table.price': 'Phí dịch vụ (VNĐ)',
   'nav.legalDocs': 'Văn bản pháp luật',
   'nav.newsletter': 'Bản tin',
   'legalDocs.kicker': 'Thư viện',

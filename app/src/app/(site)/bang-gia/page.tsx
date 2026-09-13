@@ -112,27 +112,40 @@ export default async function PricingPage() {
             actionLabel={t('nav.contact')}
           />
         ) : (
-          groups.map((group) => (
+          groups.map((group, groupIndex) => (
             <section className={styles.group} key={group.id}>
-              <h2 className={styles.groupTitle}>{group.title}</h2>
-              <div className={styles.grid}>
-                {group.plans.map((plan) => (
-                  <article
-                    className={`${styles.card} ${plan.featured ? styles.cardFeatured : ''}`}
-                    key={plan.id}
-                  >
-                    <h3 className={styles.cardName}>{plan.name}</h3>
-                    <p className={styles.cardPrice}>{plan.price}</p>
-                    {plan.summary && <p className={styles.cardSummary}>{plan.summary}</p>}
-                    {plan.features && plan.features.length > 0 && (
-                      <ul className={styles.cardFeatures}>
-                        {plan.features.map((feature, index) => (
-                          <li key={feature.id ?? index}>{feature.text}</li>
-                        ))}
-                      </ul>
-                    )}
-                  </article>
-                ))}
+              <h2 className={styles.groupTitle}>
+                <span className={styles.groupIndex}>{String(groupIndex + 1).padStart(2, '0')}</span>
+                {group.title}
+              </h2>
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>{t('pricing.table.item')}</th>
+                      <th>{t('pricing.table.scope')}</th>
+                      <th>{t('pricing.table.price')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {group.plans.map((plan) => (
+                      <tr className={plan.featured ? styles.rowFeatured : ''} key={plan.id}>
+                        <td>{plan.name}</td>
+                        <td>
+                          {plan.summary}
+                          {plan.features && plan.features.length > 0 && (
+                            <ul className={styles.features}>
+                              {plan.features.map((feature, index) => (
+                                <li key={feature.id ?? index}>{feature.text}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </td>
+                        <td className={styles.price}>{plan.price}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </section>
           ))

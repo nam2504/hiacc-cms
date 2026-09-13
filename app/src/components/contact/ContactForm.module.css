@@ -31,6 +31,17 @@
   min-width: 0;
 }
 
+.grid2x2 {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 560px) {
+  .grid2x2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .label {
   color: var(--color-text);
   font-size: var(--text-sm);
