@@ -277,6 +277,7 @@ export function ContactForm({
               id="contact-field-of-interest"
               name="fieldOfInterest"
               defaultValue={values?.fieldOfInterest ?? ''}
+              onKeyDown={blockEnterSubmit}
             >
               <option value="">{t('contact.form.fieldOfInterest.placeholder')}</option>
               {fieldOfInterestOptions.map((opt) => (
