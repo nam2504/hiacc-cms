@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/Button'
 import { RichText } from '@/components/ui/RichText'
 import { createTranslator } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
 import type { ServiceNode } from '@/payload-types'
 import styles from './ServiceBody.module.css'
@@ -27,6 +29,7 @@ export async function ServiceBody({ body }: { body?: ServiceNode['body'] }) {
           key={block.id ?? `${block.blockType}-${Math.random()}`}
           block={block}
           tr={tr}
+          locale={locale}
         />
       ))}
     </div>
@@ -36,9 +39,11 @@ export async function ServiceBody({ body }: { body?: ServiceNode['body'] }) {
 function BlockRenderer({
   block,
   tr,
+  locale,
 }: {
   block: Block
   tr: ReturnType<typeof createTranslator>
+  locale: string
 }) {
   switch (block.blockType) {
     case 'pricingTable': {
@@ -115,12 +120,20 @@ function BlockRenderer({
         </section>
       )
 
-    case 'ctaBlock':
+    case 'ctaBlock': {
+      // [B2] `href` do khách nhập tự do (field description cho phép cả route
+      // nội bộ "/lien-he" lẫn URL đầy đủ ra ngoài) — chỉ localize khi là route
+      // nội bộ, áp `localizedHref` lên URL tuyệt đối sẽ ghép sai thành
+      // "/en https://...".
+      const href = block.href.startsWith('/')
+        ? localizedHref(block.href, locale, DEFAULT_LOCALE)
+        : block.href
       return (
         <div className={styles.cta}>
-          <Button href={block.href}>{block.label}</Button>
+          <Button href={href}>{block.label}</Button>
         </div>
       )
+    }
 
     default:
       return null

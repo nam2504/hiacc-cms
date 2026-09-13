@@ -4,6 +4,8 @@ import { CategoryGroups } from '@/components/news/CategoryGroups'
 import { EmptyState } from '@/components/news/EmptyState'
 import { PageHero } from '@/components/news/PageHero'
 import { createTranslator } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
 import { localeAlternates, localePath } from '@/lib/seo'
 import { getCategories, getPostCountsByCategory } from '@/lib/site'
 import styles from './page.module.css'
@@ -78,7 +80,7 @@ export default async function CategoryListPage() {
             <EmptyState
               title={t('news.categories.empty.title')}
               body={t('news.categories.empty.body')}
-              actionHref="/"
+              actionHref={localizedHref('/', locale, DEFAULT_LOCALE)}
               actionLabel={t('common.backToHome')}
             />
           )}

@@ -108,7 +108,7 @@ export default async function GioiThieuPage() {
           rồi tóm tắt các nhóm dịch vụ. Dữ liệu lấy từ Settings và cây, khách sửa
           trong /admin. */}
       <CompanyProfile settings={settings} locale={locale} />
-      <GroupSummary tree={tree} />
+      <GroupSummary tree={tree} locale={locale} />
     </>
   )
 }

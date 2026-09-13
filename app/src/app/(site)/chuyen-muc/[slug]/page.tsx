@@ -8,6 +8,8 @@ import { PostGrid } from '@/components/news/PostGrid'
 import { readPage, seoMetadata, type SearchParams } from '@/components/news/params'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { createTranslator } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { getCategoryBySlug, getPosts, getSettings, siteDisplayName } from '@/lib/site'
 import styles from './page.module.css'
@@ -109,7 +111,7 @@ export default async function CategoryDetailPage({
             <EmptyState
               title={t('news.category.empty.title')}
               body={t('news.category.empty.body')}
-              actionHref="/tin-tuc"
+              actionHref={localizedHref('/tin-tuc', locale, DEFAULT_LOCALE)}
               actionLabel={t('news.category.empty.allPosts')}
             />
           )}

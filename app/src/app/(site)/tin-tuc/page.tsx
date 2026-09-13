@@ -7,6 +7,8 @@ import { FeaturedPost } from '@/components/news/FeaturedPost'
 import { PostGrid } from '@/components/news/PostGrid'
 import { readPage, type SearchParams } from '@/components/news/params'
 import { createTranslator } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
 import { localeAlternates, localePath } from '@/lib/seo'
 import { getPosts } from '@/lib/site'
 import styles from './page.module.css'
@@ -72,7 +74,7 @@ export default async function NewsListPage({ searchParams }: { searchParams: Sea
             <EmptyState
               title={t('news.empty.title')}
               body={t('news.empty.body')}
-              actionHref="/chuyen-muc"
+              actionHref={localizedHref('/chuyen-muc', locale, DEFAULT_LOCALE)}
               actionLabel={t('news.empty.browseCategories')}
             />
           )}

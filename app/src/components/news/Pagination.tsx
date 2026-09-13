@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { createTranslator } from '@/lib/i18n'
+import { DEFAULT_LOCALE } from '@/lib/locales'
+import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
 import styles from './Pagination.module.css'
 
@@ -10,9 +12,13 @@ import styles from './Pagination.module.css'
  * `basePath` là đường dẫn không kèm query, ví dụ '/tin-tuc' hoặc
  * '/chuyen-muc/ke-toan-tai-chinh'. Trang 1 không gắn ?page=1 để URL chính tắc
  * chỉ có một dạng (tránh nội dung trùng lặp trên Google).
+ *
+ * [B2] `basePath` luôn là route KHÔNG có locale prefix — áp `localizedHref`
+ * ở đây, chỉ một chỗ, để trang /en/tin-tuc?page=2 không rơi về bản Việt.
  */
-function hrefFor(basePath: string, page: number) {
-  return page <= 1 ? basePath : `${basePath}?page=${page}`
+function hrefFor(basePath: string, page: number, locale: string) {
+  const path = page <= 1 ? basePath : `${basePath}?page=${page}`
+  return localizedHref(path, locale, DEFAULT_LOCALE)
 }
 
 export async function Pagination({
@@ -26,7 +32,8 @@ export async function Pagination({
 }) {
   if (totalPages <= 1) return null
 
-  const t = createTranslator(await getRequestLocale())
+  const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1)
   const hasPrev = page > 1
   const hasNext = page < totalPages
@@ -34,7 +41,7 @@ export async function Pagination({
   return (
     <nav className={styles.pagination} aria-label={t('news.pagination.label')}>
       {hasPrev ? (
-        <Link className={styles.step} href={hrefFor(basePath, page - 1)} rel="prev">
+        <Link className={styles.step} href={hrefFor(basePath, page - 1, locale)} rel="prev">
           {t('news.pagination.prev')}
         </Link>
       ) : (
@@ -51,7 +58,7 @@ export async function Pagination({
                 {item}
               </span>
             ) : (
-              <Link className={styles.page} href={hrefFor(basePath, item)}>
+              <Link className={styles.page} href={hrefFor(basePath, item, locale)}>
                 {item}
               </Link>
             )}
@@ -60,7 +67,7 @@ export async function Pagination({
       </ol>
 
       {hasNext ? (
-        <Link className={styles.step} href={hrefFor(basePath, page + 1)} rel="next">
+        <Link className={styles.step} href={hrefFor(basePath, page + 1, locale)} rel="next">
           {t('news.pagination.next')}
         </Link>
       ) : (

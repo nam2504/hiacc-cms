@@ -60,6 +60,7 @@ export function ContactForm({
   const t = createTranslator(locale as Parameters<typeof createTranslator>[0])
   const [state, formAction] = useActionState(submitContactForm, INITIAL_STATE)
   const formRef = useRef<HTMLFormElement>(null)
+  const successRef = useRef<HTMLDivElement>(null)
 
   /**
    * [B3] Sau khi Server Action trả lỗi, đưa người dùng TỚI chỗ sai.
@@ -87,9 +88,22 @@ export function ContactForm({
     if (firstErrorId) (target as HTMLInputElement).focus({ preventScroll: true })
   }, [state])
 
+  /**
+   * [N4] Gửi xong khách không thấy xác nhận — khối success thay thế đúng vị
+   * trí form trong DOM, nhưng nếu form dài hơn khung nhìn (mobile, form nhiều
+   * ô) và người dùng đang cuộn dở, khối mới không tự vào tầm mắt. Cùng cơ chế
+   * cuộn+focus như nhánh lỗi ở trên, `tabIndex={-1}` để `focus()` hoạt động
+   * trên `<div>` (không phải control nhận focus tự nhiên).
+   */
+  useEffect(() => {
+    if (state.status !== 'success') return
+    successRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    successRef.current?.focus({ preventScroll: true })
+  }, [state.status])
+
   if (state.status === 'success') {
     return (
-      <div className={styles.success} role="status">
+      <div className={styles.success} role="status" ref={successRef} tabIndex={-1}>
         <h2 className={styles.successTitle}>{t('contact.form.success.title')}</h2>
         <p className={styles.successBody}>{t('contact.form.success.body')}</p>
       </div>
