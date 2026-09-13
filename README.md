@@ -71,16 +71,25 @@ Dựng thêm 1 website mới = 3 việc, **không sửa code**:
 Giá trị trong `TENANTS` chỉ là **fallback** khi Settings trong DB còn trống —
 khách sửa gì trong `/admin` thì cái đó luôn thắng (`brandName()`).
 
-Chạy thử 1 tenant thứ hai ở local (không đụng `hiacc.db` đang dùng):
+Chạy thử 1 tenant thứ hai ở local, song song với site đang chạy (không đụng
+`hiacc.db`). Next.js dev (Turbopack) khoá 1 server cho mỗi **thư mục** —
+không phải mỗi port — nên chạy chung `app/` sẽ báo lỗi "Another next dev
+server is already running". Dùng `git worktree` để có thư mục riêng:
 
 ```bash
-cd app
+git worktree add ../hiacc-cms-hitax HEAD
+cd ../hiacc-cms-hitax/app
+cp ../../hiacc-cms/app/.env .env    # copy PAYLOAD_SECRET từ site chính
+
 TENANT=hitax DATABASE_URI=file:./hitax.db PORT=3001 \
 NEXT_PUBLIC_SERVER_URL=http://localhost:3001 NEXT_PUBLIC_SITE_URL=http://localhost:3001 \
-npm run dev
-# terminal khác, cùng biến môi trường:
+npm install && npm run dev
+
+# terminal khác, cùng biến TENANT/DATABASE_URI:
 TENANT=hitax DATABASE_URI=file:./hitax.db npm run seed   # nội dung mẫu riêng cho site này
 ```
+
+Xong việc thì `git worktree remove ../hiacc-cms-hitax` để dọn lại.
 
 ## Đa ngôn ngữ
 
