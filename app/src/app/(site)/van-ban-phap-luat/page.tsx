@@ -4,6 +4,7 @@ import { LEGAL_GROUPS } from '@/collections/LegalDocuments'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { getPayloadClient, getSettings, siteDisplayName } from '@/lib/site'
 import type { LegalDocument } from '@/payload-types'
+import { logger } from '@/lib/observability/logger'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
 import { createTranslator } from '@/lib/i18n'
@@ -82,7 +83,7 @@ async function getDocuments(locale: string): Promise<LegalDocument[]> {
     })
     return res.docs as LegalDocument[]
   } catch (error) {
-    console.error('[legal-documents] không đọc được danh mục văn bản:', error)
+    logger.error('[legal-documents] không đọc được danh mục văn bản:', error)
     return []
   }
 }

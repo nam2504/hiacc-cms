@@ -7,6 +7,7 @@
  */
 import { DEFAULT_LOCALE, ENABLED_LOCALES, type LocaleCode } from './locales'
 import { mediaUrl } from './site'
+import { logger } from './observability/logger'
 
 /**
  * Domain gốc của site. Deploy đổi domain thì đổi biến môi trường, KHÔNG sửa code.
@@ -23,7 +24,7 @@ import { mediaUrl } from './site'
 const FALLBACK_SITE_URL = 'http://localhost:3000'
 
 if (process.env.NODE_ENV === 'production' && !process.env.NEXT_PUBLIC_SITE_URL) {
-  console.error(
+  logger.warn(
     '[seo] THIẾU NEXT_PUBLIC_SITE_URL — canonical, sitemap, og:url và JSON-LD sẽ ' +
       `phát "${FALLBACK_SITE_URL}" ra ngoài. Biến này bị nướng cứng lúc \`next build\`, ` +
       'nên phải set TRƯỚC khi build, không phải lúc chạy.',

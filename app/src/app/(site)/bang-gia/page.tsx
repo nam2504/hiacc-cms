@@ -9,6 +9,7 @@ import { getRequestLocale } from '@/lib/requestLocale'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { getPayloadClient, getSettings, siteDisplayName } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
+import { logger } from '@/lib/observability/logger'
 import type { PricingPlan } from '@/payload-types'
 import styles from './page.module.css'
 
@@ -72,7 +73,7 @@ async function getPlans(locale: string): Promise<PricingPlan[]> {
     })
     return res.docs as PricingPlan[]
   } catch (error) {
-    console.error('[pricing-plans] không đọc được bảng giá:', error)
+    logger.error('[pricing-plans] không đọc được bảng giá:', error)
     return []
   }
 }

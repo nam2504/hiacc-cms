@@ -28,7 +28,7 @@ const vi: Dict = {
   'nav.skipToContent': 'Bỏ qua, tới nội dung chính',
   'service.requestQuote': 'Yêu cầu báo phí',
   'service.quickQuote.title': 'Cần báo phí nhanh?',
-  'service.quickQuote.body': 'Gọi trực tiếp hoặc để lại thông tin, HiACC báo phí trong ngày làm việc.',
+  'service.quickQuote.body': 'Gọi trực tiếp hoặc để lại thông tin, {brand} báo phí trong ngày làm việc.',
   'service.viewOwnPage': 'Xem dạng trang riêng',
   'service.stat.duration': 'Thời gian',
   'service.stat.feeFrom': 'Phí dịch vụ từ',
@@ -54,14 +54,14 @@ const vi: Dict = {
   'footer.recentPosts': 'Bài viết gần đây',
   'footer.headOffice': 'Trụ sở',
   'footer.contact': 'Liên hệ',
-  'footer.followUs': 'Kênh của HiACC',
+  'footer.followUs': 'Kênh của {brand}',
 
   // --- Trang chủ (W1) — AUDIT §3, khối 2–8 ---
   // Mọi số liệu marketing chép từ site tham chiếu site tham chiếu (điểm sao, số lượng
   // khách hàng, các mức phần trăm ở khối Stats) đã bị GỠ: không có nguồn nào kiểm
   // chứng được, mà tuyên bố định lượng của một công ty kế toán sai là rủi ro pháp lý.
   // Chỉ đưa lại khi khách tự cung cấp số thật kèm nguồn và chịu trách nhiệm về số đó.
-  'home.hero.eyebrow': 'Welcome to HiACC',
+  'home.hero.eyebrow': 'Welcome to {brand}',
   'home.hero.tagline': 'Đồng hành cùng doanh nghiệp Việt',
   // Không lặp lại cụm của tagline ("đồng hành cùng doanh nghiệp Việt") — hai dòng
   // đứng sát nhau trong hero, lặp nguyên cụm đọc rất lộ.
@@ -341,6 +341,10 @@ const vi: Dict = {
   'about.profile.fieldValue': 'Kế toán, thuế, thủ tục pháp lý doanh nghiệp',
   'about.profile.slogan': 'Slogan',
   'about.principles.title': 'Nguyên tắc hành nghề',
+
+  'error.generic.title': 'Trang gặp sự cố',
+  'error.generic.body': 'Đã có lỗi xảy ra khi tải trang này. Vui lòng thử lại.',
+  'error.generic.retry': 'Thử lại',
 
 }
 

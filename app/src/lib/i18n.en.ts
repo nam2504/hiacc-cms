@@ -23,7 +23,7 @@ export const en = {
   'nav.skipToContent': 'Skip to main content',
   'service.requestQuote': 'Request a quote',
   'service.quickQuote.title': 'Need a quick quote?',
-  'service.quickQuote.body': 'Call us or leave your details — HiACC replies with a quote within the working day.',
+  'service.quickQuote.body': 'Call us or leave your details — {brand} replies with a quote within the working day.',
   'service.viewOwnPage': 'View as separate page',
   'service.stat.duration': 'Duration',
   'service.stat.feeFrom': 'Service fee from',
@@ -49,9 +49,9 @@ export const en = {
   'footer.recentPosts': 'Recent posts',
   'footer.headOffice': 'Head office',
   'footer.contact': 'Contact',
-  'footer.followUs': 'HiACC channels',
+  'footer.followUs': '{brand} channels',
 
-  'home.hero.eyebrow': 'Welcome to HiACC',
+  'home.hero.eyebrow': 'Welcome to {brand}',
   'home.hero.tagline': 'Your partner for Vietnamese business',
   'home.hero.lead':
     'Full-service accounting, tax and business advisory for small and medium enterprises.',
@@ -312,5 +312,9 @@ export const en = {
   'about.profile.fieldValue': 'Accounting, tax and corporate legal procedures',
   'about.profile.slogan': 'Slogan',
   'about.principles.title': 'How we work',
+
+  'error.generic.title': 'Something went wrong',
+  'error.generic.body': 'An error occurred while loading this page. Please try again.',
+  'error.generic.retry': 'Try again',
 
 } as const

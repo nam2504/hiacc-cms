@@ -2,6 +2,7 @@ import { cache } from 'react'
 import type { ServiceNode } from '@/payload-types'
 import { getPayloadClient, mediaUrl, toPayloadLocale } from '@/lib/site'
 import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
+import { logger } from '@/lib/observability/logger'
 
 /**
  * Đọc cây dịch vụ và giải đường dẫn.
@@ -68,7 +69,7 @@ async function fetchNodes(locale: LocaleCode): Promise<RawNode[]> {
     })
     return res.docs as RawNode[]
   } catch (error) {
-    console.error('[serviceTree] không đọc được cây dịch vụ:', error)
+    logger.error('[serviceTree] không đọc được cây dịch vụ:', error)
     return []
   }
 }
@@ -182,7 +183,7 @@ export const getNodeImages = cache(async (ids: string[]): Promise<Record<string,
     }
     return map
   } catch (error) {
-    console.error('[serviceTree] không đọc được ảnh mục dịch vụ:', error)
+    logger.error('[serviceTree] không đọc được ảnh mục dịch vụ:', error)
     return {}
   }
 })

@@ -14,6 +14,7 @@ import { findByPath, getServiceTree, type TreeNode } from '@/lib/serviceTree'
 import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
 import { getSettings, mediaUrl, siteDisplayName, toPayloadLocale } from '@/lib/site'
 import { getPayloadClient } from '@/lib/site'
+import { logger } from '@/lib/observability/logger'
 import type { ServiceNode } from '@/payload-types'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -68,7 +69,7 @@ const getNodeDetail = cache(async (id: string, locale: LocaleCode): Promise<Serv
       locale: toPayloadLocale(locale),
     })) as ServiceNode
   } catch (error) {
-    console.error('[service-node] không đọc được chi tiết mục:', id, error)
+    logger.error('[service-node] không đọc được chi tiết mục:', error, { id })
     return null
   }
 })

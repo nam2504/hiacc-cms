@@ -19,6 +19,13 @@ const PER_PAGE = 9
 
 type Params = Promise<{ slug: string }>
 
+/**
+ * ISR 10 phút, nhất quán với các trang nội dung khác (`chuyen-muc/page.tsx`,
+ * trang chủ...) — không có gì riêng theo người dùng, phục vụ bản đã dựng sẵn
+ * và dựng lại nền mỗi 600s thay vì render lại từ đầu mỗi request.
+ */
+export const revalidate = 600
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const locale = await getRequestLocale()
   const t = createTranslator(locale)

@@ -2,6 +2,7 @@
 
 import { headers } from 'next/headers'
 import { getPayloadClient } from '@/lib/site'
+import { logger } from '@/lib/observability/logger'
 
 /**
  * Server Action nhận form liên hệ của trang /lien-he (gói W7).
@@ -228,7 +229,7 @@ export async function submitContactForm(
     })
   } catch (error) {
     // Lỗi DB chỉ nằm ở log server — người dùng nhận thông điệp chung, không thấy stack.
-    console.error('[W7][contact-form] Ghi contact-submissions thất bại:', error)
+    logger.error('[W7][contact-form] Ghi contact-submissions thất bại:', error)
     return { status: 'error', errorKey: 'contact.form.error.generic', values }
   }
 

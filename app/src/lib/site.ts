@@ -10,6 +10,7 @@ import configPromise from '@payload-config'
 import { DEFAULT_LOCALE, type LocaleCode } from './locales'
 import { createTranslator } from './i18n'
 import { TENANT } from '@/config/tenant'
+import { logger } from './observability/logger'
 import type { Branch, Category, Config, Page, Post, Service, Setting } from '@/payload-types'
 
 /**
@@ -26,30 +27,38 @@ export async function getPayloadClient() {
 }
 
 /**
- * Settings có thể chưa được tạo lần đầu (DB trống) → trả null thay vì ném lỗi,
- * để trang vẫn render được lúc mới cài. Component phải chịu được null.
+ * DB chết thì trang vẫn render rỗng bằng `fallback` (chủ ý) thay vì ném lỗi ra
+ * ngoài — không log thì không ai biết. Gộp lại từ 10 khối try/catch giống hệt
+ * nhau trong file này.
  */
+async function safeQuery<T>(label: string, fallback: T, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn()
+  } catch (error) {
+    logger.error(`[site] ${label} không đọc được dữ liệu:`, error)
+    return fallback
+  }
+}
+
 /**
  * Bọc `cache()` như getServiceTree: layout (Header + Footer) và page đều gọi
  * getSettings trong CÙNG một request. Không dedupe thì mỗi lượt tải trang là
  * 2–3 lần đọc global settings — đo được TTFB 1.0–3.0s trên staging (09/09).
  * Cache chỉ sống trong phạm vi một request nên khách sửa admin vẫn thấy ngay.
+ *
+ * Settings có thể chưa được tạo lần đầu (DB trống) → trả null thay vì ném lỗi,
+ * để trang vẫn render được lúc mới cài. Component phải chịu được null.
  */
 export const getSettings = cache(
-  async (locale: LocaleCode = DEFAULT_LOCALE): Promise<Setting | null> => {
-    try {
+  async (locale: LocaleCode = DEFAULT_LOCALE): Promise<Setting | null> =>
+    safeQuery('getSettings', null, async () => {
       const payload = await getPayloadClient()
       return (await payload.findGlobal({
         slug: 'settings',
         locale: asPayloadLocale(locale),
         depth: 1,
       })) as Setting
-    } catch (error) {
-      // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
-      console.error('[site] getSettings không đọc được dữ liệu:', error)
-      return null
-    }
-  },
+    }),
 )
 
 /**
@@ -80,7 +89,7 @@ export function siteDisplayName(
 }
 
 export async function getBranches(locale: LocaleCode = DEFAULT_LOCALE): Promise<Branch[]> {
-  try {
+  return safeQuery('getBranches', [] as Branch[], async () => {
     const payload = await getPayloadClient()
     const res = await payload.find({
       collection: 'branches',
@@ -89,11 +98,7 @@ export async function getBranches(locale: LocaleCode = DEFAULT_LOCALE): Promise<
       sort: 'order',
     })
     return res.docs as Branch[]
-  } catch (error) {
-    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
-    console.error('[site] getBranches không đọc được dữ liệu:', error)
-    return []
-  }
+  })
 }
 
 /** Dùng cho khối "bài viết gần đây" ở footer (AUDIT §3.9). */
@@ -101,7 +106,7 @@ export async function getRecentPosts(
   limit = 3,
   locale: LocaleCode = DEFAULT_LOCALE,
 ): Promise<Post[]> {
-  try {
+  return safeQuery('getRecentPosts', [] as Post[], async () => {
     const payload = await getPayloadClient()
     const res = await payload.find({
       collection: 'posts',
@@ -111,11 +116,7 @@ export async function getRecentPosts(
       where: { _status: { equals: 'published' } },
     })
     return res.docs as Post[]
-  } catch (error) {
-    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
-    console.error('[site] getRecentPosts không đọc được dữ liệu:', error)
-    return []
-  }
+  })
 }
 
 /** Đường dẫn ảnh từ field upload — chịu được cả dạng id lẫn object đã populate. */
@@ -140,7 +141,7 @@ export const toPayloadLocale = asPayloadLocale
 
 /** Dịch vụ đã sắp thứ tự — dùng cho khối "Dịch vụ" trang chủ và trang /dich-vu. */
 export async function getServices(locale: LocaleCode = DEFAULT_LOCALE): Promise<Service[]> {
-  try {
+  return safeQuery('getServices', [] as Service[], async () => {
     const payload = await getPayloadClient()
     const res = await payload.find({
       collection: 'services',
@@ -152,16 +153,12 @@ export async function getServices(locale: LocaleCode = DEFAULT_LOCALE): Promise<
       depth: 1,
     })
     return res.docs as Service[]
-  } catch (error) {
-    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
-    console.error('[site] getServices không đọc được dữ liệu:', error)
-    return []
-  }
+  })
 }
 
 /** Chuyên mục đã sắp thứ tự — dùng cho khối "Trung tâm kiến thức" và trang /chuyen-muc. */
 export async function getCategories(locale: LocaleCode = DEFAULT_LOCALE): Promise<Category[]> {
-  try {
+  return safeQuery('getCategories', [] as Category[], async () => {
     const payload = await getPayloadClient()
     const res = await payload.find({
       collection: 'categories',
@@ -170,11 +167,7 @@ export async function getCategories(locale: LocaleCode = DEFAULT_LOCALE): Promis
       sort: 'order',
     })
     return res.docs as Category[]
-  } catch (error) {
-    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
-    console.error('[site] getCategories không đọc được dữ liệu:', error)
-    return []
-  }
+  })
 }
 
 /**
@@ -191,8 +184,8 @@ export async function getCategories(locale: LocaleCode = DEFAULT_LOCALE): Promis
  * cache() để trang chủ và /chuyen-muc trong cùng một request dùng chung kết quả.
  */
 export const getPostCountsByCategory = cache(
-  async (locale: LocaleCode = DEFAULT_LOCALE): Promise<Record<string, number>> => {
-    try {
+  async (locale: LocaleCode = DEFAULT_LOCALE): Promise<Record<string, number>> =>
+    safeQuery('getPostCountsByCategory', {}, async () => {
       const payload = await getPayloadClient()
       const res = await payload.find({
         collection: 'posts',
@@ -213,12 +206,7 @@ export const getPostCountsByCategory = cache(
         counts[slug] = (counts[slug] ?? 0) + 1
       }
       return counts
-    } catch (error) {
-      // DB chết thì trang vẫn render (chỉ mất nhãn "chưa có bài"), không 500.
-      console.error('[site] getPostCountsByCategory không đọc được dữ liệu:', error)
-      return {}
-    }
-  },
+    }),
 )
 
 /**
@@ -230,7 +218,7 @@ async function findOneBySlug<T>(
   slug: string,
   locale: LocaleCode,
 ): Promise<T | null> {
-  try {
+  return safeQuery('findOneBySlug', null, async () => {
     const payload = await getPayloadClient()
     const res = await payload.find({
       collection,
@@ -240,11 +228,7 @@ async function findOneBySlug<T>(
       depth: 2,
     })
     return (res.docs[0] as T) ?? null
-  } catch (error) {
-    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
-    console.error('[site] findOneBySlug không đọc được dữ liệu:', error)
-    return null
-  }
+  })
 }
 
 export const getPageBySlug = (slug: string, locale: LocaleCode = DEFAULT_LOCALE) =>
@@ -274,31 +258,31 @@ export async function getPosts({
   categorySlug?: string
   locale?: LocaleCode
 } = {}) {
-  try {
-    const payload = await getPayloadClient()
-    const where: Where = { _status: { equals: 'published' } }
-    if (categorySlug) where['category.slug'] = { equals: categorySlug }
+  return safeQuery(
+    'getPosts',
+    { docs: [] as Post[], totalPages: 0, page: 1, totalDocs: 0 },
+    async () => {
+      const payload = await getPayloadClient()
+      const where: Where = { _status: { equals: 'published' } }
+      if (categorySlug) where['category.slug'] = { equals: categorySlug }
 
-    const res = await payload.find({
-      collection: 'posts',
-      locale: asPayloadLocale(locale),
-      where,
-      page,
-      limit,
-      depth: 2,
-      sort: '-publishedAt',
-    })
-    return {
-      docs: res.docs as Post[],
-      totalPages: res.totalPages,
-      page: res.page ?? 1,
-      totalDocs: res.totalDocs,
-    }
-  } catch (error) {
-    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
-    console.error('[site] getPosts không đọc được dữ liệu:', error)
-    return { docs: [] as Post[], totalPages: 0, page: 1, totalDocs: 0 }
-  }
+      const res = await payload.find({
+        collection: 'posts',
+        locale: asPayloadLocale(locale),
+        where,
+        page,
+        limit,
+        depth: 2,
+        sort: '-publishedAt',
+      })
+      return {
+        docs: res.docs as Post[],
+        totalPages: res.totalPages,
+        page: res.page ?? 1,
+        totalDocs: res.totalDocs,
+      }
+    },
+  )
 }
 
 /** Một mục trong sitemap: đường dẫn slug + mốc sửa cuối, đủ cho MetadataRoute.Sitemap. */
@@ -313,7 +297,7 @@ export type SlugEntry = { slug: string; updatedAt: string }
 export async function getAllPostSlugs(
   locale: LocaleCode = DEFAULT_LOCALE,
 ): Promise<SlugEntry[]> {
-  try {
+  return safeQuery('getAllPostSlugs', [] as SlugEntry[], async () => {
     const payload = await getPayloadClient()
     const res = await payload.find({
       collection: 'posts',
@@ -324,11 +308,7 @@ export async function getAllPostSlugs(
       sort: '-publishedAt',
     })
     return (res.docs as Post[]).map((doc) => ({ slug: doc.slug, updatedAt: doc.updatedAt }))
-  } catch (error) {
-    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
-    console.error('[site] getAllPostSlugs không đọc được dữ liệu:', error)
-    return []
-  }
+  })
 }
 
 /**
@@ -338,7 +318,7 @@ export async function getAllPostSlugs(
 export async function getAllPageSlugs(
   locale: LocaleCode = DEFAULT_LOCALE,
 ): Promise<SlugEntry[]> {
-  try {
+  return safeQuery('getAllPageSlugs', [] as SlugEntry[], async () => {
     const payload = await getPayloadClient()
     const res = await payload.find({
       collection: 'pages',
@@ -348,9 +328,5 @@ export async function getAllPageSlugs(
       depth: 0,
     })
     return (res.docs as Page[]).map((doc) => ({ slug: doc.slug, updatedAt: doc.updatedAt }))
-  } catch (error) {
-    // DB chết thì trang vẫn render rỗng (chủ ý); không log thì không ai biết.
-    console.error('[site] getAllPageSlugs không đọc được dữ liệu:', error)
-    return []
-  }
+  })
 }
