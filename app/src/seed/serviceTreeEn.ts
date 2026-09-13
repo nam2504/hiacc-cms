@@ -342,25 +342,37 @@ export async function seedServiceTreeEn(payload: Payload): Promise<void> {
      * thay vì coi là block mới. Nếu số block không khớp giữa DEMO_BODIES và
      * viDoc.body (dữ liệu VI đổi tay), bỏ qua và log cảnh báo — thà thiếu bản
      * dịch còn hơn phá dữ liệu.
+     *
+     * [QC 13/09] Nhánh gán `data.body` này chạy KHÔNG PHỤ THUỘC `untranslated`
+     * (khác `title`/`summary`/`heroStats` ở trên) — Payload validate field
+     * `required + localized` bên trong block (vd `item` của pricingTable) ở
+     * MỌI lần `update`, kể cả khi title đã dịch và `data` không đụng tới
+     * `body`. Node nào có block chưa từng ghi cho locale 'en' (25 hạng mục mới
+     * thêm bảng giá ở serviceContent.ts, chưa có cặp EN trong DEMO_BODIES) mà
+     * KHÔNG gửi kèm `data.body` sẽ luôn bị Payload trả 400, dù ta không hề
+     * đổi field đó — phải luôn gửi kèm để giữ nguyên giá trị hiện có.
      */
-    if (untranslated) {
-      const demoBody = DEMO_BODIES[node.slug]
-      const existingBody = viDoc?.body as Array<Record<string, unknown>> | undefined
+    const demoBody = DEMO_BODIES[node.slug]
+    const existingBody = viDoc?.body as Array<Record<string, unknown>> | undefined
 
-      if (demoBody && (!existingBody || existingBody.length === 0)) {
-        // Chưa có block VI nào — an toàn để tạo mới nguyên khối.
-        data.body = demoBody
-      } else if (demoBody && existingBody && existingBody.length === demoBody.length) {
-        try {
-          data.body = existingBody.map((block, i) => mergeBlockKeepingIds(block, demoBody[i]))
-        } catch (err) {
-          console.warn(`[seed] bỏ qua body EN của "${node.slug}": ${(err as Error).message}`)
-        }
-      } else if (demoBody) {
-        console.warn(
-          `[seed] bỏ qua body EN của "${node.slug}": số block VI (${existingBody?.length}) khác DEMO_BODIES (${demoBody.length}).`,
-        )
+    if (untranslated && demoBody && (!existingBody || existingBody.length === 0)) {
+      // Chưa có block VI nào — an toàn để tạo mới nguyên khối.
+      data.body = demoBody
+    } else if (untranslated && demoBody && existingBody && existingBody.length === demoBody.length) {
+      try {
+        data.body = existingBody.map((block, i) => mergeBlockKeepingIds(block, demoBody[i]))
+      } catch (err) {
+        console.warn(`[seed] bỏ qua body EN của "${node.slug}": ${(err as Error).message}`)
+        data.body = existingBody
       }
+    } else if (untranslated && demoBody) {
+      console.warn(
+        `[seed] bỏ qua body EN của "${node.slug}": số block VI (${existingBody?.length}) khác DEMO_BODIES (${demoBody.length}).`,
+      )
+      data.body = existingBody
+    } else if (existingBody && existingBody.length > 0) {
+      // Không có bản dịch mẫu (chưa untranslated, hoặc chưa có demoBody) — giữ nguyên bản VI.
+      data.body = existingBody
     }
 
     await payload.update({

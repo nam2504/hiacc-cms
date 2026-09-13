@@ -1,12 +1,13 @@
 /**
  * Nội dung MẪU cho các hạng mục dịch vụ.
  *
- * Vì sao chỉ làm đầy 2 hạng mục: khách chưa gửi nội dung thật (Excel ghi 2 lần
- * "Thông tin chi tiết e sẽ up vào sau ạ"). Hai hạng mục này dựng đủ để chứng
- * minh khối lắp ghép chịu được CẢ HAI cực cấu trúc trong tài liệu khách:
- *   - Kế toán trọn gói : bảng giá + 3 danh sách (nhóm lệch chuẩn nhất)
- *   - Thay đổi tên     : bảng 5 trường chuẩn hoá (nhóm quy củ nhất)
- * 30 hạng mục còn lại giữ tiêu đề thật + một dòng báo đang cập nhật.
+ * Ban đầu chỉ 2 hạng mục (Kế toán trọn gói, Thay đổi tên) — khách chưa gửi nội
+ * dung thật lúc đó. Bổ sung 13/09: khách duyệt biểu phí mẫu do bên thiết kế
+ * soạn trong `hitax/hiacc-website-demo.html` (biến `PRICES`/`CATS`, tự ghi chú
+ * "chờ HIACC xác nhận trước khi công bố" — nay đã được xác nhận), nên seed
+ * thêm bảng giá cho 4 nhóm còn lại (Thành lập, Thay đổi ĐKKD, Giấy phép hoạt
+ * động, Dịch vụ khác). Mỗi hạng mục con seed đúng 1 dòng giá của chính nó —
+ * cây dịch vụ thật đã tách theo hạng mục, khác bảng gộp-theo-nhóm của file demo.
  *
  * ⚠️ Số trong bảng giá "Kế toán trọn gói" lấy đúng từ ảnh mockup khách gửi
  * (`hitax/extracted/Chi tiết dịch vụ.png`), KHÔNG phải tôi bịa. Mọi con số
@@ -127,7 +128,7 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
           },
           {
             label: 'Phí dịch vụ',
-            value: `${SAMPLE_TAG} Liên hệ để nhận báo phí theo hồ sơ cụ thể.`,
+            value: `${SAMPLE_TAG} 800.000.`,
           },
         ],
       },
@@ -140,6 +141,250 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
           'Phí báo trước, không phát sinh ngoài nội dung đã thoả thuận.',
           'Bảo mật toàn bộ thông tin và dữ liệu của khách hàng.',
         ],
+      },
+    ],
+  },
+  // --- Thành lập (PRICES.thanhlap, hitax/hiacc-website-demo.html) ---
+  {
+    slug: 'thanh-lap-cong-ty',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [
+          { item: 'Công ty trong nước', scope: 'Soạn hồ sơ, nộp, nhận GCN ĐKDN, khắc dấu', fee: '1.200.000' },
+        ],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'thanh-lap-chi-nhanh-dia-diem-kinh-doanh',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [
+          { item: 'Chi nhánh, địa điểm kinh doanh', scope: 'Soạn hồ sơ, nộp, nhận kết quả', fee: '1.000.000' },
+        ],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'thanh-lap-van-phong-dai-dien',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [{ item: 'Văn phòng đại diện', scope: 'Soạn hồ sơ, nộp, nhận kết quả', fee: '1.000.000' }],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'thanh-lap-ho-kinh-doanh',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [{ item: 'Hộ kinh doanh', scope: 'Hồ sơ, nộp UBND cấp huyện', fee: '800.000' }],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'thanh-lap-cong-ty-von-nuoc-ngoai',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [{ item: 'Công ty có vốn nước ngoài', scope: 'Tư vấn ngành nghề, IRC và ERC', fee: 'từ 12.000.000' }],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  // --- Thay đổi ĐKKD (CATS.thaydoi.items, cùng nguồn) ---
+  {
+    slug: 'thay-doi-dia-chi',
+    blocks: [
+      { type: 'pricingTable', rows: [{ item: 'Thay đổi địa chỉ', fee: '800.000' }], note: SAMPLE_TAG },
+    ],
+  },
+  {
+    slug: 'bo-sung-nganh-nghe',
+    blocks: [
+      { type: 'pricingTable', rows: [{ item: 'Bổ sung ngành nghề', fee: '800.000' }], note: SAMPLE_TAG },
+    ],
+  },
+  {
+    slug: 'tang-giam-von-dieu-le',
+    blocks: [
+      { type: 'pricingTable', rows: [{ item: 'Tăng, giảm vốn điều lệ', fee: '1.000.000' }], note: SAMPLE_TAG },
+    ],
+  },
+  {
+    slug: 'thay-doi-co-dong',
+    blocks: [{ type: 'pricingTable', rows: [{ item: 'Thay đổi cổ đông', fee: '1.000.000' }], note: SAMPLE_TAG }],
+  },
+  {
+    slug: 'thay-doi-dai-dien-phap-luat',
+    blocks: [
+      { type: 'pricingTable', rows: [{ item: 'Thay đổi đại diện pháp luật', fee: '1.000.000' }], note: SAMPLE_TAG },
+    ],
+  },
+  {
+    slug: 'thay-doi-loai-hinh-cong-ty',
+    blocks: [
+      { type: 'pricingTable', rows: [{ item: 'Thay đổi loại hình công ty', fee: '1.500.000' }], note: SAMPLE_TAG },
+    ],
+  },
+  {
+    slug: 'cap-nhat-thong-tin-cong-ty',
+    blocks: [
+      { type: 'pricingTable', rows: [{ item: 'Cập nhật thông tin công ty', fee: '600.000' }], note: SAMPLE_TAG },
+    ],
+  },
+  {
+    slug: 'tam-ngung-hoat-dong',
+    blocks: [{ type: 'pricingTable', rows: [{ item: 'Tạm ngừng hoạt động', fee: '700.000' }], note: SAMPLE_TAG }],
+  },
+  // --- Giấy phép hoạt động (PRICES.giayphep, cùng nguồn) ---
+  {
+    slug: 'gp-du-lich-lu-hanh',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [{ item: 'GP du lịch lữ hành', scope: 'Điều kiện, ký quỹ, hồ sơ, nộp Sở Du lịch', fee: 'từ 6.000.000' }],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'gp-kinh-doanh-ruou',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [
+          {
+            item: 'GP kinh doanh rượu',
+            scope: 'Hồ sơ, nộp Phòng Kinh tế / Sở Công Thương',
+            fee: 'từ 5.000.000',
+          },
+        ],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'gp-ve-sinh-an-toan-thuc-pham',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [
+          {
+            item: 'GP vệ sinh an toàn thực phẩm',
+            scope: 'Hồ sơ, tập huấn, thẩm định cơ sở',
+            fee: 'từ 5.000.000',
+          },
+        ],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'gp-kinh-doanh-van-tai',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [
+          { item: 'GP kinh doanh vận tải', scope: 'Phương án kinh doanh, hồ sơ, nộp Sở GTVT', fee: 'từ 4.000.000' },
+        ],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'gp-cho-thue-lai-lao-dong',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [
+          {
+            item: 'GP cho thuê lại lao động',
+            scope: 'Ký quỹ, hồ sơ, nộp Sở LĐ-TB&XH',
+            fee: 'từ 15.000.000',
+          },
+        ],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  // --- Dịch vụ khác (PRICES.dvkhac, cùng nguồn) ---
+  {
+    slug: 'xin-visa',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [
+          { item: 'Xin visa, gia hạn tạm trú', scope: 'Hồ sơ, nộp Cục Quản lý xuất nhập cảnh', fee: 'từ 3.000.000' },
+        ],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'xin-cap-giay-phep-lao-dong',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [
+          { item: 'Giấy phép lao động', scope: 'Chấp thuận nhu cầu và cấp GPLĐ', fee: 'từ 6.000.000' },
+        ],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'dang-ky-nhan-hieu',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [
+          { item: 'Đăng ký nhãn hiệu', scope: 'Tra cứu, phân nhóm, nộp đơn Cục SHTT', fee: 'từ 2.500.000' },
+        ],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'bao-hiem-xa-hoi',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [
+          {
+            item: 'BHXH — đăng ký ban đầu',
+            scope: 'Đăng ký đơn vị, hồ sơ tham gia cho lao động',
+            fee: '800.000',
+          },
+        ],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'dau-bien',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [{ item: 'Dấu, biển', scope: 'Khắc dấu, làm biển hiệu', fee: 'từ 500.000' }],
+        note: SAMPLE_TAG,
+      },
+    ],
+  },
+  {
+    slug: 'chu-ky-so',
+    blocks: [
+      {
+        type: 'pricingTable',
+        rows: [{ item: 'Chữ ký số (CKS)', scope: 'Đăng ký chữ ký số', fee: 'từ 500.000' }],
+        note: SAMPLE_TAG,
       },
     ],
   },
