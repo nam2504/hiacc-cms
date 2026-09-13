@@ -178,7 +178,19 @@ async function fillServiceContent(payload: Payload): Promise<number> {
 
   for (const item of SERVICE_CONTENT) {
     const doc = await findBySlug(payload, item.slug)
-    if (!doc || (doc.body?.length ?? 0) > 0) continue
+    if (!doc) continue
+    /**
+     * [13/09, đợt bổ sung section CATS] Guard cũ chỉ xét "có body hay chưa":
+     * đúng cho lần seed đầu (node trống), nhưng chặn luôn việc SEED THÊM block
+     * mới vào node mà chính seed từng tạo dở (ví dụ 24 hạng mục chỉ có sẵn
+     * `pricingTable` từ đợt seed bảng giá 13/09, chưa có ai vào /admin sửa gì
+     * thêm). Đổi điều kiện: chỉ bỏ qua khi node đã có SỐ BLOCK ≥ số block seed
+     * định nghĩa — tức khách (hoặc chính seed ở lần chạy trước) đã có đủ hoặc
+     * nhiều nội dung hơn bản seed hiện tại, không có gì để bổ sung. Ít hơn thì
+     * ghi đè bằng `body` mới — an toàn vì `item.blocks` luôn liệt kê lại đầy đủ
+     * mọi block cũ lẫn mới, không có block nào "biến mất" so với bản trước.
+     */
+    if ((doc.body?.length ?? 0) >= item.blocks.length) continue
 
     const body = item.blocks.map((block) => {
       switch (block.type) {
