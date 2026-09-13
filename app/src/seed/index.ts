@@ -12,6 +12,7 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { getPayload } from 'payload'
 import config from '../payload.config'
+import { TENANT } from '../config/tenant'
 
 import {
   BRANCHES,
@@ -22,7 +23,7 @@ import {
   POSTS,
   SERVICE_IMAGES,
   SERVICES,
-  SETTINGS,
+  settingsForTenant,
   SETTINGS_HERO_IMAGE,
 } from './data'
 import { seedPayrollConfig } from './payrollConfig'
@@ -224,7 +225,7 @@ async function seed() {
 
   // Settings là global: chỉ điền field còn trống, không đè giá trị khách đã nhập
   const current = await payload.findGlobal({ slug: 'settings' })
-  const merged: Record<string, unknown> = { ...SETTINGS }
+  const merged: Record<string, unknown> = { ...settingsForTenant(TENANT.key) }
   for (const [key, value] of Object.entries(current ?? {})) {
     // Mảng rỗng cũng là "chưa có dữ liệu": Payload trả [] cho array chưa ai nhập,
     // mà [] không phải null cũng không phải '' nên vòng lặp cũ coi là giá trị

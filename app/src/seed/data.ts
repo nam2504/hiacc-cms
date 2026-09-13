@@ -689,21 +689,51 @@ export const SETTINGS_HERO_IMAGE = {
   alt: 'Góc làm việc bên cửa sổ văn phòng, có laptop và cây xanh [Ảnh mẫu]',
 }
 
+/**
+ * Thương hiệu là dữ liệu THẬT của riêng HiACC (số điện thoại, mã số thuế lấy
+ * từ tài liệu khách gửi — SET WEB.xlsx) — không được seed cho tenant khác
+ * (13/09, phát hiện khi dựng thử site `hitax` local: seed cũ hardcode nhóm
+ * field này nên site hitax vẫn hiện tên/SĐT của HiACC). Tenant khác để trống
+ * nhóm này, `resolveBrand()`/`brandName()` trong `config/tenant.ts` tự rơi về
+ * TENANT.name/seoSiteName; khách tự điền số thật trong /admin khi có.
+ */
+type BrandSettings = {
+  siteName: string
+  primaryColor: string
+  companyName: string
+  taxCode: string
+  headOfficeAddress: string
+  hotline: string
+  hotline2: string
+  email: string
+}
+
+const BRAND_SETTINGS_BY_TENANT: Record<string, BrandSettings> = {
+  hiacc: {
+    siteName: 'Kế toán HiACC',
+    primaryColor: '#CC1420',
+    companyName: 'Công ty TNHH HiACC',
+    taxCode: '0110387991',
+    /**
+     * Liên hệ: SĐT và email lấy từ chính tài liệu khách gửi (SET WEB.xlsx, sheet
+     * PAGE) nên là số THẬT. Địa chỉ trụ sở là mẫu — khách chưa cấp, và ảnh thiết
+     * kế cũng ghi "Số nhà — đường — phường — quận — thành phố".
+     */
+    headOfficeAddress: 'Tầng 14, toà nhà Việt Á, phường Cầu Giấy, thành phố Hà Nội',
+    hotline: '0948 861 209',
+    hotline2: '0965 963 813',
+    email: 'hiacc.kt01@gmail.com',
+  },
+}
+
+/** Tenant không có trong bảng trên (chưa có dữ liệu thật) → không seed field thương hiệu, để Settings trống cho fallback theo tenant hoạt động. */
+export function settingsForTenant(tenantKey: string): typeof SETTINGS & Partial<BrandSettings> {
+  const brand = BRAND_SETTINGS_BY_TENANT[tenantKey]
+  return { ...SETTINGS, ...brand }
+}
+
 export const SETTINGS = {
-  siteName: 'Kế toán HiACC',
   tagline: 'Đồng hành cùng doanh nghiệp Việt',
-  primaryColor: '#CC1420',
-  companyName: 'Công ty TNHH HiACC',
-  taxCode: '0110387991',
-  /**
-   * Liên hệ: SĐT và email lấy từ chính tài liệu khách gửi (SET WEB.xlsx, sheet
-   * PAGE) nên là số THẬT. Địa chỉ trụ sở là mẫu — khách chưa cấp, và ảnh thiết
-   * kế cũng ghi "Số nhà — đường — phường — quận — thành phố".
-   */
-  headOfficeAddress: 'Tầng 14, toà nhà Việt Á, phường Cầu Giấy, thành phố Hà Nội',
-  hotline: '0948 861 209',
-  hotline2: '0965 963 813',
-  email: 'hiacc.kt01@gmail.com',
   workingHours: '08:00 – 17:30, thứ Hai – thứ Sáu',
   /**
    * Mạng xã hội: khách CHƯA cấp link thật, khác nhóm hotline/email/taxCode ở

@@ -38,11 +38,49 @@ Lần đầu vào `/admin` sẽ hỏi tạo tài khoản quản trị.
 
 | Đường dẫn | Vai trò |
 |---|---|
-| `app/src/collections/` | 8 collection CMS (Bài viết, Dịch vụ, Chi nhánh, Trang, Chuyên mục, Ảnh, Liên hệ, Người dùng) |
-| `app/src/lib/brand.ts` | Màu chủ đạo `#CC1420` — lấy từ logo. Dùng hằng này, đừng viết mã màu chỗ khác. |
+| `app/src/collections/ServiceNodes.ts` | **Cây dịch vụ** — nhóm + hạng mục con, tự sinh route (`/[...slug]`). Nơi chính để thêm/sửa dịch vụ. |
+| `app/src/collections/PricingPlans.ts` | Gói giá, gắn với 1 nhóm gốc trong Cây dịch vụ — nguồn dữ liệu cho `/bang-gia`. |
+| `app/src/collections/Pages.ts` | **Trang tĩnh** — đúng 2 bản ghi cố định (Giới thiệu, Liên hệ), mỗi bản ghi buộc với 1 route viết tay. Không tạo được bản ghi mới. |
+| `app/src/collections/Posts.ts`, `Categories.ts` | Bài viết + chuyên mục (route `/tin-tuc`, `/chuyen-muc`). |
+| `app/src/collections/Branches.ts` | Chi nhánh (đang ẩn khỏi trang chủ, xem `page.tsx`). |
+| `app/src/collections/LegalDocuments.ts` | Danh mục văn bản pháp luật. |
+| `app/src/collections/ContactSubmissions.ts` | Nơi lưu form liên hệ khách gửi. |
+| `app/src/collections/Services.ts` | **Legacy — đã bị Cây dịch vụ thay thế, ẩn khỏi admin.** Chỉ còn để `seed/migrateServices.ts` đọc nốt nội dung cũ; xoá hẳn là việc riêng, làm khi xác nhận cây đã có đủ 7 mục. |
+| `app/src/globals/Settings.ts` | Cấu hình toàn site: tên, logo, màu, liên hệ, mạng xã hội — khách sửa trong `/admin`. |
+| `app/src/config/tenant.ts` | Fallback thương hiệu theo tenant khi Settings còn trống — xem mục Multi-tenant. |
 | `app/src/lib/locales.ts` | `ENABLED_LOCALES` — bật thêm ngôn ngữ sửa đúng file này |
-| `app/src/seed/` | Nội dung mẫu |
+| `app/src/seed/` | Nội dung mẫu, chạy được nhiều lần (idempotent) |
 | `scripts/` | Backup / restore database |
+
+## Multi-tenant (nhiều website, cùng codebase)
+
+Repo phục vụ nhiều khách trên CÙNG một codebase — mỗi site chạy 1 process +
+1 database riêng, không share dữ liệu. Cấu hình duy nhất ở
+`app/src/config/tenant.ts`.
+
+Dựng thêm 1 website mới = 3 việc, **không sửa code**:
+
+1. Thêm 1 khoá vào `TENANTS` trong `tenant.ts` (tên hiển thị, tên pháp nhân,
+   màu thương hiệu, slogan) — nếu tenant đã có sẵn trong danh sách thì bỏ qua.
+2. Set biến môi trường `TENANT=<key>` và trỏ `DATABASE_URI` sang file DB
+   riêng (deploy thật thì là app Fly.io + volume riêng).
+3. Vào `/admin` của site mới, điền `Settings` (tên, logo, hotline, mạng xã
+   hội...) và nhập nội dung (bài viết, dịch vụ, chuyên mục) — mỗi tenant có
+   Settings và nội dung độc lập hoàn toàn.
+
+Giá trị trong `TENANTS` chỉ là **fallback** khi Settings trong DB còn trống —
+khách sửa gì trong `/admin` thì cái đó luôn thắng (`brandName()`).
+
+Chạy thử 1 tenant thứ hai ở local (không đụng `hiacc.db` đang dùng):
+
+```bash
+cd app
+TENANT=hitax DATABASE_URI=file:./hitax.db PORT=3001 \
+NEXT_PUBLIC_SERVER_URL=http://localhost:3001 NEXT_PUBLIC_SITE_URL=http://localhost:3001 \
+npm run dev
+# terminal khác, cùng biến môi trường:
+TENANT=hitax DATABASE_URI=file:./hitax.db npm run seed   # nội dung mẫu riêng cho site này
+```
 
 ## Đa ngôn ngữ
 
