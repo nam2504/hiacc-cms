@@ -25,6 +25,7 @@ import { ParagraphFeatureClient as ParagraphFeatureClient_e70f5e05f09f93e00b997e
 import { default as default_cbe21e508b6dbcc1715f2415b15a7874 } from '@/components/admin/ParentCell'
 import { default as default_190033c2a0f0accb1cf206d89984e106 } from '@/components/admin/ServiceTree'
 import { default as default_be603342b1270a0754e859ff9f3d6791 } from '@/components/admin/PrimaryColorField'
+import { default as default_e66ed436b81c8e443c971536ed53d681 } from '@/components/admin/FooterBgField'
 import { default as default_442eb58ea133c11bf2993d26e1972395 } from '@/components/admin/RefreshCacheButton'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -57,6 +58,7 @@ export const importMap = {
   "@/components/admin/ParentCell#default": default_cbe21e508b6dbcc1715f2415b15a7874,
   "@/components/admin/ServiceTree#default": default_190033c2a0f0accb1cf206d89984e106,
   "@/components/admin/PrimaryColorField#default": default_be603342b1270a0754e859ff9f3d6791,
+  "@/components/admin/FooterBgField#default": default_e66ed436b81c8e443c971536ed53d681,
   "@/components/admin/RefreshCacheButton#default": default_442eb58ea133c11bf2993d26e1972395,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

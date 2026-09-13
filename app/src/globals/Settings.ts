@@ -138,7 +138,18 @@ export const Settings: GlobalConfig = {
               // Không đặt defaultValue: bỏ trống = dùng tông đã chọn ở "Nền chân trang".
               admin: {
                 description:
-                  'Không bắt buộc. Gõ mã dạng #RRGGBB để dùng màu nền riêng cho chân trang, ví dụ #1F4141. Bỏ trống thì theo lựa chọn "Nền chân trang" ở trên. Màu chữ tự đổi sáng/tối cho dễ đọc.',
+                  'Không bắt buộc. Bấm một ô trong bảng màu, hoặc gõ mã dạng #RRGGBB, ví dụ #1F4141. Bỏ trống thì theo lựa chọn "Nền chân trang" ở trên. Màu chữ tự đổi sáng/tối cho dễ đọc.',
+                /**
+                 * Ô text gốc được bọc thêm bảng màu bấm chọn — cùng kiểu với
+                 * "Màu chủ đạo" ở trên, xem `components/admin/FooterBgField.tsx`.
+                 *
+                 * ⚠️ Đổi đường dẫn này thì PHẢI chạy lại
+                 * `npm run generate:importmap`, nếu không admin chết
+                 * "Module not found".
+                 */
+                components: {
+                  Field: { path: '@/components/admin/FooterBgField' },
+                },
               },
             },
           ],
