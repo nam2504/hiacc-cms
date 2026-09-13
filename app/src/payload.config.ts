@@ -34,7 +34,6 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Categories } from './collections/Categories'
-import { Services } from './collections/Services'
 import { ServiceNodes } from './collections/ServiceNodes'
 import { LegalDocuments } from './collections/LegalDocuments'
 import { PricingPlans } from './collections/PricingPlans'
@@ -73,7 +72,6 @@ export default buildConfig({
     // Nội dung
     Posts,
     Pages,
-    Services,
     ServiceNodes,
     LegalDocuments,
     PricingPlans,

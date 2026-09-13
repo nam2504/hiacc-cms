@@ -11,7 +11,7 @@ import { DEFAULT_LOCALE, type LocaleCode } from './locales'
 import { createTranslator } from './i18n'
 import { TENANT } from '@/config/tenant'
 import { logger } from './observability/logger'
-import type { Branch, Category, Config, Page, Post, Service, Setting } from '@/payload-types'
+import type { Branch, Category, Config, Page, Post, Setting } from '@/payload-types'
 
 /**
  * payload-types.ts sinh union locale HẸP theo ENABLED_LOCALES đang bật (giờ chỉ 'vi'),
@@ -139,23 +139,6 @@ export function mediaAlt(value: unknown, fallback = ''): string {
  */
 export const toPayloadLocale = asPayloadLocale
 
-/** Dịch vụ đã sắp thứ tự — dùng cho khối "Dịch vụ" trang chủ và trang /dich-vu. */
-export async function getServices(locale: LocaleCode = DEFAULT_LOCALE): Promise<Service[]> {
-  return safeQuery('getServices', [] as Service[], async () => {
-    const payload = await getPayloadClient()
-    const res = await payload.find({
-      collection: 'services',
-      locale: asPayloadLocale(locale),
-      limit: 50,
-      sort: 'order',
-      // depth 1: cần `image` trả về object Media (có url) chứ không phải ID số,
-      // nếu không thẻ dịch vụ ngoài trang chủ / /dich-vu không render được ảnh.
-      depth: 1,
-    })
-    return res.docs as Service[]
-  })
-}
-
 /** Chuyên mục đã sắp thứ tự — dùng cho khối "Trung tâm kiến thức" và trang /chuyen-muc. */
 export async function getCategories(locale: LocaleCode = DEFAULT_LOCALE): Promise<Category[]> {
   return safeQuery('getCategories', [] as Category[], async () => {
@@ -214,7 +197,7 @@ export const getPostCountsByCategory = cache(
  * Dùng chung cho pages / services / posts / categories, đừng viết lại từng gói.
  */
 async function findOneBySlug<T>(
-  collection: 'pages' | 'services' | 'posts' | 'categories',
+  collection: 'pages' | 'posts' | 'categories',
   slug: string,
   locale: LocaleCode,
 ): Promise<T | null> {
@@ -233,9 +216,6 @@ async function findOneBySlug<T>(
 
 export const getPageBySlug = (slug: string, locale: LocaleCode = DEFAULT_LOCALE) =>
   findOneBySlug<Page>('pages', slug, locale)
-
-export const getServiceBySlug = (slug: string, locale: LocaleCode = DEFAULT_LOCALE) =>
-  findOneBySlug<Service>('services', slug, locale)
 
 export const getPostBySlug = (slug: string, locale: LocaleCode = DEFAULT_LOCALE) =>
   findOneBySlug<Post>('posts', slug, locale)

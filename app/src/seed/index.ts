@@ -21,15 +21,12 @@ import {
   PAGES,
   POST_IMAGES,
   POSTS,
-  SERVICE_IMAGES,
-  SERVICES,
   settingsForTenant,
   SETTINGS_HERO_IMAGE,
 } from './data'
 import { seedPayrollConfig } from './payrollConfig'
 import { seedServiceTree } from './serviceTree'
 import { seedLegalDocuments } from './legalDocuments'
-import { migrateServicesToTree } from './migrateServices'
 import { seedServiceTreeEn } from './serviceTreeEn'
 import { seedPricingPlans } from './pricingPlans'
 
@@ -63,7 +60,7 @@ async function seed() {
   const payload = await getPayload({ config })
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const findBySlug = async (collection: 'categories' | 'services' | 'pages' | 'posts', slug: string): Promise<any> => {
+  const findBySlug = async (collection: 'categories' | 'pages' | 'posts', slug: string): Promise<any> => {
     const res = await payload.find({ collection, where: { slug: { equals: slug } }, limit: 1 })
     return res.docs[0] ?? null
   }
@@ -125,27 +122,6 @@ async function seed() {
       continue
     }
     await payload.create({ collection: 'categories', data: { ...cat } })
-    created++
-  }
-
-  for (const svc of SERVICES) {
-    const imageSpec = SERVICE_IMAGES[svc.slug]
-    const image = imageSpec ? await ensureMedia(imageSpec.filename, imageSpec.alt) : null
-    const existing = await findBySlug('services', svc.slug)
-    if (existing) {
-      skipped++
-      const patch: Record<string, unknown> = {}
-      if (!existing.summary) patch.summary = svc.summary
-      if (isEmptyRichText(existing.content)) patch.content = svc.content
-      // Chỉ gắn khi ô ảnh còn trống — khách đã chọn ảnh riêng thì không đè.
-      if (image && !existing.image) patch.image = image
-      if (Object.keys(patch).length > 0) {
-        await payload.update({ collection: 'services', id: existing.id, data: patch })
-        filled++
-      }
-      continue
-    }
-    await payload.create({ collection: 'services', data: { ...svc, ...(image ? { image } : {}) } })
     created++
   }
 
@@ -246,10 +222,6 @@ async function seed() {
 
   // Danh mục văn bản pháp luật (thiết kế 06/09). Link nguồn để khách tự điền.
   await seedLegalDocuments(payload)
-
-  // Chuyển nội dung 7 dịch vụ của cấu trúc cũ sang cây. Không xoá bản ghi cũ,
-  // không đè nội dung đã có trong cây — xem chú thích trong migrateServices.ts.
-  await migrateServicesToTree(payload)
 
   // Bản tiếng Anh: tên nhóm và hạng mục, cộng nội dung hai hạng mục demo.
   await seedServiceTreeEn(payload)

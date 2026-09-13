@@ -69,7 +69,6 @@ export interface Config {
   collections: {
     posts: Post;
     pages: Page;
-    services: Service;
     'service-nodes': ServiceNode;
     'legal-documents': LegalDocument;
     'pricing-plans': PricingPlan;
@@ -87,7 +86,6 @@ export interface Config {
   collectionsSelect: {
     posts: PostsSelect<false> | PostsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
-    services: ServicesSelect<false> | ServicesSelect<true>;
     'service-nodes': ServiceNodesSelect<false> | ServiceNodesSelect<true>;
     'legal-documents': LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
     'pricing-plans': PricingPlansSelect<false> | PricingPlansSelect<true>;
@@ -359,73 +357,6 @@ export interface Page {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * CẤU TRÚC CŨ, không còn hiển thị ra website. Nội dung đã chuyển sang "Cây dịch vụ" — sửa ở đó. Mục này giữ lại để đối chiếu, sẽ gỡ sau.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services".
- */
-export interface Service {
-  id: number;
-  name: string;
-  /**
-   * Phần đuôi địa chỉ web, viết thường không dấu, nối bằng dấu gạch ngang. Ví dụ: gioi-thieu. ĐÃ ĐĂNG RỒI THÌ ĐỪNG ĐỔI — đổi là mọi link cũ hỏng và mất thứ hạng Google.
-   */
-  slug: string;
-  /**
-   * Chọn một khoá icon có sẵn: chart, folder, search, document, finance, archive, growth. Bỏ trống hoặc gõ sai tên sẽ tự dùng icon mặc định, không vỡ giao diện.
-   */
-  icon?: string | null;
-  /**
-   * Số nhỏ hiện trước.
-   */
-  order?: number | null;
-  /**
-   * Ảnh minh hoạ hiện ở thẻ dịch vụ ngoài trang chủ và đầu trang chi tiết. Nên ảnh ngang tỉ lệ 3:2. Bỏ trống thì thẻ chỉ hiện icon như trước.
-   */
-  image?: (number | null) | Media;
-  /**
-   * 1–2 câu hiện ở thẻ dịch vụ ngoài trang chủ.
-   */
-  summary?: string | null;
-  /**
-   * Nội dung đầy đủ của trang dịch vụ. Soạn thảo như Word.
-   */
-  content?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Phần hiển thị trên Google và khi chia sẻ lên Facebook/Zalo. Bỏ trống thì hệ thống tự lấy tiêu đề và mô tả ngắn của bài.
-   */
-  seo?: {
-    /**
-     * Dòng chữ xanh trên Google. Nên 50–60 ký tự, có tên dịch vụ chính.
-     */
-    title?: string | null;
-    /**
-     * Đoạn mô tả dưới tiêu đề trên Google. Nên 120–160 ký tự.
-     */
-    description?: string | null;
-    /**
-     * Ảnh hiện khi dán link lên Facebook/Zalo. Nên 1200×630 px.
-     */
-    image?: (number | null) | Media;
-  };
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * Cây dịch vụ. Sơ đồ phía trên cho thấy mục nào nằm trong nhóm nào; bảng bên dưới để sửa. Mục không chọn "Thuộc nhóm" là nhóm cấp cao nhất, hiện trên thanh menu. Mục có chọn là hạng mục con của nhóm đó.
@@ -784,10 +715,6 @@ export interface PayloadLockedDocument {
         value: number | Page;
       } | null)
     | ({
-        relationTo: 'services';
-        value: number | Service;
-      } | null)
-    | ({
         relationTo: 'service-nodes';
         value: number | ServiceNode;
       } | null)
@@ -903,28 +830,6 @@ export interface PagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services_select".
- */
-export interface ServicesSelect<T extends boolean = true> {
-  name?: T;
-  slug?: T;
-  icon?: T;
-  order?: T;
-  image?: T;
-  summary?: T;
-  content?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
