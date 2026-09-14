@@ -25,6 +25,16 @@ export const PricingPlans: CollectionConfig = {
     defaultColumns: ['item', 'serviceNode', 'fee', 'order'],
     description:
       'Nguồn giá duy nhất — mỗi dòng gắn với 1 hạng mục dịch vụ cụ thể. Hiện tự động ở trang chi tiết hạng mục đó và ở /bang-gia (gộp theo nhóm gốc).',
+    /**
+     * Cột "Thuộc hạng mục dịch vụ" là relationship — Payload không cho lọc
+     * bảng theo cột đó tại chỗ. Sơ đồ cây (đọc dùng chung `ServiceTree.tsx`)
+     * là lối lọc thay thế: bấm tên hạng mục → lọc đúng dòng giá của nó.
+     *
+     * ⚠️ Đổi đường dẫn này thì PHẢI chạy lại `npm run generate:importmap`.
+     */
+    components: {
+      beforeListTable: ['@/components/admin/PricingTree'],
+    },
   },
   labels: { singular: 'Dòng giá', plural: 'Bảng giá' },
   access: contentAccess,

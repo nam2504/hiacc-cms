@@ -62,28 +62,21 @@ const byOrderThenTitle = (a: NodeRow, b: NodeRow) => {
   return (a.title ?? '').localeCompare(b.title ?? '', 'vi')
 }
 
-const styles = {
-  wrap: {
-    marginBottom: '1.5rem',
-    padding: '1rem 1.25rem',
-    border: '1px solid var(--theme-elevation-150)',
-    borderRadius: '4px',
-    background: 'var(--theme-elevation-50)',
-  },
-  heading: { margin: '0 0 .25rem', fontSize: '1rem' },
-  hint: { margin: '0 0 .75rem', fontSize: '.8125rem', color: 'var(--theme-elevation-600)' },
-  orphanNote: {
-    marginTop: '.75rem',
-    fontSize: '.8125rem',
-    color: 'var(--theme-error-500)',
-  },
-} as const
+export type ServiceTreeView = {
+  nodes: TreeNodeView[]
+  childrenOf: Record<string, string[]>
+  rootCount: number
+  totalCount: number
+  detachedCount: number
+}
 
-const ServiceTree = async ({ payload }: ServerProps) => {
-  // Component chạy ở mọi view có beforeListTable; không có payload thì im lặng
-  // biến mất, không làm hỏng trang danh sách.
-  if (!payload) return null
-
+/**
+ * Đọc `service-nodes` và dựng quan hệ cha–con dạng thuần (props qua được ranh
+ * giới server/client). Tách khỏi `ServiceTree` để `PricingTree.tsx` dùng lại
+ * đúng một cách đọc cây — không viết lại lần hai (đã sai lệch một lần trong
+ * quá khứ: `/bang-gia` từng tự đọc `body` theo cách khác `serviceTree.ts`).
+ */
+export async function buildServiceTreeView(payload: NonNullable<ServerProps['payload']>): Promise<ServiceTreeView> {
   const { docs } = await payload.find({
     collection: 'service-nodes',
     limit: FETCH_LIMIT,
@@ -117,7 +110,7 @@ const ServiceTree = async ({ payload }: ServerProps) => {
 
   for (const bucket of childrenOf.values()) bucket.sort(byOrderThenTitle)
 
-  const detached = rows.filter((row) => row.parentId && !knownIds.has(row.parentId)).length
+  const detachedCount = rows.filter((row) => row.parentId && !knownIds.has(row.parentId)).length
 
   /**
    * Quy `childrenOf` (Map, khoá `null` cho gốc) về dạng thuần Record để truyền
@@ -145,24 +138,55 @@ const ServiceTree = async ({ payload }: ServerProps) => {
   }
   walk(null, 0)
 
-  const rootCount = childrenOf.get(null)?.length ?? 0
+  return {
+    nodes,
+    childrenOf: childrenOfPlain,
+    rootCount: childrenOf.get(null)?.length ?? 0,
+    totalCount: rows.length,
+    detachedCount,
+  }
+}
+
+const styles = {
+  wrap: {
+    marginBottom: '1.5rem',
+    padding: '1rem 1.25rem',
+    border: '1px solid var(--theme-elevation-150)',
+    borderRadius: '4px',
+    background: 'var(--theme-elevation-50)',
+  },
+  heading: { margin: '0 0 .25rem', fontSize: '1rem' },
+  hint: { margin: '0 0 .75rem', fontSize: '.8125rem', color: 'var(--theme-elevation-600)' },
+  orphanNote: {
+    marginTop: '.75rem',
+    fontSize: '.8125rem',
+    color: 'var(--theme-error-500)',
+  },
+} as const
+
+const ServiceTree = async ({ payload }: ServerProps) => {
+  // Component chạy ở mọi view có beforeListTable; không có payload thì im lặng
+  // biến mất, không làm hỏng trang danh sách.
+  if (!payload) return null
+
+  const { nodes, childrenOf, rootCount, totalCount, detachedCount } = await buildServiceTreeView(payload)
 
   return (
     <div style={styles.wrap}>
       <h3 style={styles.heading}>Sơ đồ cây dịch vụ</h3>
       <p style={styles.hint}>
-        {rootCount} nhóm cấp cao nhất, tổng {rows.length} mục. Các nhóm đang thu gọn — bấm mũi
+        {rootCount} nhóm cấp cao nhất, tổng {totalCount} mục. Các nhóm đang thu gọn — bấm mũi
         tên để xổ ra. Bấm tên một nhóm để lọc bảng bên dưới còn nhóm đó và toàn bộ hạng mục
         trong nó; bấm tên một hạng mục để lọc còn đúng dòng đó.
       </p>
-      {rows.length === 0 ? (
+      {totalCount === 0 ? (
         <p style={styles.hint}>Chưa có mục dịch vụ nào.</p>
       ) : (
-        <ServiceTreeInteractive nodes={nodes} childrenOf={childrenOfPlain} />
+        <ServiceTreeInteractive nodes={nodes} childrenOf={childrenOf} />
       )}
-      {detached > 0 ? (
+      {detachedCount > 0 ? (
         <p style={styles.orphanNote}>
-          {detached} mục đang trỏ tới một nhóm cha không còn tồn tại, tạm xếp ở cấp cao nhất. Mở
+          {detachedCount} mục đang trỏ tới một nhóm cha không còn tồn tại, tạm xếp ở cấp cao nhất. Mở
           từng mục đó và chọn lại &quot;Thuộc nhóm&quot;.
         </p>
       ) : null}
