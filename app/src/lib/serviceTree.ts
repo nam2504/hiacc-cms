@@ -187,3 +187,39 @@ export const getNodeImages = cache(async (ids: string[]): Promise<Record<string,
     return {}
   }
 })
+
+export type PricingRow = { id: string; item: string; scope?: string | null; fee: string; order: number }
+
+/**
+ * Toàn bộ dòng giá (`pricing-plans`), nhóm theo id node dịch vụ (`serviceNode`).
+ *
+ * Nạp MỘT LẦN, cache trong phạm vi request — cùng lý do với `getServiceTree`:
+ * trang chi tiết (`[...slug]`, mỗi block `pricingTable` trong body tra theo
+ * node của chính nó) và `/bang-gia` (gom theo nhóm gốc) đều cần dữ liệu này
+ * trong cùng một request.
+ */
+export const getPricingRowsByNodeId = cache(
+  async (locale: LocaleCode = DEFAULT_LOCALE): Promise<Map<string, PricingRow[]>> => {
+    const rowsByNode = new Map<string, PricingRow[]>()
+    try {
+      const payload = await getPayloadClient()
+      const res = await payload.find({
+        collection: 'pricing-plans',
+        limit: 1000,
+        depth: 0,
+        sort: 'order',
+        locale: toPayloadLocale(locale),
+      })
+      for (const doc of res.docs) {
+        const nodeId = doc.serviceNode == null ? null : String(doc.serviceNode)
+        if (!nodeId) continue
+        const rows = rowsByNode.get(nodeId) ?? []
+        rows.push({ id: String(doc.id), item: doc.item, scope: doc.scope, fee: doc.fee, order: doc.order ?? 0 })
+        rowsByNode.set(nodeId, rows)
+      }
+    } catch (error) {
+      logger.error('[serviceTree] không đọc được bảng giá:', error)
+    }
+    return rowsByNode
+  },
+)

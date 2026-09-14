@@ -10,6 +10,7 @@ import * as migration_20260909_150000_them_footer_theme from './20260909_150000_
 import * as migration_20260912_100000_them_bang_gia from './20260912_100000_them_bang_gia';
 import * as migration_20260912_110000_them_salutation_field_of_interest from './20260912_110000_them_salutation_field_of_interest';
 import * as migration_20260913_060247_xoa_services_cu from './20260913_060247_xoa_services_cu';
+import * as migration_20260914_070706_doi_schema_pricing_plans from './20260914_070706_doi_schema_pricing_plans';
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20260913_060247_xoa_services_cu.up,
     down: migration_20260913_060247_xoa_services_cu.down,
     name: '20260913_060247_xoa_services_cu'
+  },
+  {
+    up: migration_20260914_070706_doi_schema_pricing_plans.up,
+    down: migration_20260914_070706_doi_schema_pricing_plans.down,
+    name: '20260914_070706_doi_schema_pricing_plans',
   },
 ];

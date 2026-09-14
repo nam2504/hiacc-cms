@@ -108,28 +108,6 @@ const DEMO_BODIES: Record<string, unknown[]> = {
       blockType: 'pricingTable',
       title: 'Service fees',
       note: '[Sample content — pending the final version from the client.] Fees exclude state charges.',
-      rows: [
-        {
-          item: 'No invoices issued',
-          scope: 'Tax returns, quarterly reports, annual financial statements',
-          fee: 'VND 500,000 / month',
-        },
-        {
-          item: 'Under 20 documents',
-          scope: 'Books, tax, payroll, annual financial statements',
-          fee: 'VND 1,200,000 / month',
-        },
-        {
-          item: '20 – 50 documents',
-          scope: 'Books, tax, payroll, inventory, annual financial statements',
-          fee: 'VND 2,000,000 / month',
-        },
-        {
-          item: 'Over 50 documents',
-          scope: 'Full service based on actual volume',
-          fee: 'from VND 3,000,000 / month',
-        },
-      ],
     },
     {
       blockType: 'bulletList',
@@ -384,5 +362,75 @@ export async function seedServiceTreeEn(payload: Payload): Promise<void> {
     filled += 1
   }
 
-  console.log(`[seed] bản tiếng Anh cây dịch vụ: ghi ${filled} mục.`)
+  const pricingFilled = await seedPricingRowsEn(payload)
+  console.log(`[seed] bản tiếng Anh cây dịch vụ: ghi ${filled} mục, ${pricingFilled} dòng giá.`)
+}
+
+/** Bản dịch EN các dòng giá — cặp với `DEMO_BODIES['ke-toan-tron-goi']` (2 hạng mục demo). */
+const PRICING_ROWS_EN: Record<string, { item: string; item_vi: string; scope: string; fee: string }[]> = {
+  'ke-toan-tron-goi': [
+    {
+      item_vi: 'Không phát sinh hoá đơn',
+      item: 'No invoices issued',
+      scope: 'Tax returns, quarterly reports, annual financial statements',
+      fee: 'VND 500,000 / month',
+    },
+    {
+      item_vi: 'Dưới 20 chứng từ',
+      item: 'Under 20 documents',
+      scope: 'Books, tax, payroll, annual financial statements',
+      fee: 'VND 1,200,000 / month',
+    },
+    {
+      item_vi: '20 – 50 chứng từ',
+      item: '20 – 50 documents',
+      scope: 'Books, tax, payroll, inventory, annual financial statements',
+      fee: 'VND 2,000,000 / month',
+    },
+    {
+      item_vi: 'Trên 50 chứng từ',
+      item: 'Over 50 documents',
+      scope: 'Full service based on actual volume',
+      fee: 'from VND 3,000,000 / month',
+    },
+  ],
+}
+
+/**
+ * Dịch EN cho dòng giá — update ĐÚNG document đã tạo bởi `seedPricingRows`
+ * (tra theo `item` tiếng Việt ở locale 'vi'), không tạo document mới. Chỉ ghi
+ * khi bản EN đang trống hoặc trùng bản VI (chưa dịch) — khách sửa tay thì giữ.
+ */
+async function seedPricingRowsEn(payload: Payload): Promise<number> {
+  let filled = 0
+
+  for (const rows of Object.values(PRICING_ROWS_EN)) {
+    for (const row of rows) {
+      const viMatch = await payload.find({
+        collection: 'pricing-plans',
+        where: { item: { equals: row.item_vi } },
+        limit: 1,
+        depth: 0,
+        locale: 'vi',
+      })
+      const doc = viMatch.docs[0]
+      if (!doc) continue
+
+      const enDoc = (
+        await payload.findByID({ collection: 'pricing-plans', id: doc.id, locale: 'en', depth: 0 })
+      )
+      const untranslated = !enDoc.item?.trim() || enDoc.item === row.item_vi
+      if (!untranslated) continue
+
+      await payload.update({
+        collection: 'pricing-plans',
+        id: doc.id,
+        locale: 'en',
+        data: { item: row.item, scope: row.scope, fee: row.fee },
+      })
+      filled += 1
+    }
+  }
+
+  return filled
 }

@@ -411,17 +411,6 @@ export interface ServiceNode {
              * Bỏ trống thì hiện "Bảng giá dịch vụ".
              */
             title?: string | null;
-            rows?:
-              | {
-                  item: string;
-                  scope?: string | null;
-                  /**
-                   * Ghi cả đơn vị, ví dụ "500.000 / tháng" hoặc "từ 3.000.000 / tháng". Đây là chữ, không phải số — để ghi được "liên hệ" hay "theo khối lượng".
-                   */
-                  fee?: string | null;
-                  id?: string | null;
-                }[]
-              | null;
             /**
              * Ví dụ: phí chưa gồm lệ phí nhà nước.
              */
@@ -554,7 +543,7 @@ export interface LegalDocument {
   createdAt: string;
 }
 /**
- * Các gói giá hiện ở trang Bảng giá, nhóm theo dịch vụ. Thứ tự hiển thị: theo "Thuộc nhóm dịch vụ", trong nhóm theo "Thứ tự".
+ * Nguồn giá duy nhất — mỗi dòng gắn với 1 hạng mục dịch vụ cụ thể. Hiện tự động ở trang chi tiết hạng mục đó và ở /bang-gia (gộp theo nhóm gốc).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pricing-plans".
@@ -562,36 +551,17 @@ export interface LegalDocument {
 export interface PricingPlan {
   id: number;
   /**
-   * Ví dụ: Kế toán trọn gói, Gói cơ bản.
+   * Hạng mục dịch vụ cụ thể (node con, vd "Kế toán trọn gói"), không phải nhóm gốc. Quyết định dòng giá hiện ở trang chi tiết hạng mục nào.
    */
-  name: string;
+  serviceNode: number | ServiceNode;
+  item: string;
+  scope?: string | null;
   /**
-   * Nhóm dịch vụ cấp cao nhất mà gói này thuộc về (kế toán, thuế, BHXH...). Quyết định gói hiện ở bảng giá của nhóm nào. Chỉ hiện các nhóm gốc, không hiện hạng mục con.
+   * Ghi cả đơn vị, ví dụ "500.000 / tháng" hoặc "từ 3.000.000 / tháng". Đây là chữ, không phải số — để ghi được "liên hệ" hay "theo khối lượng".
    */
-  serviceGroup: number | ServiceNode;
+  fee: string;
   /**
-   * Chữ hiển thị cho giá, không bắt buộc là số — ví dụ "1.500.000đ/tháng", "Liên hệ báo giá".
-   */
-  price: string;
-  /**
-   * Một câu ngắn dưới tên gói, giải thích gói này dành cho ai.
-   */
-  summary?: string | null;
-  /**
-   * Danh sách gạch đầu dòng hiện trong thẻ gói giá.
-   */
-  features?:
-    | {
-        text: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Bật để gói này hiện nổi bật (viền/nền khác) trong bảng giá của nhóm.
-   */
-  featured?: boolean | null;
-  /**
-   * Số nhỏ hiện trước trong nhóm.
+   * Số nhỏ hiện trước, trong cùng hạng mục.
    */
   order?: number | null;
   updatedAt: string;
@@ -857,14 +827,6 @@ export interface ServiceNodesSelect<T extends boolean = true> {
           | T
           | {
               title?: T;
-              rows?:
-                | T
-                | {
-                    item?: T;
-                    scope?: T;
-                    fee?: T;
-                    id?: T;
-                  };
               note?: T;
               id?: T;
               blockName?: T;
@@ -943,17 +905,10 @@ export interface LegalDocumentsSelect<T extends boolean = true> {
  * via the `definition` "pricing-plans_select".
  */
 export interface PricingPlansSelect<T extends boolean = true> {
-  name?: T;
-  serviceGroup?: T;
-  price?: T;
-  summary?: T;
-  features?:
-    | T
-    | {
-        text?: T;
-        id?: T;
-      };
-  featured?: T;
+  serviceNode?: T;
+  item?: T;
+  scope?: T;
+  fee?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;

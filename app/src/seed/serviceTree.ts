@@ -157,9 +157,54 @@ export async function seedServiceTree(payload: Payload): Promise<void> {
   }
 
   const filled = await fillServiceContent(payload)
+  const pricingCreated = await seedPricingRows(payload)
   console.log(
-    `[seed] cây dịch vụ: tạo mới ${created}, bỏ qua ${skipped} (đã có), điền nội dung mẫu ${filled}.`,
+    `[seed] cây dịch vụ: tạo mới ${created}, bỏ qua ${skipped} (đã có), điền nội dung mẫu ${filled}, ` +
+      `dòng giá mới ${pricingCreated}.`,
   )
+}
+
+/**
+ * Dòng giá mẫu (`SERVICE_CONTENT[].blocks[].rows`, đổi 14/09: nguồn duy nhất
+ * giờ là `pricing-plans`, không còn nhúng vào `body` nữa — xem PricingPlans.ts).
+ * Idempotent theo (serviceNode, item): khách sửa/xoá dòng nào trong admin thì
+ * chạy lại seed không tạo lại dòng đó.
+ */
+async function seedPricingRows(payload: Payload): Promise<number> {
+  let created = 0
+
+  for (const item of SERVICE_CONTENT) {
+    const doc = await findBySlug(payload, item.slug)
+    if (!doc) continue
+
+    for (const block of item.blocks) {
+      if (block.type !== 'pricingTable') continue
+
+      for (const [index, row] of block.rows.entries()) {
+        const existing = await payload.find({
+          collection: 'pricing-plans',
+          where: { serviceNode: { equals: doc.id }, item: { equals: row.item } },
+          limit: 1,
+          depth: 0,
+        })
+        if (existing.docs.length > 0) continue
+
+        await payload.create({
+          collection: 'pricing-plans',
+          data: {
+            serviceNode: doc.id,
+            item: row.item,
+            scope: row.scope,
+            fee: row.fee ?? 'Liên hệ',
+            order: (index + 1) * 10,
+          },
+        })
+        created += 1
+      }
+    }
+  }
+
+  return created
 }
 
 /**
@@ -195,12 +240,9 @@ async function fillServiceContent(payload: Payload): Promise<number> {
     const body = item.blocks.map((block) => {
       switch (block.type) {
         case 'pricingTable':
-          return {
-            blockType: 'pricingTable' as const,
-            title: block.title,
-            note: block.note,
-            rows: block.rows.map((row) => ({ item: row.item, scope: row.scope, fee: row.fee })),
-          }
+          // Chỉ còn placeholder vị trí — dòng giá thật giờ ở collection
+          // pricing-plans (đổi 14/09, xem seedPricingRows bên dưới).
+          return { blockType: 'pricingTable' as const, title: block.title, note: block.note }
         case 'bulletList':
           return {
             blockType: 'bulletList' as const,

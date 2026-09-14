@@ -16,10 +16,18 @@ import type { Block } from 'payload'
  * Người nhập tự chọn khối cần dùng và kéo đổi thứ tự trong /admin.
  */
 
-/** Bảng giá: Hạng mục | Phạm vi công việc | Phí dịch vụ. */
+/**
+ * Bảng giá: PLACEHOLDER đánh dấu vị trí chèn trong `body` (đổi 14/09 — dữ liệu
+ * dòng giá không còn nằm ở đây nữa, chuyển hết sang collection `pricing-plans`
+ * để đó là nguồn duy nhất quản lý giá; xem `PricingPlans.ts`). Khối này chỉ
+ * còn quyết định TIÊU ĐỀ/GHI CHÚ và VỊ TRÍ hiện bảng giá của chính node đang
+ * xem, giữa các block khác — kéo-thả trong admin vẫn đổi được vị trí đó.
+ * Không xoá hẳn khối để giữ chỗ chèn: xoá khối này khỏi body = ẩn bảng giá
+ * khỏi trang, dù `pricing-plans` của node đó vẫn còn dữ liệu.
+ */
 export const pricingTableBlock: Block = {
   slug: 'pricingTable',
-  labels: { singular: 'Bảng giá dịch vụ', plural: 'Bảng giá dịch vụ' },
+  labels: { singular: 'Bảng giá dịch vụ (vị trí)', plural: 'Bảng giá dịch vụ (vị trí)' },
   fields: [
     {
       name: 'title',
@@ -27,27 +35,6 @@ export const pricingTableBlock: Block = {
       label: 'Tiêu đề khối',
       localized: true,
       admin: { description: 'Bỏ trống thì hiện "Bảng giá dịch vụ".' },
-    },
-    {
-      name: 'rows',
-      type: 'array',
-      label: 'Các dòng',
-      labels: { singular: 'Dòng', plural: 'Dòng' },
-      minRows: 1,
-      fields: [
-        { name: 'item', type: 'text', label: 'Hạng mục', required: true, localized: true },
-        { name: 'scope', type: 'textarea', label: 'Phạm vi công việc', localized: true },
-        {
-          name: 'fee',
-          type: 'text',
-          label: 'Phí dịch vụ',
-          localized: true,
-          admin: {
-            description:
-              'Ghi cả đơn vị, ví dụ "500.000 / tháng" hoặc "từ 3.000.000 / tháng". Đây là chữ, không phải số — để ghi được "liên hệ" hay "theo khối lượng".',
-          },
-        },
-      ],
     },
     {
       name: 'note',

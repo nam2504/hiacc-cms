@@ -4,27 +4,19 @@ import { EmptyState } from '@/components/news/EmptyState'
 import { PageHero } from '@/components/news/PageHero'
 import { createTranslator } from '@/lib/i18n'
 import { localizedHref } from '@/lib/nav'
-import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
+import { DEFAULT_LOCALE } from '@/lib/locales'
 import { getRequestLocale } from '@/lib/requestLocale'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
-import { getPayloadClient, getSettings, siteDisplayName, toPayloadLocale } from '@/lib/site'
-import { getServiceTree, type TreeNode } from '@/lib/serviceTree'
-import { logger } from '@/lib/observability/logger'
-import type { ServiceNode } from '@/payload-types'
+import { getSettings, siteDisplayName } from '@/lib/site'
+import { getServiceTree, getPricingRowsByNodeId, type TreeNode, type PricingRow } from '@/lib/serviceTree'
 import styles from './page.module.css'
 
 /**
- * /bang-gia — khách feedback 13/09: trang tổng hợp đang đọc collection riêng
- * `pricing-plans` (khách chưa từng nhập data thật vào đó), trong khi bảng giá
- * THẬT đã được khách nhập trực tiếp vào từng hạng mục dịch vụ qua khối
- * "Bảng giá dịch vụ" (`service-nodes.body`, block `pricingTable` — xem
- * `collections/blocks.ts`), hiện đúng ở trang chi tiết (vd /ke-toan/ke-toan-tron-goi)
- * nhưng KHÔNG được trang này gom lại. Đổi nguồn: gộp mọi dòng `pricingTable`
- * của mọi hạng mục con vào một bảng theo NHÓM GỐC (đúng bố cục figma khách
- * duyệt — "01 Kế toán" là một bảng duy nhất, không tách theo hạng mục con).
- *
- * `pricing-plans` (collection cũ) không còn được đọc ở đây nữa, nhưng KHÔNG
- * xoá collection — có thể còn nơi khác tham chiếu, ngoài phạm vi việc này.
+ * /bang-gia — nguồn giá DUY NHẤT là collection `pricing-plans` (đổi 14/09,
+ * đảo lại hướng 13/09 từng đọc từ `service-nodes.body` block `pricingTable`
+ * — khối đó giờ chỉ còn là placeholder vị trí, xem `collections/blocks.ts`).
+ * Gộp mọi dòng giá của mọi hạng mục con vào một bảng theo NHÓM GỐC (đúng bố
+ * cục figma khách duyệt — "01 Kế toán" là một bảng duy nhất).
  *
  * Đọc Settings nên phải dynamic; xem chú thích cùng loại ở /chuyen-muc.
  */
@@ -63,41 +55,6 @@ export async function generateMetadata(): Promise<Metadata> {
       images: ogImages(settings?.logo),
     },
   }
-}
-
-type PricingRow = { id: string; item: string; scope?: string | null; fee?: string | null }
-
-/**
- * Đọc `body` của MỌI hạng mục (select riêng, không dùng `getServiceTree()` —
- * cây đó cố tình bỏ `body` vì chạy ở layout, xem chú thích ở serviceTree.ts).
- * Trả về map nodeId → các dòng `pricingTable.rows` gộp từ mọi block giá của
- * node đó (một node có thể có nhiều khối giá, dù hiếm).
- */
-async function getPricingRowsByNodeId(locale: LocaleCode): Promise<Map<string, PricingRow[]>> {
-  const rowsByNode = new Map<string, PricingRow[]>()
-  try {
-    const payload = await getPayloadClient()
-    const res = await payload.find({
-      collection: 'service-nodes',
-      limit: 500,
-      depth: 0,
-      select: { body: true },
-      locale: toPayloadLocale(locale),
-    })
-    for (const doc of res.docs as ServiceNode[]) {
-      const rows: PricingRow[] = []
-      for (const block of doc.body ?? []) {
-        if (block.blockType !== 'pricingTable') continue
-        for (const row of block.rows ?? []) {
-          rows.push({ id: row.id ?? `${doc.id}-${rows.length}`, item: row.item, scope: row.scope, fee: row.fee })
-        }
-      }
-      if (rows.length > 0) rowsByNode.set(String(doc.id), rows)
-    }
-  } catch (error) {
-    logger.error('[bang-gia] không đọc được khối bảng giá:', error)
-  }
-  return rowsByNode
 }
 
 export default async function PricingPage() {

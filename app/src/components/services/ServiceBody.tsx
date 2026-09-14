@@ -4,6 +4,7 @@ import { createTranslator } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
+import { getPricingRowsByNodeId, type PricingRow } from '@/lib/serviceTree'
 import type { ServiceNode } from '@/payload-types'
 import styles from './ServiceBody.module.css'
 
@@ -16,11 +17,15 @@ import styles from './ServiceBody.module.css'
 
 type Block = NonNullable<ServiceNode['body']>[number]
 
-export async function ServiceBody({ body }: { body?: ServiceNode['body'] }) {
+export async function ServiceBody({ body, nodeId }: { body?: ServiceNode['body']; nodeId: string }) {
   if (!body || body.length === 0) return null
 
   const locale = await getRequestLocale()
   const tr = createTranslator(locale)
+  // Nạp một lần cho cả trang: chỉ khối pricingTable cần, nhưng cache() trong
+  // getPricingRowsByNodeId dedupe với /bang-gia nếu cùng request (hiếm, khác route).
+  const rowsByNode = await getPricingRowsByNodeId(locale)
+  const pricingRows = rowsByNode.get(nodeId) ?? []
 
   return (
     <div className={styles.body}>
@@ -30,6 +35,7 @@ export async function ServiceBody({ body }: { body?: ServiceNode['body'] }) {
           block={block}
           tr={tr}
           locale={locale}
+          pricingRows={pricingRows}
         />
       ))}
     </div>
@@ -40,15 +46,16 @@ function BlockRenderer({
   block,
   tr,
   locale,
+  pricingRows,
 }: {
   block: Block
   tr: ReturnType<typeof createTranslator>
   locale: string
+  pricingRows: PricingRow[]
 }) {
   switch (block.blockType) {
     case 'pricingTable': {
-      const rows = block.rows ?? []
-      if (rows.length === 0) return null
+      if (pricingRows.length === 0) return null
       return (
         <section className={styles.section}>
           <h2 className={styles.heading}>{block.title || tr('services.pricingTable.title')}</h2>
@@ -64,8 +71,8 @@ function BlockRenderer({
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row, index) => (
-                  <tr key={row.id ?? index}>
+                {pricingRows.map((row) => (
+                  <tr key={row.id}>
                     <td className={styles.cellItem}>{row.item}</td>
                     <td>{row.scope}</td>
                     <td className={styles.cellFee}>{row.fee}</td>

@@ -28,7 +28,6 @@ import { seedPayrollConfig } from './payrollConfig'
 import { seedServiceTree } from './serviceTree'
 import { seedLegalDocuments } from './legalDocuments'
 import { seedServiceTreeEn } from './serviceTreeEn'
-import { seedPricingPlans } from './pricingPlans'
 
 /**
  * Thư mục chứa file ảnh stock nguồn để nạp qua Local API (gói M1, đợt 6).
@@ -225,10 +224,6 @@ async function seed() {
 
   // Bản tiếng Anh: tên nhóm và hạng mục, cộng nội dung hai hạng mục demo.
   await seedServiceTreeEn(payload)
-
-  // Bảng giá placeholder mỗi nhóm dịch vụ gốc — chạy sau cây dịch vụ vì cần
-  // service-nodes đã tồn tại để tra id nhóm gốc theo slug.
-  await seedPricingPlans(payload)
 
   // payroll-config (W5) cũng là global, cùng nguyên tắc: chỉ điền ô còn trống.
   const payrollFilled = await seedPayrollConfig(payload)

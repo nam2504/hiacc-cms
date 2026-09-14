@@ -10,7 +10,7 @@ import { Container } from '@/components/ui/Container'
 import { createTranslator } from '@/lib/i18n'
 import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
 import { localizedHref } from '@/lib/nav'
-import { findByPath, getServiceTree, type TreeNode } from '@/lib/serviceTree'
+import { findByPath, getServiceTree, getPricingRowsByNodeId, type TreeNode, type PricingRow } from '@/lib/serviceTree'
 import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
 import { getSettings, mediaUrl, siteDisplayName, toPayloadLocale } from '@/lib/site'
 import { getPayloadClient } from '@/lib/site'
@@ -143,7 +143,10 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
   // Danh sách cho sidebar: các anh em cùng nhóm (hoặc con của chính nó nếu là nhóm).
   const siblings = isGroup ? node.children : findSiblings(tree, trail)
   // Trang NHÓM giữ dải số của nhóm; trang HẠNG MỤC suy 4 ô theo Figma.
-  const heroStats = isGroup ? (detail?.heroStats ?? []) : leafStats(detail, tr)
+  const pricingRowsByNode = await getPricingRowsByNodeId(locale)
+  const heroStats = isGroup
+    ? (detail?.heroStats ?? [])
+    : leafStats(detail, tr, pricingRowsByNode.get(shown.id) ?? [])
   const heroImage = mediaUrl(detail?.image)
   const related = tree.filter((item) => item.id !== root.id)
 
@@ -221,7 +224,7 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
             <h2 className={styles.contentTitle}>{shown.title}</h2>
             {shown.summary ? <p className={styles.contentLead}>{shown.summary}</p> : null}
 
-            <ServiceBody body={shownDetail?.body} />
+            <ServiceBody body={shownDetail?.body} nodeId={shown.id} />
 
             <div className={styles.actions}>
               <Link className={styles.actionPrimary} href={href('/lien-he')}>
@@ -273,25 +276,23 @@ export default async function ServiceNodePage({ params }: { params: Promise<Para
 function leafStats(
   detail: ServiceNode | null,
   tr: ReturnType<typeof createTranslator>,
+  pricingRows: PricingRow[],
 ): { value: string; label: string; id?: string | null }[] {
   if (!detail) return []
   const custom = detail.heroStats ?? []
   const byLabel = new Map(custom.map((s) => [s.label, s.value]))
 
-  const body = detail.body ?? []
-  const pricing = body.find((b) => b.blockType === 'pricingTable')
-  // Phí thấp nhất trong bảng giá. `fee` là chữ ("từ 3.000.000 / tháng") nên bóc
-  // cụm số đầu tiên ra để so sánh; ô nào không có số ("liên hệ") thì bỏ qua.
+  // Phí thấp nhất trong bảng giá (nguồn: pricing-plans, không còn body). `fee`
+  // là chữ ("từ 3.000.000 / tháng") nên bóc cụm số đầu tiên ra để so sánh; ô
+  // nào không có số ("liên hệ") thì bỏ qua.
   let cheapest: { text: string; num: number } | null = null
-  if (pricing && 'rows' in pricing) {
-    for (const row of pricing.rows ?? []) {
-      const raw = row.fee ?? ''
-      const m = raw.match(/[\d][\d.,]*/)
-      if (!m) continue
-      const num = Number(m[0].replace(/[.,]/g, ''))
-      if (!Number.isFinite(num)) continue
-      if (!cheapest || num < cheapest.num) cheapest = { text: m[0], num }
-    }
+  for (const row of pricingRows) {
+    const raw = row.fee ?? ''
+    const m = raw.match(/[\d][\d.,]*/)
+    if (!m) continue
+    const num = Number(m[0].replace(/[.,]/g, ''))
+    if (!Number.isFinite(num)) continue
+    if (!cheapest || num < cheapest.num) cheapest = { text: m[0], num }
   }
 
   const updated = detail.updatedAt ? new Date(detail.updatedAt) : null
@@ -301,9 +302,10 @@ function leafStats(
     if (value) stats.push({ value, label })
   }
 
+  const bodyLength = detail.body?.length ?? 0
   push(tr('service.stat.duration'), null)
   push(tr('service.stat.feeFrom'), cheapest?.text ?? null)
-  push(tr('service.stat.sections'), body.length > 0 ? String(body.length) : null)
+  push(tr('service.stat.sections'), bodyLength > 0 ? String(bodyLength) : null)
   push(
     tr('service.stat.updated'),
     updated
