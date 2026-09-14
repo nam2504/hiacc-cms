@@ -23,6 +23,7 @@ import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0
 import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ParagraphFeatureClient as ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_cbe21e508b6dbcc1715f2415b15a7874 } from '@/components/admin/ParentCell'
+import { default as default_52068b333b147b62fae83a3a03e15c80 } from '@/components/admin/PricingReference'
 import { default as default_190033c2a0f0accb1cf206d89984e106 } from '@/components/admin/ServiceTree'
 import { default as default_be603342b1270a0754e859ff9f3d6791 } from '@/components/admin/PrimaryColorField'
 import { default as default_e66ed436b81c8e443c971536ed53d681 } from '@/components/admin/FooterBgField'
@@ -56,6 +57,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ParagraphFeatureClient": ParagraphFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@/components/admin/ParentCell#default": default_cbe21e508b6dbcc1715f2415b15a7874,
+  "@/components/admin/PricingReference#default": default_52068b333b147b62fae83a3a03e15c80,
   "@/components/admin/ServiceTree#default": default_190033c2a0f0accb1cf206d89984e106,
   "@/components/admin/PrimaryColorField#default": default_be603342b1270a0754e859ff9f3d6791,
   "@/components/admin/FooterBgField#default": default_e66ed436b81c8e443c971536ed53d681,

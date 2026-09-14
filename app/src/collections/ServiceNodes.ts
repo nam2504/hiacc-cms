@@ -161,6 +161,19 @@ export const ServiceNodes: CollectionConfig = {
                   'Chọn từng khối cần dùng rồi kéo để đổi thứ tự. Không bắt buộc dùng đủ mọi khối.',
               },
             },
+            {
+              name: 'pricingReference',
+              type: 'ui',
+              label: 'Bảng giá tham khảo',
+              admin: {
+                /**
+                 * Sửa đường dẫn này thì PHẢI chạy lại `npm run generate:importmap`.
+                 */
+                components: {
+                  Field: '@/components/admin/PricingReference',
+                },
+              },
+            },
           ],
         },
         { label: 'SEO', fields: [seoField] },
