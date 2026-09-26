@@ -1,3 +1,5 @@
+import { TENANT } from '../config/tenant'
+
 /**
  * Nội dung MẪU cho các hạng mục dịch vụ.
  *
@@ -1138,11 +1140,11 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
   },
   {
     slug: 'kiem-tra-soat-xet-ho-so-ke-toan',
-    summary: 'Nhiệm vụ của HIACC, nhiệm vụ của khách hàng và cam kết khi soát xét hồ sơ kế toán.',
+    summary: `Nhiệm vụ của ${TENANT.name.toUpperCase()}, nhiệm vụ của khách hàng và cam kết khi soát xét hồ sơ kế toán.`,
     blocks: [
       {
         type: 'bulletList',
-        title: 'Nhiệm vụ của HIACC',
+        title: `Nhiệm vụ của ${TENANT.name.toUpperCase()}`,
         items: [
           `${SAMPLE_TAG} Rà soát tính hợp lệ, hợp lý, hợp pháp của chứng từ và sổ sách kế toán đã lập.`,
           'Chỉ ra sai sót, rủi ro về thuế và đề xuất phương án khắc phục.',
@@ -1169,7 +1171,7 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
   },
   {
     slug: 'quyet-toan-thue',
-    summary: 'Các trường hợp quyết toán thuế, nhiệm vụ của HIACC, nhiệm vụ của khách hàng và cam kết.',
+    summary: `Các trường hợp quyết toán thuế, nhiệm vụ của ${TENANT.name.toUpperCase()}, nhiệm vụ của khách hàng và cam kết.`,
     blocks: [
       {
         type: 'bulletList',
@@ -1182,7 +1184,7 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
       },
       {
         type: 'bulletList',
-        title: 'Nhiệm vụ của HIACC',
+        title: `Nhiệm vụ của ${TENANT.name.toUpperCase()}`,
         items: [
           'Rà soát hồ sơ, chứng từ liên quan đến kỳ quyết toán.',
           'Lập tờ khai quyết toán thuế và làm việc với cơ quan thuế khi cần.',
@@ -1208,7 +1210,7 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
   },
   {
     slug: 'hoan-thue-gtgt',
-    summary: 'Đối tượng được hoàn thuế GTGT, nhiệm vụ của HIACC, nhiệm vụ của khách hàng và cam kết.',
+    summary: `Đối tượng được hoàn thuế GTGT, nhiệm vụ của ${TENANT.name.toUpperCase()}, nhiệm vụ của khách hàng và cam kết.`,
     blocks: [
       {
         type: 'bulletList',
@@ -1221,7 +1223,7 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
       },
       {
         type: 'bulletList',
-        title: 'Nhiệm vụ của HIACC',
+        title: `Nhiệm vụ của ${TENANT.name.toUpperCase()}`,
         items: [
           'Rà soát điều kiện hoàn thuế và chuẩn bị hồ sơ theo quy định.',
           'Nộp hồ sơ hoàn thuế và làm việc với cơ quan thuế trong quá trình kiểm tra.',
@@ -1247,11 +1249,11 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
   },
   {
     slug: 'quyet-toan-giai-the',
-    summary: 'Nhiệm vụ của HIACC, nhiệm vụ của khách hàng và cam kết khi quyết toán giải thể.',
+    summary: `Nhiệm vụ của ${TENANT.name.toUpperCase()}, nhiệm vụ của khách hàng và cam kết khi quyết toán giải thể.`,
     blocks: [
       {
         type: 'bulletList',
-        title: 'Nhiệm vụ của HIACC',
+        title: `Nhiệm vụ của ${TENANT.name.toUpperCase()}`,
         items: [
           `${SAMPLE_TAG} Rà soát toàn bộ nghĩa vụ thuế còn tồn đọng trước khi lập hồ sơ giải thể.`,
           'Lập báo cáo quyết toán thuế đến thời điểm giải thể và làm việc với cơ quan thuế.',
@@ -1278,7 +1280,7 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
   {
     slug: 'bao-cao-tai-chinh',
     summary:
-      'Thời hạn nộp báo cáo tài chính, nhiệm vụ của HIACC, nhiệm vụ của khách hàng và cam kết.',
+      `Thời hạn nộp báo cáo tài chính, nhiệm vụ của ${TENANT.name.toUpperCase()}, nhiệm vụ của khách hàng và cam kết.`,
     blocks: [
       {
         type: 'bulletList',
@@ -1290,7 +1292,7 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
       },
       {
         type: 'bulletList',
-        title: 'Nhiệm vụ của HIACC',
+        title: `Nhiệm vụ của ${TENANT.name.toUpperCase()}`,
         items: [
           'Lập báo cáo tài chính theo chuẩn mực kế toán hiện hành.',
           'Nộp báo cáo đúng thời hạn tới các cơ quan quản lý liên quan.',
@@ -1309,7 +1311,7 @@ export const SERVICE_CONTENT: ServiceContentSeed[] = [
         title: 'Cam kết',
         items: [
           'Báo cáo tài chính được lập đúng chuẩn mực và quy định pháp luật hiện hành.',
-          'Nộp đúng thời hạn quy định, không phát sinh chậm nộp do lỗi của HIACC.',
+          `Nộp đúng thời hạn quy định, không phát sinh chậm nộp do lỗi của ${TENANT.name.toUpperCase()}.`,
         ],
       },
     ],

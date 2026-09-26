@@ -1,3 +1,5 @@
+import { TENANT } from '../config/tenant'
+
 /**
  * Nội dung mẫu, rút từ AUDIT-hiacc.com.vn.md (site tham chiếu).
  *
@@ -123,7 +125,7 @@ export const PAGES = [
     slug: 'gioi-thieu',
     content: richText([
       paragraph(
-        'HiACC là công ty cung cấp dịch vụ kế toán, thuế và tư vấn doanh nghiệp, đồng hành cùng khách hàng từ giai đoạn thành lập đến vận hành ổn định. Đoạn giới thiệu này là nội dung mẫu — khách sẽ thay bằng câu chuyện thương hiệu chính thức.',
+        `${TENANT.name} là công ty cung cấp dịch vụ kế toán, thuế và tư vấn doanh nghiệp, đồng hành cùng khách hàng từ giai đoạn thành lập đến vận hành ổn định. Đoạn giới thiệu này là nội dung mẫu — khách sẽ thay bằng câu chuyện thương hiệu chính thức.`,
       ),
       heading('h2', 'Lĩnh vực hoạt động'),
       bulletList([
@@ -149,7 +151,7 @@ export const PAGES = [
     slug: 'lien-he',
     content: richText([
       paragraph(
-        'Quý khách có thể liên hệ HiACC qua thông tin chi nhánh gần nhất hoặc để lại thông tin qua biểu mẫu liên hệ trên website, đội ngũ sẽ phản hồi trong thời gian sớm nhất.',
+        `Quý khách có thể liên hệ ${TENANT.name} qua thông tin chi nhánh gần nhất hoặc để lại thông tin qua biểu mẫu liên hệ trên website, đội ngũ sẽ phản hồi trong thời gian sớm nhất.`,
       ),
     ]),
   },
@@ -555,6 +557,6 @@ export const SETTINGS = {
   // KHÔNG khẳng định năng lực chưa được khách xác nhận ("đội ngũ 100% có chứng
   // chỉ hành nghề" là tuyên bố kiểm chứng được, khách phải tự chịu trách nhiệm).
   aboutShort:
-    'HiACC cung cấp dịch vụ kế toán, thuế và thủ tục pháp lý doanh nghiệp, với một chuyên viên phụ trách xuyên suốt từng hồ sơ.',
+    `${TENANT.name} cung cấp dịch vụ kế toán, thuế và thủ tục pháp lý doanh nghiệp, với một chuyên viên phụ trách xuyên suốt từng hồ sơ.`,
   copyright: '© 2026 Công ty TNHH HiACC. Bảo lưu mọi quyền.',
 } as const
