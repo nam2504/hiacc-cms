@@ -505,6 +505,8 @@ const BRAND_SETTINGS_BY_TENANT: Record<string, BrandSettings> = {
     email: 'hiacc.kt01@gmail.com',
   },
 }
+/** HiTax dùng chung pháp nhân và liên hệ với HiACC, chỉ khác tên website; khách tách trong /admin khi cần. */
+BRAND_SETTINGS_BY_TENANT.hitax = { ...BRAND_SETTINGS_BY_TENANT.hiacc, siteName: 'Kế toán HiTax' }
 
 /** Tenant không có trong bảng trên (chưa có dữ liệu thật) → không seed field thương hiệu, để Settings trống cho fallback theo tenant hoạt động. */
 export function settingsForTenant(tenantKey: string): typeof SETTINGS & Partial<BrandSettings> {
@@ -521,9 +523,13 @@ export const SETTINGS = {
    * cột khi test local — không seed lên staging/production, khách tự điền
    * link thật trong /admin khi có.
    */
-  facebook: 'https://facebook.com/hiacc.placeholder',
-  tiktok: 'https://tiktok.com/@hiacc.placeholder',
-  youtube: 'https://youtube.com/@hiacc.placeholder',
+  ...(process.env.NODE_ENV === 'production'
+    ? {}
+    : {
+        facebook: 'https://facebook.com/hiacc.placeholder',
+        tiktok: 'https://tiktok.com/@hiacc.placeholder',
+        youtube: 'https://youtube.com/@hiacc.placeholder',
+      }),
   /**
    * Nguyên tắc hành nghề: nội dung MẪU cho trang Giới thiệu. Ba mục này mô tả
    * cách làm việc, không phải tuyên bố năng lực kiểm chứng được (chứng chỉ, giải
