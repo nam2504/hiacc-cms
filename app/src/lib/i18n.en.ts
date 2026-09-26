@@ -95,8 +95,6 @@ export const en = {
   'home.social.youtube': 'YouTube',
   'home.social.twitter': 'Twitter (X)',
 
-  'home.knowledge.title': 'Knowledge centre',
-  'home.knowledge.subtitle': 'Articles and legal updates organised by topic.',
   'home.knowledge.group.accounting': 'Accounting & Business',
   'home.knowledge.group.legal-hr': 'Legal & HR',
 

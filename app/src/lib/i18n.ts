@@ -105,8 +105,6 @@ const vi: Dict = {
   'home.social.youtube': 'YouTube',
   'home.social.twitter': 'Twitter (X)',
 
-  'home.knowledge.title': 'Trung tâm kiến thức',
-  'home.knowledge.subtitle': 'Bài viết và văn bản pháp luật chia theo chuyên mục.',
   'home.knowledge.group.accounting': 'Kế toán & Doanh nghiệp',
   'home.knowledge.group.legal-hr': 'Pháp lý & Nhân sự',
 
