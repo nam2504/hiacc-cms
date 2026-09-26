@@ -199,12 +199,13 @@ async function seed() {
   }
 
   // Settings là global: chỉ điền field còn trống, không đè giá trị khách đã nhập
-  const current = await payload.findGlobal({ slug: 'settings' })
+  // depth 0: quan hệ (logo, ảnh) trả về ID thay vì object đã populate.
+  const current = await payload.findGlobal({ slug: 'settings', depth: 0 })
   const merged: Record<string, unknown> = { ...settingsForTenant(TENANT.key) }
-  for (const [key, value] of Object.entries(current ?? {})) {
-    // Mảng rỗng cũng là "chưa có dữ liệu": Payload trả [] cho array chưa ai nhập,
-    // mà [] không phải null cũng không phải '' nên vòng lặp cũ coi là giá trị
-    // thật rồi giữ lại, khiến seed không bao giờ điền được các field dạng array.
+  // Chỉ duyệt field seed sở hữu — không mang id/createdAt/updatedAt hay field khác vào data.
+  for (const key of Object.keys(merged)) {
+    const value: unknown = current?.[key as keyof typeof current]
+    // Mảng rỗng cũng là "chưa có dữ liệu": Payload trả [] cho array chưa ai nhập.
     if (Array.isArray(value) && value.length === 0) continue
     if (value !== null && value !== undefined && value !== '') merged[key] = value
   }
