@@ -6,7 +6,7 @@ import { StagingBanner } from '@/components/layout/StagingBanner'
 import { brandStyle, footerStyle } from '@/lib/brandStyle'
 import { createTranslator } from '@/lib/i18n'
 import { getRequestLocale } from '@/lib/requestLocale'
-import { localePath, ogImages, SITE_URL } from '@/lib/seo'
+import { absoluteMediaUrl, localePath, ogImages, SITE_URL } from '@/lib/seo'
 import { isStaging } from '@/lib/staging'
 import { getSettings } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
@@ -46,6 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
     createTranslator(locale)('seo.siteName', { brand: TENANT.name })
   const description = settings?.tagline || undefined
   const images = ogImages(settings?.logo)
+  const favicon = absoluteMediaUrl(settings?.favicon)
 
   /**
    * `metadataBase` cho phép trang con khai canonical / ảnh OG bằng đường dẫn
@@ -57,6 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: siteName, template: `%s | ${siteName}` },
     description,
     alternates: { canonical: '/' },
+    ...(favicon ? { icons: { icon: favicon, apple: favicon } } : {}),
     /**
      * Bản nháp: cấm đánh chỉ mục ở tầng thẻ meta. Đây là lớp chặn thật —
      * robots.txt chỉ xin bot đừng bò, còn `noindex` mới giữ trang khỏi kết quả

@@ -54,6 +54,16 @@ export const Settings: GlobalConfig = {
               admin: { description: 'Nên dùng file PNG nền trong suốt, cao tối thiểu 120 px.' },
             },
             {
+              name: 'favicon',
+              type: 'upload',
+              relationTo: 'media',
+              label: 'Favicon',
+              admin: {
+                description:
+                  'Icon nhỏ trên tab trình duyệt. Nên dùng ảnh PNG vuông, tối thiểu 512 × 512 px. Bỏ trống thì trình duyệt hiện icon mặc định.',
+              },
+            },
+            {
               name: 'heroImage',
               type: 'upload',
               relationTo: 'media',

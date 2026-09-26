@@ -1095,6 +1095,10 @@ export interface Setting {
    */
   logo?: (number | null) | Media;
   /**
+   * Icon nhỏ trên tab trình duyệt. Nên dùng ảnh PNG vuông, tối thiểu 512 × 512 px. Bỏ trống thì trình duyệt hiện icon mặc định.
+   */
+  favicon?: (number | null) | Media;
+  /**
    * Ảnh lớn cạnh slogan ở đầu trang chủ. Nên dùng ảnh ngang (tỉ lệ 3:2), rộng tối thiểu 1200 px. Để trống thì phần chữ tự giãn kín chiều ngang.
    */
   heroImage?: (number | null) | Media;
@@ -1370,6 +1374,7 @@ export interface PayrollConfig {
 export interface SettingsSelect<T extends boolean = true> {
   siteName?: T;
   logo?: T;
+  favicon?: T;
   heroImage?: T;
   tagline?: T;
   businessField?: T;
