@@ -11,6 +11,20 @@ export const Settings: GlobalConfig = {
   label: 'Cấu hình chung',
   admin: {
     group: 'Cấu hình',
+    /**
+     * Nút "Live Preview" trên đầu form: mở trang chủ cạnh form để khách đối chiếu
+     * ô nào ứng với chỗ nào trên trang (tab Trang chủ xếp theo đúng thứ tự khối).
+     * Đường dẫn tương đối — admin và site cùng một origin. Bấm Save thì khung tự
+     * tải lại (LivePreviewRefresh trong layout site). Theo ngôn ngữ đang sửa.
+     */
+    livePreview: {
+      url: ({ locale }) => (locale?.code === 'en' ? '/en' : '/'),
+      breakpoints: [
+        { label: 'Máy tính', name: 'desktop', width: 1440, height: 900 },
+        { label: 'Máy tính bảng', name: 'tablet', width: 768, height: 1024 },
+        { label: 'Điện thoại', name: 'mobile', width: 390, height: 844 },
+      ],
+    },
     description:
       'Thông tin dùng chung cho toàn website: logo, hotline, địa chỉ, mạng xã hội. Chỉ Quản trị viên sửa được.',
     /**
@@ -62,24 +76,6 @@ export const Settings: GlobalConfig = {
                 description:
                   'Icon nhỏ trên tab trình duyệt. Nên dùng ảnh PNG vuông, tối thiểu 512 × 512 px. Bỏ trống thì trình duyệt hiện icon mặc định.',
               },
-            },
-            {
-              name: 'heroImage',
-              type: 'upload',
-              relationTo: 'media',
-              label: 'Ảnh trang chủ',
-              admin: {
-                description:
-                  'Ảnh lớn cạnh slogan ở đầu trang chủ. Nên dùng ảnh ngang (tỉ lệ 3:2), ' +
-                  'rộng tối thiểu 1200 px. Để trống thì phần chữ tự giãn kín chiều ngang.',
-              },
-            },
-            {
-              name: 'tagline',
-              type: 'text',
-              label: 'Slogan',
-              localized: true,
-              admin: { description: 'Câu ngắn dưới logo, ví dụ "Dịch vụ kế toán trọn gói".' },
             },
             {
               name: 'businessField',
@@ -271,45 +267,86 @@ export const Settings: GlobalConfig = {
               fields: [
                 {
                   type: 'collapsible',
-                  label: 'Khối đầu trang (Hero)',
-                  admin: { initCollapsed: true },
+                  label: '① Banner đầu trang',
+                  admin: { initCollapsed: false },
                   fields: [
                     {
                       name: 'heroEyebrow',
                       type: 'text',
-                      label: 'Dòng chữ nhỏ trên slogan',
+                      label: '1. Dòng chữ nhỏ màu đỏ (trên cùng)',
                       localized: true,
                       admin: { description: 'Mặc định: Welcome to HiACC' },
                     },
                     {
-                      name: 'heroLead',
-                      type: 'textarea',
-                      label: 'Đoạn mô tả',
+                      name: 'heroTagline',
+                      type: 'text',
+                      label: '2. Slogan (tiêu đề lớn)',
                       localized: true,
                       admin: {
                         description:
-                          'Đoạn văn dưới slogan. Mặc định: "Dịch vụ kế toán trọn gói…". Slogan sửa ở tab Thương hiệu.',
+                          'Mặc định: Đồng hành cùng doanh nghiệp Việt. Câu này cũng dùng làm mô tả khi chia sẻ link ' +
+                          'trang chủ lên Facebook/Google và dòng "Slogan" ở trang Giới thiệu.',
                       },
                     },
                     {
-                      name: 'heroCta',
-                      type: 'text',
-                      label: 'Chữ trên nút chính',
+                      name: 'heroLead',
+                      type: 'textarea',
+                      label: '3. Đoạn mô tả',
                       localized: true,
-                      admin: { description: 'Mặc định: Nhận tư vấn miễn phí' },
+                      admin: {
+                        description:
+                          'Dòng chữ dưới slogan. Mặc định: "Dịch vụ kế toán, thuế và tư vấn doanh nghiệp trọn gói…".',
+                      },
                     },
                     {
-                      name: 'heroCtaSecondary',
-                      type: 'text',
-                      label: 'Chữ trên nút phụ',
-                      localized: true,
-                      admin: { description: 'Mặc định: Xem dịch vụ' },
+                      type: 'row',
+                      fields: [
+                        {
+                          name: 'heroCta',
+                          type: 'text',
+                          label: '4. Chữ trên nút đỏ',
+                          localized: true,
+                          admin: { width: '50%', description: 'Mặc định: Nhận tư vấn miễn phí' },
+                        },
+                        {
+                          name: 'heroCtaSecondary',
+                          type: 'text',
+                          label: '5. Chữ trên nút trắng',
+                          localized: true,
+                          admin: { width: '50%', description: 'Mặc định: Xem dịch vụ' },
+                        },
+                      ],
+                    },
+                    {
+                      name: 'heroImage',
+                      type: 'upload',
+                      relationTo: 'media',
+                      label: '6. Ảnh nền banner',
+                      admin: {
+                        description:
+                          'Ảnh phủ kín banner, chữ nằm trong khung mờ ở giữa. Nên dùng ảnh ngang, rộng tối thiểu ' +
+                          '1920 px, chủ thể ở giữa (hai mép trái/phải bị cắt trên điện thoại). Để trống thì banner ' +
+                          'dùng nền màu nhạt.',
+                      },
+                    },
+                    {
+                      name: 'heroBlur',
+                      type: 'number',
+                      label: '7. Độ mờ khung chữ (%)',
+                      min: 0,
+                      max: 100,
+                      admin: {
+                        step: 5,
+                        description:
+                          '0 = trong suốt (thấy rõ ảnh, chữ khó đọc hơn), 100 = mờ đục gần như trắng. ' +
+                          'Bỏ trống thì dùng 70. Chỉ có tác dụng khi đã chọn ảnh nền.',
+                      },
                     },
                   ],
                 },
                 {
                   type: 'collapsible',
-                  label: 'Dải cam kết (3 ô)',
+                  label: '② Dải cam kết (3 ô dưới banner)',
                   admin: { initCollapsed: true },
                   fields: [
                     {
@@ -341,7 +378,7 @@ export const Settings: GlobalConfig = {
                 },
                 {
                   type: 'collapsible',
-                  label: 'Khối giới thiệu (4 điểm tin cậy)',
+                  label: '③ Khối giới thiệu (4 điểm tin cậy)',
                   admin: { initCollapsed: true },
                   fields: [
                     {
@@ -382,8 +419,11 @@ export const Settings: GlobalConfig = {
                 },
                 {
                   type: 'collapsible',
-                  label: 'Tiêu đề các khối còn lại',
-                  admin: { initCollapsed: true },
+                  label: '④ Lĩnh vực hoạt động (5 nhóm dịch vụ)',
+                  admin: {
+                    initCollapsed: true,
+                    description: 'Ảnh và nội dung từng nhóm sửa ở mục Cây dịch vụ, ở đây chỉ có tiêu đề khối.',
+                  },
                   fields: [
                     {
                       type: 'row',
@@ -404,6 +444,49 @@ export const Settings: GlobalConfig = {
                         },
                       ],
                     },
+                  ],
+                },
+                {
+                  type: 'collapsible',
+                  label: '⑤ Dải đỏ kêu gọi tư vấn',
+                  admin: { initCollapsed: true },
+                  fields: [
+                    {
+                      name: 'ctaTitle',
+                      type: 'text',
+                      label: 'Tiêu đề',
+                      localized: true,
+                      admin: { description: 'Mặc định: Cần tư vấn cho doanh nghiệp của bạn?' },
+                    },
+                    {
+                      name: 'ctaSubtitle',
+                      type: 'textarea',
+                      label: 'Mô tả',
+                      localized: true,
+                      admin: {
+                        description:
+                          'Mặc định có nhắc "gọi trực tiếp" — nếu chưa điền Hotline ở tab Liên hệ thì nên sửa lại câu này cho khớp.',
+                      },
+                    },
+                    {
+                      name: 'ctaButton',
+                      type: 'text',
+                      label: 'Chữ trên nút',
+                      localized: true,
+                      admin: { description: 'Mặc định: Nhận tư vấn miễn phí' },
+                    },
+                  ],
+                },
+                {
+                  type: 'collapsible',
+                  label: 'Khối đang ẩn khỏi trang chủ',
+                  admin: {
+                    initCollapsed: true,
+                    description:
+                      'Chi nhánh / Trung tâm kiến thức / Mạng xã hội đã bỏ khỏi trang chủ theo thiết kế mới. ' +
+                      'Sửa các ô này hiện KHÔNG thay đổi gì trên site — giữ lại để bật lại khối khi cần.',
+                  },
+                  fields: [
                     {
                       type: 'row',
                       fields: [
@@ -460,37 +543,6 @@ export const Settings: GlobalConfig = {
                           admin: { width: '50%' },
                         },
                       ],
-                    },
-                  ],
-                },
-                {
-                  type: 'collapsible',
-                  label: 'Khối kêu gọi cuối trang (CTA)',
-                  admin: { initCollapsed: true },
-                  fields: [
-                    {
-                      name: 'ctaTitle',
-                      type: 'text',
-                      label: 'Tiêu đề',
-                      localized: true,
-                      admin: { description: 'Mặc định: Cần tư vấn cho doanh nghiệp của bạn?' },
-                    },
-                    {
-                      name: 'ctaSubtitle',
-                      type: 'textarea',
-                      label: 'Mô tả',
-                      localized: true,
-                      admin: {
-                        description:
-                          'Mặc định có nhắc "gọi trực tiếp" — nếu chưa điền Hotline ở tab Liên hệ thì nên sửa lại câu này cho khớp.',
-                      },
-                    },
-                    {
-                      name: 'ctaButton',
-                      type: 'text',
-                      label: 'Chữ trên nút',
-                      localized: true,
-                      admin: { description: 'Mặc định: Nhận tư vấn miễn phí' },
                     },
                   ],
                 },

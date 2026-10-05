@@ -23,6 +23,7 @@ import {
   POSTS,
   settingsForTenant,
   SETTINGS_HERO_IMAGE,
+  HOME_HERO_TAGLINE,
 } from './data'
 import { seedPayrollConfig } from './payrollConfig'
 import { seedServiceTree } from './serviceTree'
@@ -209,11 +210,17 @@ async function seed() {
     if (Array.isArray(value) && value.length === 0) continue
     if (value !== null && value !== undefined && value !== '') merged[key] = value
   }
+  // Banner trang chủ nằm trong group `home`. Vòng lặp trên chỉ so khoá cấp 1, mà
+  // `home` luôn là object (kể cả khi mọi ô trống) nên phải điền từng ô riêng ở
+  // đây — vẫn theo luật chỉ điền ô còn trống, không đè giá trị khách đã nhập.
+  const home: Record<string, unknown> = { ...(current?.home ?? {}) }
+  if (!home.heroTagline) home.heroTagline = HOME_HERO_TAGLINE
   // Ảnh hero: chỉ nạp khi khách CHƯA chọn ảnh nào, để seed không đè ảnh thật.
-  if (!current?.heroImage && SETTINGS_HERO_IMAGE) {
+  if (!home.heroImage && SETTINGS_HERO_IMAGE) {
     const heroId = await ensureMedia(SETTINGS_HERO_IMAGE.filename, SETTINGS_HERO_IMAGE.alt)
-    if (heroId) merged.heroImage = heroId
+    if (heroId) home.heroImage = heroId
   }
+  merged.home = home
   await payload.updateGlobal({ slug: 'settings', data: merged })
 
   // Cây dịch vụ (5 nhóm / 32 hạng mục theo SET WEB.xlsx 06/09). Tên hạng mục là

@@ -14,16 +14,6 @@
   text-align: center;
 }
 
-/* Có ảnh: 2 cột từ 900px. Dưới ngưỡng đó vẫn xếp dọc, chữ TRƯỚC ảnh SAU —
-   thứ tự DOM đã đúng nên không cần order, và người dùng màn hình nhỏ đọc
-   được nội dung trước khi phải cuộn qua ảnh. */
-.innerSplit {
-  display: grid;
-  grid-template-columns: 1fr;
-  align-items: center;
-  gap: var(--space-5);
-}
-
 .copy {
   display: flex;
   flex-direction: column;
@@ -32,29 +22,65 @@
   text-align: center;
 }
 
-@media (min-width: 900px) {
-  .innerSplit {
-    grid-template-columns: 1.05fr 1fr;
-    gap: var(--space-6);
-  }
-
-  /* Chỉ đổi sang căn trái khi thật sự có cột ảnh bên cạnh: căn giữa một cột
-     chữ hẹp bên trái trông như lỗi bố cục. */
-  .innerSplit .copy {
-    align-items: flex-start;
-    text-align: left;
-  }
+/* Có ảnh (Figma 05/10): ảnh phủ kín section, card kính mờ căn giữa.
+   Figma 1440x495 — dùng min-height thay vì height cố định để chữ dài (bản EN,
+   màn hẹp) giãn section ra chứ không tràn khỏi ảnh. */
+.heroBanner {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 495px;
+  padding-block: var(--space-7);
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-border);
 }
 
-/* width/height ở <Image> là 1200x800 (3:2). Khai báo lại tỉ lệ ở CSS để trình
-   duyệt dành sẵn chỗ trước khi ảnh tải xong — cùng lý do như .logo bên dưới,
-   tránh CLS. */
-.image {
+.heroBanner > * {
   width: 100%;
-  height: auto;
-  aspect-ratio: 3 / 2;
-  border-radius: var(--radius-lg);
+}
+
+.bg {
+  z-index: -1;
   object-fit: cover;
+}
+
+/* Nền trắng mờ + blur như Figma. --hero-blur (0–1) đến từ field "Độ mờ khung
+   chữ banner" trong admin, Hero.tsx gắn inline: 0 → nền trắng 0.15, không blur;
+   1 → nền trắng 0.9, blur 24px. Mặc định 0.7 → nền 0.675, blur ~17px.
+   Không có backdrop-filter (trình duyệt cũ) thì chỉ còn lớp trắng — vẫn đọc được. */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 1130px;
+  margin-inline: auto;
+  padding: var(--space-6) var(--space-5);
+  text-align: center;
+  --hero-blur: 0.7;
+  background: rgb(255 255 255 / calc(0.15 + var(--hero-blur) * 0.75));
+  -webkit-backdrop-filter: blur(calc(var(--hero-blur) * 24px));
+  backdrop-filter: blur(calc(var(--hero-blur) * 24px));
+  border: 1px solid rgb(255 255 255 / 0.6);
+  border-radius: var(--radius-lg);
+}
+
+.card .siteName {
+  font-size: var(--text-xl);
+}
+
+.card .tagline {
+  max-width: 100%;
+}
+
+/* Khách yêu cầu (05/10) dòng mô tả nằm trên 1 dòng: bỏ giới hạn 60ch của .lead,
+   card rộng ~1130px là đủ chỗ ở desktop. Màn hẹp hơn câu buộc phải xuống dòng —
+   balance để 2 dòng dài gần bằng nhau thay vì để 1 chữ "nhỏ." mồ côi. */
+.card .lead {
+  max-width: 100%;
+  color: var(--color-ink);
+  text-wrap: balance;
 }
 
 .logo {
@@ -89,9 +115,9 @@
     font-size: var(--text-4xl);
   }
 
-  /* Cột chữ đã hẹp sẵn, giới hạn 18ch nữa sẽ ngắt dòng quá vụn. */
-  .innerSplit .tagline {
-    max-width: 100%;
+  /* Headline trên banner Figma ~56px, to hơn h1 thường của site. */
+  .card .tagline {
+    font-size: 3.5rem;
   }
 }
 

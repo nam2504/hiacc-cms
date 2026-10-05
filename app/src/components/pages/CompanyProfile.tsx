@@ -44,7 +44,7 @@ export function CompanyProfile({
       label: tr('about.profile.field'),
       value: settings?.businessField || tr('about.profile.fieldValue'),
     },
-    { label: tr('about.profile.slogan'), value: settings?.tagline },
+    { label: tr('about.profile.slogan'), value: settings?.home?.heroTagline },
   ]
 
   const principles = settings?.principles ?? []

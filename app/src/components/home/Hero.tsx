@@ -1,11 +1,12 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { createTranslator } from "@/lib/i18n";
 import { DEFAULT_LOCALE } from "@/lib/locales";
 import { localizedHref } from "@/lib/nav";
 import { getRequestLocale } from "@/lib/requestLocale";
-import { mediaAlt, mediaUrl, siteDisplayName } from "@/lib/site";
+import { mediaUrl, siteDisplayName } from "@/lib/site";
 import type { Setting } from "@/payload-types";
 import styles from "./Hero.module.css";
 
@@ -21,34 +22,55 @@ import styles from "./Hero.module.css";
  * Figma đặt ở đây một dòng chữ ngắn ("Welcom to HiAcc" trong file gốc), nên chỗ
  * này bám chữ; logo chỉ còn ở header/footer.
  *
- * Bố cục 2 cột (chữ trái / ảnh phải) từ 768px trở lên, CHỈ khi có heroImage.
- * Không có ảnh thì rơi về 1 cột căn giữa như cũ — khách xoá ảnh trong admin
- * cũng không làm vỡ trang.
+ * Có heroImage (Figma 05/10, node 1-1104): ảnh phủ kín section làm nền, chữ
+ * nằm trong một card kính mờ căn giữa. Thay bố cục 2 cột chữ trái / ảnh phải cũ.
+ * Không có ảnh thì rơi về 1 cột căn giữa trên nền gradient — khách xoá ảnh
+ * trong admin cũng không làm vỡ trang.
  */
 export async function Hero({ settings }: { settings: Setting | null }) {
   // Mọi link phải giữ ngôn ngữ đang xem, không thì bấm vào là rơi về bản tiếng Việt.
   const locale = await getRequestLocale();
   const t = createTranslator(locale);
   const href = (path: string) => localizedHref(path, locale, DEFAULT_LOCALE);
-  const heroImage = mediaUrl(settings?.heroImage);
+  // Mọi ô của banner nằm chung nhóm "① Banner đầu trang" (Settings → Trang chủ).
+  const home = settings?.home;
+  const heroImage = mediaUrl(home?.heroImage);
   const siteName = siteDisplayName(settings, locale);
   // Tagline ưu tiên nội dung khách sửa trong admin, không có thì rơi về khoá dịch.
-  const tagline = settings?.tagline || t("home.hero.tagline");
   // Cùng quy tắc cho phần chữ còn lại: ô trống trong admin = dùng bản mặc định,
   // nên xoá nhầm một ô không làm mất chữ trên trang.
-  const home = settings?.home;
+  const tagline = home?.heroTagline || t("home.hero.tagline");
   const lead = home?.heroLead || t("home.hero.lead");
   const cta = home?.heroCta || t("home.hero.cta");
   const ctaSecondary = home?.heroCtaSecondary || t("home.hero.ctaSecondary");
   // Eyebrow: ô trống trong admin thì rơi về khoá dịch, khoá dịch để trống nữa
   // thì dùng tên site — không bao giờ để hở một dòng rỗng trên đầu hero.
   const eyebrow = home?.heroEyebrow || t("home.hero.eyebrow") || siteName;
+  // Độ mờ khung kính 0–100 từ admin, trống thì 70. Dùng ?? chứ không ||:
+  // khách chọn 0 (trong suốt) là giá trị hợp lệ, không được rơi về mặc định.
+  const blur = Math.min(100, Math.max(0, home?.heroBlur ?? 70)) / 100;
+  const cardStyle = { "--hero-blur": blur } as CSSProperties;
 
   return (
-    <section className={styles.hero}>
+    <section className={heroImage ? styles.heroBanner : styles.hero}>
+      {/* Ảnh nền đứng trước Container trong DOM và nằm dưới bằng z-index;
+          alt rỗng vì là ảnh trang trí, nội dung đã nằm trong card chữ. */}
+      {heroImage ? (
+        <Image
+          className={styles.bg}
+          src={heroImage}
+          alt=""
+          fill
+          sizes="100vw"
+          priority
+        />
+      ) : null}
       <Container>
-        <div className={heroImage ? styles.innerSplit : styles.inner}>
-          <div className={styles.copy}>
+        <div className={styles.inner}>
+          <div
+            className={heroImage ? styles.card : styles.copy}
+            style={heroImage ? cardStyle : undefined}
+          >
             <p className={styles.siteName}>{eyebrow}</p>
 
             <h1 className={styles.tagline}>{tagline}</h1>
@@ -67,18 +89,6 @@ export async function Hero({ settings }: { settings: Setting | null }) {
               </Button>
             </div>
           </div>
-
-          {heroImage ? (
-            <Image
-              className={styles.image}
-              src={heroImage}
-              alt={mediaAlt(settings?.heroImage, "")}
-              width={1200}
-              height={800}
-              sizes="(min-width: 900px) 50vw, 100vw"
-              priority
-            />
-          ) : null}
         </div>
       </Container>
     </section>

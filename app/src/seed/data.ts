@@ -516,8 +516,10 @@ export function settingsForTenant(tenantKey: string): typeof SETTINGS & Partial<
   return { ...SETTINGS, ...brand }
 }
 
+/** Slogan banner trang chủ — Settings.home.heroTagline (trước 05/10 là Settings.tagline). */
+export const HOME_HERO_TAGLINE = 'Đồng hành cùng doanh nghiệp Việt'
+
 export const SETTINGS = {
-  tagline: 'Đồng hành cùng doanh nghiệp Việt',
   workingHours: '08:00 – 17:30, thứ Hai – thứ Sáu',
   /**
    * Mạng xã hội: khách CHƯA cấp link thật, khác nhóm hotline/email/taxCode ở

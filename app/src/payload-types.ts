@@ -1099,14 +1099,6 @@ export interface Setting {
    */
   favicon?: (number | null) | Media;
   /**
-   * Ảnh lớn cạnh slogan ở đầu trang chủ. Nên dùng ảnh ngang (tỉ lệ 3:2), rộng tối thiểu 1200 px. Để trống thì phần chữ tự giãn kín chiều ngang.
-   */
-  heroImage?: (number | null) | Media;
-  /**
-   * Câu ngắn dưới logo, ví dụ "Dịch vụ kế toán trọn gói".
-   */
-  tagline?: string | null;
-  /**
    * Hiện ở bảng "Hồ sơ công ty" trang Giới thiệu. Mặc định: Kế toán, thuế, thủ tục pháp lý doanh nghiệp.
    */
   businessField?: string | null;
@@ -1180,7 +1172,11 @@ export interface Setting {
      */
     heroEyebrow?: string | null;
     /**
-     * Đoạn văn dưới slogan. Mặc định: "Dịch vụ kế toán trọn gói…". Slogan sửa ở tab Thương hiệu.
+     * Mặc định: Đồng hành cùng doanh nghiệp Việt. Câu này cũng dùng làm mô tả khi chia sẻ link trang chủ lên Facebook/Google và dòng "Slogan" ở trang Giới thiệu.
+     */
+    heroTagline?: string | null;
+    /**
+     * Dòng chữ dưới slogan. Mặc định: "Dịch vụ kế toán, thuế và tư vấn doanh nghiệp trọn gói…".
      */
     heroLead?: string | null;
     /**
@@ -1191,6 +1187,14 @@ export interface Setting {
      * Mặc định: Xem dịch vụ
      */
     heroCtaSecondary?: string | null;
+    /**
+     * Ảnh phủ kín banner, chữ nằm trong khung mờ ở giữa. Nên dùng ảnh ngang, rộng tối thiểu 1920 px, chủ thể ở giữa (hai mép trái/phải bị cắt trên điện thoại). Để trống thì banner dùng nền màu nhạt.
+     */
+    heroImage?: (number | null) | Media;
+    /**
+     * 0 = trong suốt (thấy rõ ảnh, chữ khó đọc hơn), 100 = mờ đục gần như trắng. Bỏ trống thì dùng 70. Chỉ có tác dụng khi đã chọn ảnh nền.
+     */
+    heroBlur?: number | null;
     /**
      * Để trống cả mảng thì dùng 3 ô mặc định (Giảm thiểu / Nâng cao / Tối ưu). Thêm ô thứ 4 sẽ làm hàng bị lệch trên màn hình hẹp.
      */
@@ -1228,6 +1232,18 @@ export interface Setting {
     servicesTitle?: string | null;
     servicesSubtitle?: string | null;
     /**
+     * Mặc định: Cần tư vấn cho doanh nghiệp của bạn?
+     */
+    ctaTitle?: string | null;
+    /**
+     * Mặc định có nhắc "gọi trực tiếp" — nếu chưa điền Hotline ở tab Liên hệ thì nên sửa lại câu này cho khớp.
+     */
+    ctaSubtitle?: string | null;
+    /**
+     * Mặc định: Nhận tư vấn miễn phí
+     */
+    ctaButton?: string | null;
+    /**
      * Mặc định: Mạng lưới chi nhánh
      */
     branchesTitle?: string | null;
@@ -1242,18 +1258,6 @@ export interface Setting {
      */
     socialTitle?: string | null;
     socialSubtitle?: string | null;
-    /**
-     * Mặc định: Cần tư vấn cho doanh nghiệp của bạn?
-     */
-    ctaTitle?: string | null;
-    /**
-     * Mặc định có nhắc "gọi trực tiếp" — nếu chưa điền Hotline ở tab Liên hệ thì nên sửa lại câu này cho khớp.
-     */
-    ctaSubtitle?: string | null;
-    /**
-     * Mặc định: Nhận tư vấn miễn phí
-     */
-    ctaButton?: string | null;
   };
   /**
    * 2–3 câu về công ty, hiện ở cột đầu chân trang.
@@ -1375,8 +1379,6 @@ export interface SettingsSelect<T extends boolean = true> {
   siteName?: T;
   logo?: T;
   favicon?: T;
-  heroImage?: T;
-  tagline?: T;
   businessField?: T;
   primaryColor?: T;
   footerTheme?: T;
@@ -1404,9 +1406,12 @@ export interface SettingsSelect<T extends boolean = true> {
     | T
     | {
         heroEyebrow?: T;
+        heroTagline?: T;
         heroLead?: T;
         heroCta?: T;
         heroCtaSecondary?: T;
+        heroImage?: T;
+        heroBlur?: T;
         stats?:
           | T
           | {
@@ -1425,15 +1430,15 @@ export interface SettingsSelect<T extends boolean = true> {
             };
         servicesTitle?: T;
         servicesSubtitle?: T;
+        ctaTitle?: T;
+        ctaSubtitle?: T;
+        ctaButton?: T;
         branchesTitle?: T;
         branchesSubtitle?: T;
         knowledgeTitle?: T;
         knowledgeSubtitle?: T;
         socialTitle?: T;
         socialSubtitle?: T;
-        ctaTitle?: T;
-        ctaSubtitle?: T;
-        ctaButton?: T;
       };
   aboutShort?: T;
   copyright?: T;

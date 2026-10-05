@@ -12,6 +12,7 @@ import * as migration_20260912_110000_them_salutation_field_of_interest from './
 import * as migration_20260913_060247_xoa_services_cu from './20260913_060247_xoa_services_cu';
 import * as migration_20260914_070706_doi_schema_pricing_plans from './20260914_070706_doi_schema_pricing_plans';
 import * as migration_20260926_103000_them_favicon_settings from './20260926_103000_them_favicon_settings';
+import * as migration_20261005_120000_gom_banner_trang_chu from './20261005_120000_gom_banner_trang_chu';
 
 export const migrations = [
   {
@@ -83,5 +84,10 @@ export const migrations = [
     up: migration_20260926_103000_them_favicon_settings.up,
     down: migration_20260926_103000_them_favicon_settings.down,
     name: '20260926_103000_them_favicon_settings',
+  },
+  {
+    up: migration_20261005_120000_gom_banner_trang_chu.up,
+    down: migration_20261005_120000_gom_banner_trang_chu.down,
+    name: '20261005_120000_gom_banner_trang_chu',
   },
 ];

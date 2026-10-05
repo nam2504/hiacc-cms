@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Be_Vietnam_Pro } from 'next/font/google'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
+import { LivePreviewRefresh } from '@/components/layout/LivePreviewRefresh'
 import { StagingBanner } from '@/components/layout/StagingBanner'
 import { brandStyle, footerStyle } from '@/lib/brandStyle'
 import { createTranslator } from '@/lib/i18n'
@@ -44,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteName =
     settings?.siteName?.trim() ||
     createTranslator(locale)('seo.siteName', { brand: TENANT.name })
-  const description = settings?.tagline || undefined
+  const description = settings?.home?.heroTagline || undefined
   const images = ogImages(settings?.logo)
   const favicon = absoluteMediaUrl(settings?.favicon)
 
@@ -108,6 +109,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <StagingBanner />
         <Header settings={settings} tree={tree} locale={locale} />
         <main id="main-content">{children}</main>
+        <LivePreviewRefresh />
         <Footer settings={settings} />
       </body>
     </html>

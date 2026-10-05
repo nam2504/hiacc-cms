@@ -44,12 +44,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const tr = createTranslator(locale)
   const settings = await getSettings(locale)
   const siteName = siteDisplayName(settings, locale)
-  const description = settings?.tagline || settings?.aboutShort || undefined
+  const description = settings?.home?.heroTagline || settings?.aboutShort || undefined
   const images = ogImages(settings?.logo)
 
   // `title.absolute` để trang chủ không bị nối template "%s | Tên site" thành lặp tên.
   return {
-    title: { absolute: settings?.tagline ? `${siteName} — ${tr('seo.home.title')}` : siteName },
+    title: { absolute: settings?.home?.heroTagline ? `${siteName} — ${tr('seo.home.title')}` : siteName },
     description,
     alternates: localeAlternates('/', locale),
     openGraph: {
@@ -101,7 +101,7 @@ export default async function HomePage() {
    */
   const jsonLd = accountingServiceJsonLd({
     siteName: siteDisplayName(settings, locale),
-    description: settings?.tagline || settings?.aboutShort,
+    description: settings?.home?.heroTagline || settings?.aboutShort,
     logoUrl: absoluteMediaUrl(settings?.logo),
     hotlines: [settings?.hotline, settings?.hotline2],
     email: settings?.email,
