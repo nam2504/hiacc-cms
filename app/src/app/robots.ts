@@ -26,10 +26,16 @@ export default function robots(): MetadataRoute.Robots {
     return { rules: { userAgent: '*', disallow: '/' } }
   }
 
+  /**
+   * Mở riêng `/api/media/file/` (08/10): favicon và ảnh OG do khách tải lên đều
+   * nằm dưới đường này. Chặn cả `/api` thì Googlebot không lấy được icon → kết quả
+   * tìm kiếm hiện quả địa cầu mặc định. Google chọn luật có đường dẫn DÀI hơn,
+   * nên `allow` này thắng `disallow: /api` mà REST API vẫn bị chặn.
+   */
   return {
     rules: {
       userAgent: '*',
-      allow: '/',
+      allow: ['/', '/api/media/file/'],
       disallow: ['/admin', '/api'],
     },
     sitemap: absoluteUrl('/sitemap.xml'),
