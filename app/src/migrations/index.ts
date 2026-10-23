@@ -13,6 +13,7 @@ import * as migration_20260913_060247_xoa_services_cu from './20260913_060247_xo
 import * as migration_20260914_070706_doi_schema_pricing_plans from './20260914_070706_doi_schema_pricing_plans';
 import * as migration_20260926_103000_them_favicon_settings from './20260926_103000_them_favicon_settings';
 import * as migration_20261005_120000_gom_banner_trang_chu from './20261005_120000_gom_banner_trang_chu';
+import * as migration_20261021_120000_can_cu_phap_ly_da_ngon_ngu from './20261021_120000_can_cu_phap_ly_da_ngon_ngu';
 
 export const migrations = [
   {
@@ -89,5 +90,10 @@ export const migrations = [
     up: migration_20261005_120000_gom_banner_trang_chu.up,
     down: migration_20261005_120000_gom_banner_trang_chu.down,
     name: '20261005_120000_gom_banner_trang_chu',
+  },
+  {
+    up: migration_20261021_120000_can_cu_phap_ly_da_ngon_ngu.up,
+    down: migration_20261021_120000_can_cu_phap_ly_da_ngon_ngu.down,
+    name: '20261021_120000_can_cu_phap_ly_da_ngon_ngu',
   },
 ];

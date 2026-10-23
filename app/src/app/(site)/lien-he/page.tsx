@@ -107,7 +107,7 @@ export default async function LienHePage() {
         image={page?.heroImage}
       />
 
-      <ContactChannels settings={settings} />
+      <ContactChannels settings={settings} locale={locale} />
 
       {/*
         Bố cục 2 cột theo Liên hệ.png: cột TRÁI là thông tin trụ sở + bản đồ,

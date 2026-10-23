@@ -23,21 +23,34 @@ type Group = {
  * các nhóm khác ẩn hẳn khỏi DOM — đúng yêu cầu khách 12/09 "đi theo dạng tab
  * thật", không phải section xếp dọc cuộn qua anchor.
  *
- * Nhãn "Xem nguồn"/"Đang cập nhật"/số lượng giữ hardcode tiếng Việt như bản cũ
- * (page.tsx trước đây cũng vậy, không qua `t()`) — gap i18n có sẵn từ trước,
- * ngoài phạm vi việc đổi sang tab thật nên không tự thêm dịch thuật ở đây.
+ * Client component nên không gọi translator: trang cha dịch sẵn và truyền `labels`.
  */
+export type LegalDocLabels = {
+  groupsAria: string
+  countOne: string
+  countOther: string
+  colCode: string
+  colTitle: string
+  colIssuer: string
+  colEffective: string
+  colLink: string
+  viewSource: string
+  pending: string
+}
+
 export function LegalDocTabs({
   groups,
+  labels,
 }: {
   groups: Group[]
+  labels: LegalDocLabels
 }) {
   const [active, setActive] = useState(groups[0]?.value ?? '')
   const current = groups.find((g) => g.value === active) ?? groups[0]
 
   return (
     <>
-      <div className={styles.tabs} role="tablist" aria-label="Nhóm văn bản">
+      <div className={styles.tabs} role="tablist" aria-label={labels.groupsAria}>
         {groups.map((group) => (
           <button
             key={group.value}
@@ -62,17 +75,17 @@ export function LegalDocTabs({
           aria-labelledby={`tab-${current.value}`}
         >
           <h2 className={styles.groupTitle}>{current.label}</h2>
-          <p className={styles.groupCount}>{current.items.length} văn bản trong nhóm này.</p>
+          <p className={styles.groupCount}>{(current.items.length === 1 ? labels.countOne : labels.countOther).replace('{n}', String(current.items.length))}</p>
 
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th scope="col">Số hiệu</th>
-                  <th scope="col">Tên văn bản</th>
-                  <th scope="col">Cơ quan ban hành</th>
-                  <th scope="col">Hiệu lực</th>
-                  <th scope="col">Liên kết</th>
+                  <th scope="col">{labels.colCode}</th>
+                  <th scope="col">{labels.colTitle}</th>
+                  <th scope="col">{labels.colIssuer}</th>
+                  <th scope="col">{labels.colEffective}</th>
+                  <th scope="col">{labels.colLink}</th>
                 </tr>
               </thead>
               <tbody>
@@ -90,10 +103,10 @@ export function LegalDocTabs({
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Xem nguồn →
+                          {labels.viewSource}
                         </a>
                       ) : (
-                        <span className={styles.noSource}>Đang cập nhật</span>
+                        <span className={styles.noSource}>{labels.pending}</span>
                       )}
                     </td>
                   </tr>

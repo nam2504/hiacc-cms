@@ -11,14 +11,24 @@
  * có chiều ngược lại: lương người dùng nhập không bao giờ rời trình duyệt.
  */
 import { getPayloadClient } from '@/lib/site'
-import { DEFAULT_PAYROLL_CONFIG, normalizePayrollConfig, type PayrollConfig } from './config'
+import {
+  DEFAULT_PAYROLL_CONFIG,
+  DEFAULT_PAYROLL_CONFIG_EN,
+  normalizePayrollConfig, type PayrollConfig } from './config'
 
-export async function getPayrollConfig(): Promise<PayrollConfig> {
+export async function getPayrollConfig(locale: string = 'vi'): Promise<PayrollConfig> {
   try {
     const payload = await getPayloadClient()
-    const raw = await payload.findGlobal({ slug: 'payroll-config', depth: 0 })
-    return normalizePayrollConfig(raw)
+    const raw = await payload.findGlobal({
+      slug: 'payroll-config',
+      depth: 0,
+      locale: locale === 'en' ? 'en' : 'vi',
+      // Tắt fallback sang vi: thiếu bản en thì defaultValue theo locale chạy, giống tab English
+      // trong admin; để fallback thì /en hiện căn cứ tiếng Việt.
+      fallbackLocale: false,
+    })
+    return normalizePayrollConfig(raw, locale)
   } catch {
-    return DEFAULT_PAYROLL_CONFIG
+    return locale === 'en' ? DEFAULT_PAYROLL_CONFIG_EN : DEFAULT_PAYROLL_CONFIG
   }
 }

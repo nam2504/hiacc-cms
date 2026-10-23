@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Container } from '@/components/ui/Container'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { localizedHref } from '@/lib/nav'
+import { createTranslator } from '@/lib/i18n'
 import type { TreeNode } from '@/lib/serviceTree'
 import styles from './GroupSummary.module.css'
 
@@ -16,12 +17,14 @@ import styles from './GroupSummary.module.css'
 export function GroupSummary({ tree, locale }: { tree: TreeNode[]; locale: string }) {
   if (tree.length === 0) return null
 
+  const t = createTranslator(locale as Parameters<typeof createTranslator>[0])
+  const plural = (n: number) => (n === 1 ? 'one' : 'other')
   const total = String(tree.length).padStart(2, '0')
 
   return (
     <section className={styles.section}>
       <Container>
-        <h2 className={styles.title}>{total} nhóm dịch vụ</h2>
+        <h2 className={styles.title}>{t(`about.groups.title.${plural(tree.length)}`, { total })}</h2>
 
         <ul className={styles.grid}>
           {tree.map((group, index) => (
@@ -31,7 +34,7 @@ export function GroupSummary({ tree, locale }: { tree: TreeNode[]; locale: strin
                 <span className={styles.name}>{group.title}</span>
                 {group.summary ? <span className={styles.summary}>{group.summary}</span> : null}
                 {group.children.length > 0 ? (
-                  <span className={styles.count}>{group.children.length} hạng mục</span>
+                  <span className={styles.count}>{t(`about.groups.items.${plural(group.children.length)}`, { n: String(group.children.length) })}</span>
                 ) : null}
               </Link>
             </li>

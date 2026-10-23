@@ -1,5 +1,6 @@
 import type { GlobalConfig, Validate } from 'payload'
 import { isAdmin, isPublic } from '../access'
+import { DEFAULT_PAYROLL_CONFIG, DEFAULT_PAYROLL_CONFIG_EN } from '../lib/payroll/config'
 
 /**
  * Global `payroll-config` — số liệu luật của công cụ tính lương Gross ↔ Net (gói W5).
@@ -330,15 +331,14 @@ export const PayrollConfig: GlobalConfig = {
               type: 'textarea',
               label: 'Căn cứ pháp lý',
               required: true,
-              defaultValue: [
-                'Giảm trừ gia cảnh: Nghị quyết 110/2025/UBTVQH15 (áp dụng từ kỳ tính thuế 2026).',
-                'Biểu thuế thu nhập cá nhân lũy tiến 5 bậc: Luật Thuế thu nhập cá nhân 2025 (Luật 109/2025/QH15), phần thu nhập từ tiền lương hiệu lực 01/01/2026.',
-                'Tỷ lệ bảo hiểm người lao động đóng (BHXH 8%, BHYT 1,5%, BHTN 1%): Luật Bảo hiểm xã hội 2024 (số 41/2024/QH15), Nghị định 158/2025/NĐ-CP, Nghị định 188/2025/NĐ-CP.',
-                'Lương tối thiểu vùng: Nghị định 293/2025/NĐ-CP.',
-              ].join('\n'),
+              localized: true,
+              defaultValue: ({ locale }) =>
+                locale === 'en'
+                  ? DEFAULT_PAYROLL_CONFIG_EN.legalBasis
+                  : DEFAULT_PAYROLL_CONFIG.legalBasis,
               admin: {
                 description:
-                  'Danh sách văn bản pháp luật làm căn cứ cho các số ở trên. Hiện công khai trên trang tính lương để người dùng tự đối chiếu. Mỗi căn cứ một dòng. Sửa số ở các tab khác thì nhớ cập nhật lại dòng căn cứ tương ứng ở đây.',
+                  'Danh sách văn bản pháp luật làm căn cứ cho các số ở trên. Hiện công khai trên trang tính lương để người dùng tự đối chiếu. Mỗi căn cứ một dòng. Sửa số ở các tab khác thì nhớ cập nhật lại dòng căn cứ tương ứng ở đây. Muốn sửa bản tiếng Anh thì đổi ngôn ngữ sang English ở góc trên trang quản trị.',
               },
             },
           ],

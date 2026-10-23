@@ -1,5 +1,6 @@
 import { Container } from '@/components/ui/Container'
 import type { Setting } from '@/payload-types'
+import { createTranslator } from '@/lib/i18n'
 import styles from './ContactChannels.module.css'
 
 /**
@@ -8,7 +9,8 @@ import styles from './ContactChannels.module.css'
  *
  * Cột nào không có dữ liệu trong Settings thì tự ẩn — không dựng cột rỗng.
  */
-export function ContactChannels({ settings }: { settings: Setting | null }) {
+export function ContactChannels({ settings, locale }: { settings: Setting | null; locale: string }) {
+  const t = createTranslator(locale as Parameters<typeof createTranslator>[0])
   const hotline = settings?.hotline
   const hotline2 = settings?.hotline2
   const email = settings?.email
@@ -28,7 +30,7 @@ export function ContactChannels({ settings }: { settings: Setting | null }) {
         <div className={styles.row}>
           {hotline || hotline2 ? (
             <div className={styles.col}>
-              <h2 className={styles.label}>Điện thoại</h2>
+              <h2 className={styles.label}>{t('contact.channels.phone')}</h2>
               {hotline ? (
                 <a className={styles.value} href={`tel:${hotline.replace(/[^\d+]/g, '')}`}>
                   {hotline}
@@ -48,13 +50,13 @@ export function ContactChannels({ settings }: { settings: Setting | null }) {
               <a className={styles.value} href={`mailto:${email}`}>
                 {email}
               </a>
-              {workingHours ? <p className={styles.hint}>Giờ làm việc: {workingHours}</p> : null}
+              {workingHours ? <p className={styles.hint}>{t('contact.channels.hours')} {workingHours}</p> : null}
             </div>
           ) : null}
 
           {socials.length > 0 ? (
             <div className={styles.col}>
-              <h2 className={styles.label}>Kênh khác</h2>
+              <h2 className={styles.label}>{t('contact.channels.other')}</h2>
               <ul className={styles.links}>
                 {socials.map((item) => (
                   <li key={item.label}>

@@ -8,7 +8,7 @@ import { logger } from '@/lib/observability/logger'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
 import { createTranslator } from '@/lib/i18n'
-import { LegalDocTabs } from './LegalDocTabs'
+import { LegalDocTabs, type LegalDocLabels } from './LegalDocTabs'
 
 /**
  * /van-ban-phap-luat — thư viện văn bản, thiết kế khách 06/09.
@@ -96,10 +96,26 @@ export default async function LegalDocumentsPage() {
 
   const byGroup = LEGAL_GROUPS.map((group) => ({
     ...group,
+    label: t(`legalDocs.group.${group.value}`) === `legalDocs.group.${group.value}`
+      ? group.label
+      : t(`legalDocs.group.${group.value}`),
     items: docs.filter((doc) => doc.group === group.value),
   }))
   // Nhóm chưa có văn bản nào thì không dựng tab rỗng cho người đọc bấm vào.
   const groupsWithItems = byGroup.filter((group) => group.items.length > 0)
+
+  const labels: LegalDocLabels = {
+    groupsAria: t('legalDocs.aria.groups'),
+    countOne: t('legalDocs.count.one'),
+    countOther: t('legalDocs.count.other'),
+    colCode: t('legalDocs.col.code'),
+    colTitle: t('legalDocs.col.title'),
+    colIssuer: t('legalDocs.col.issuer'),
+    colEffective: t('legalDocs.col.effective'),
+    colLink: t('legalDocs.col.link'),
+    viewSource: t('legalDocs.viewSource'),
+    pending: t('seo.placeholder.pending'),
+  }
 
   return (
     <>
@@ -113,15 +129,12 @@ export default async function LegalDocumentsPage() {
 
       <Container>
         {groupsWithItems.length === 0 ? (
-          <p className={styles.empty}>Danh mục văn bản đang được cập nhật.</p>
+          <p className={styles.empty}>{t('legalDocs.empty')}</p>
         ) : (
           <>
-            <LegalDocTabs groups={groupsWithItems} />
+            <LegalDocTabs groups={groupsWithItems} labels={labels} />
 
-            <p className={styles.note}>
-              Danh mục dẫn tới văn bản trên trang của cơ quan ban hành. {siteName} không
-              đăng lại file văn bản để tránh sai lệch khi bản gốc được sửa đổi.
-            </p>
+            <p className={styles.note}>{t('legalDocs.note', { siteName })}</p>
           </>
         )}
       </Container>

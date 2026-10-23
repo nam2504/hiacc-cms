@@ -34,9 +34,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PayrollToolPage() {
   // Global lỗi/chưa seed → getPayrollConfig() trả fallback §2, trang vẫn chạy.
-  const config = await getPayrollConfig()
   // <PayrollCalculator> là client component → locale phải đi xuống qua props.
   const locale = await getRequestLocale()
+  const config = await getPayrollConfig(locale)
   const tr = createTranslator(locale)
 
   return (

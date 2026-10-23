@@ -8,8 +8,9 @@
  * ⚠️ NGUỒN SỐ: DEFAULT_PAYROLL_CONFIG trong src/lib/payroll/config.ts, chép từ contract
  * W5 §2 do PM cấp. Seed KHÔNG tự khai lại số ở đây để hai chỗ không lệch nhau.
  */
+import { sql } from '@payloadcms/db-sqlite'
 import type { Payload } from 'payload'
-import { DEFAULT_PAYROLL_CONFIG } from '../lib/payroll/config'
+import { DEFAULT_PAYROLL_CONFIG, DEFAULT_PAYROLL_CONFIG_EN } from '../lib/payroll/config'
 
 /** Field coi như "khách đã nhập" → không đụng. Mảng rỗng tính là chưa nhập. */
 const hasValue = (value: unknown): boolean => {
@@ -36,7 +37,6 @@ export async function seedPayrollConfig(payload: Payload): Promise<number> {
     regions: DEFAULT_PAYROLL_CONFIG.regions,
     unemploymentCapMultiplier: DEFAULT_PAYROLL_CONFIG.unemploymentCapMultiplier,
     effectiveFrom: DEFAULT_PAYROLL_CONFIG.effectiveFrom,
-    legalBasis: DEFAULT_PAYROLL_CONFIG.legalBasis,
   }
 
   const patch: Record<string, unknown> = {}
@@ -44,8 +44,35 @@ export async function seedPayrollConfig(payload: Payload): Promise<number> {
     if (!hasValue(current?.[key])) patch[key] = value
   }
 
-  if (Object.keys(patch).length === 0) return 0
+  let written = 0
+  if (Object.keys(patch).length > 0) {
+    await payload.updateGlobal({ slug: 'payroll-config', data: patch })
+    written += Object.keys(patch).length
+  }
 
-  await payload.updateGlobal({ slug: 'payroll-config', data: patch })
-  return Object.keys(patch).length
+  // Căn cứ pháp lý là field localized có defaultValue theo locale nên đọc qua findGlobal luôn ra
+  // giá trị; muốn biết bản nào thật sự đã lưu thì hỏi thẳng bảng locales.
+  const drizzle = (payload.db as unknown as { drizzle: { all: (q: unknown) => Promise<unknown[]> } })
+    .drizzle
+  const stored = (await drizzle.all(
+    sql`SELECT \`_locale\` AS locale FROM \`payroll_config_locales\``,
+  )) as { locale: string }[]
+  const have = new Set(stored.map((r) => r.locale))
+  if (!have.has('vi')) {
+    await payload.updateGlobal({
+      slug: 'payroll-config',
+      locale: 'vi',
+      data: { legalBasis: DEFAULT_PAYROLL_CONFIG.legalBasis },
+    })
+    written += 1
+  }
+  if (!have.has('en')) {
+    await payload.updateGlobal({
+      slug: 'payroll-config',
+      locale: 'en',
+      data: { legalBasis: DEFAULT_PAYROLL_CONFIG_EN.legalBasis },
+    })
+    written += 1
+  }
+  return written
 }

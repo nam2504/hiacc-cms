@@ -121,6 +121,17 @@ export const DEFAULT_PAYROLL_CONFIG: PayrollConfig = {
   ].join('\n'),
 }
 
+/** Bản dự phòng cho trang tiếng Anh: cùng số liệu, chỉ khác căn cứ pháp lý. */
+export const DEFAULT_PAYROLL_CONFIG_EN: PayrollConfig = {
+  ...DEFAULT_PAYROLL_CONFIG,
+  legalBasis: [
+    'Personal and dependant deductions: Resolution No. 110/2025/UBTVQH15 (applicable from the 2026 tax period).',
+    '5-bracket progressive personal income tax schedule: Law on Personal Income Tax 2025 (Law No. 109/2025/QH15); provisions on employment income effective from 1 January 2026.',
+    'Employee insurance contribution rates (social insurance 8%, health insurance 1.5%, unemployment insurance 1%): Law on Social Insurance 2024 (No. 41/2024/QH15), Decree No. 158/2025/ND-CP, Decree No. 188/2025/ND-CP.',
+    'Regional minimum wages: Decree No. 293/2025/ND-CP.',
+  ].join('\n'),
+}
+
 /** Số hợp lệ và hữu hạn? Dùng để lọc dữ liệu rác từ global trước khi tính. */
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value)
@@ -136,8 +147,8 @@ const REGION_CODES: RegionCode[] = ['I', 'II', 'III', 'IV']
  *
  * KHÔNG ném lỗi — trang public gọi hàm này, ném lỗi là trang trắng.
  */
-export function normalizePayrollConfig(raw: unknown): PayrollConfig {
-  const fallback = DEFAULT_PAYROLL_CONFIG
+export function normalizePayrollConfig(raw: unknown, locale: string = 'vi'): PayrollConfig {
+  const fallback = locale === 'en' ? DEFAULT_PAYROLL_CONFIG_EN : DEFAULT_PAYROLL_CONFIG
   if (!raw || typeof raw !== 'object') return fallback
 
   const src = raw as Record<string, unknown>

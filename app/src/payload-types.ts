@@ -1365,7 +1365,7 @@ export interface PayrollConfig {
    */
   effectiveFrom: string;
   /**
-   * Danh sách văn bản pháp luật làm căn cứ cho các số ở trên. Hiện công khai trên trang tính lương để người dùng tự đối chiếu. Mỗi căn cứ một dòng. Sửa số ở các tab khác thì nhớ cập nhật lại dòng căn cứ tương ứng ở đây.
+   * Danh sách văn bản pháp luật làm căn cứ cho các số ở trên. Hiện công khai trên trang tính lương để người dùng tự đối chiếu. Mỗi căn cứ một dòng. Sửa số ở các tab khác thì nhớ cập nhật lại dòng căn cứ tương ứng ở đây. Muốn sửa bản tiếng Anh thì đổi ngôn ngữ sang English ở góc trên trang quản trị.
    */
   legalBasis: string;
   updatedAt?: string | null;

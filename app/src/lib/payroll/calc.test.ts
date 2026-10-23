@@ -12,9 +12,11 @@ import { describe, it } from 'node:test'
 
 import {
   DEFAULT_PAYROLL_CONFIG,
+  DEFAULT_PAYROLL_CONFIG_EN,
   normalizePayrollConfig,
   type PayrollConfig,
 } from './config'
+import { PayrollConfig as PayrollConfigGlobal } from '../../globals/PayrollConfig'
 import { calculatePayroll, grossToNet, netToGross, sanitizeAmount } from './calc'
 
 const CONFIG = DEFAULT_PAYROLL_CONFIG
@@ -365,6 +367,36 @@ describe('Ca 8 — config lỗi/thiếu field → rơi về fallback, không cra
     assert.equal(config.personalDeduction, 20_000_000)
     assert.deepEqual(config.taxBrackets, DEFAULT_PAYROLL_CONFIG.taxBrackets)
     assert.equal(config.dependentDeduction, DEFAULT_PAYROLL_CONFIG.dependentDeduction)
+  })
+
+  it('căn cứ pháp lý rỗng: locale en rơi về bản tiếng Anh, vi giữ bản tiếng Việt', () => {
+    const en = normalizePayrollConfig({ legalBasis: '' }, 'en')
+    const vi = normalizePayrollConfig({ legalBasis: '' }, 'vi')
+    assert.equal(en.legalBasis, DEFAULT_PAYROLL_CONFIG_EN.legalBasis)
+    assert.match(en.legalBasis, /^Personal and dependant deductions/)
+    assert.equal(vi.legalBasis, DEFAULT_PAYROLL_CONFIG.legalBasis)
+    assert.match(vi.legalBasis, /^Giảm trừ gia cảnh/)
+    assert.deepEqual(en.taxBrackets, vi.taxBrackets)
+  })
+
+  it('defaultValue của legalBasis theo locale: en ra tiếng Anh, vi ra tiếng Việt', () => {
+    const find = (fields: unknown[]): Record<string, unknown> | undefined => {
+      for (const f of fields as Record<string, unknown>[]) {
+        if (f.name === 'legalBasis') return f
+        const nested = (f.fields ?? (f.tabs as { fields: unknown[] }[] | undefined)?.flatMap((t) => t.fields)) as
+          | unknown[]
+          | undefined
+        const hit = nested && find(nested)
+        if (hit) return hit
+      }
+      return undefined
+    }
+    const field = find(PayrollConfigGlobal.fields as unknown[])
+    assert.ok(field)
+    assert.equal(field.localized, true)
+    const dv = field.defaultValue as (a: { locale: string }) => string
+    assert.equal(dv({ locale: 'en' }), DEFAULT_PAYROLL_CONFIG_EN.legalBasis)
+    assert.equal(dv({ locale: 'vi' }), DEFAULT_PAYROLL_CONFIG.legalBasis)
   })
 
   it('bảng thuế nhập lộn xộn được sắp lại tăng dần, bậc không trần xuống cuối', () => {

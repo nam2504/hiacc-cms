@@ -5,6 +5,7 @@ import { mediaAlt, mediaUrl } from '@/lib/site'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { localizedHref } from '@/lib/nav'
 import { getRequestLocale } from '@/lib/requestLocale'
+import { createTranslator } from '@/lib/i18n'
 import { formatPostDate } from './date'
 import styles from './FeaturedPost.module.css'
 
@@ -16,6 +17,7 @@ export async function FeaturedPost({ post }: { post: Post }) {
   // Link bài/chuyên mục phải giữ ngôn ngữ đang xem; bản EN dùng path thô
   // là bấm vào rơi thẳng về trang tiếng Việt.
   const locale = await getRequestLocale()
+  const t = createTranslator(locale)
   const cover = mediaUrl(post.cover)
   const category = typeof post.category === 'object' ? post.category : null
 
@@ -37,7 +39,7 @@ export async function FeaturedPost({ post }: { post: Post }) {
 
       <div className={styles.body}>
         <p className={styles.meta}>
-          <span className={styles.badge}>Bài nổi bật</span>
+          <span className={styles.badge}>{t('news.featured.badge')}</span>
           {post.publishedAt ? (
             <time dateTime={post.publishedAt}>{formatPostDate(post.publishedAt)}</time>
           ) : null}
@@ -53,7 +55,7 @@ export async function FeaturedPost({ post }: { post: Post }) {
         {post.excerpt ? <p className={styles.excerpt}>{post.excerpt}</p> : null}
 
         <Link className={styles.action} href={localizedHref(`/tin-tuc/${post.slug}`, locale, DEFAULT_LOCALE)}>
-          Đọc bài viết
+          {t('news.featured.read')}
         </Link>
       </div>
     </article>
