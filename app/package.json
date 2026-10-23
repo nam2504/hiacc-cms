@@ -11,7 +11,7 @@
     "generate:importmap": "payload generate:importmap",
     "payload": "payload",
     "seed": "payload run src/seed/index.ts",
-    "test": "node --import tsx --test src/lib/payroll/*.test.ts",
+    "test": "node --import tsx --test src/lib/payroll/*.test.ts src/lib/localeAvailability.test.ts",
     "test:payroll": "node --import tsx --test src/lib/payroll/*.test.ts"
   },
   "dependencies": {

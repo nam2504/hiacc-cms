@@ -198,7 +198,14 @@ export function MegaMenu({
                   //    request thật.
                   e.preventDefault()
                   document.cookie = `NEXT_LOCALE=${item.code};path=/;max-age=${60 * 60 * 24 * 365}`
-                  window.location.href = localizedHref(current, item.code, DEFAULT_LOCALE)
+                  // Trang vi không khai hreflang="en" = doc chưa có bản dịch: về trang chủ /en.
+                  const noEnglishVersion =
+                    locale === DEFAULT_LOCALE &&
+                    item.code === 'en' &&
+                    !document.querySelector('link[rel="alternate"][hreflang="en"]')
+                  window.location.href = noEnglishVersion
+                    ? localizedHref('/', item.code, DEFAULT_LOCALE)
+                    : localizedHref(current, item.code, DEFAULT_LOCALE)
                 }}
               >
                 {item.code.toUpperCase()}

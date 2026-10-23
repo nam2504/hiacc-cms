@@ -7,6 +7,8 @@
  */
 import { DEFAULT_LOCALE, ENABLED_LOCALES, type LocaleCode } from './locales'
 import { mediaUrl } from './site'
+import { declaredLocales, untranslatedRobotsMeta } from './localeAvailability'
+import { isStaging } from './staging'
 import { logger } from './observability/logger'
 
 /**
@@ -105,9 +107,9 @@ export function ogLocale(locale: string): string {
  * `x-default` trỏ bản tiếng Việt vì đó là ngôn ngữ mặc định của site — nó là
  * trang Google phục vụ cho khách mà không ngôn ngữ nào khớp.
  */
-export function hreflangLanguages(path: string): Record<string, string> {
+export function hreflangLanguages(path: string, hasEnglish = true): Record<string, string> {
   const languages: Record<string, string> = {}
-  for (const code of ENABLED_LOCALES) {
+  for (const code of declaredLocales(ENABLED_LOCALES, hasEnglish)) {
     languages[code] = absoluteUrl(localePath(path, code))
   }
   languages['x-default'] = absoluteUrl(localePath(path, DEFAULT_LOCALE))
@@ -121,9 +123,14 @@ export function hreflangLanguages(path: string): Record<string, string> {
  * dựng. Canonical trỏ đúng bản đang xem — bản `/en` tự trỏ về `/en`, không trỏ
  * về bản tiếng Việt.
  */
-export function localeAlternates(path: string, locale: LocaleCode) {
+export function localeAlternates(path: string, locale: LocaleCode, hasEnglish = true) {
   return {
     canonical: absoluteUrl(localePath(path, locale)),
-    languages: hreflangLanguages(path),
+    languages: hreflangLanguages(path, hasEnglish),
   }
+}
+
+/** Trang /en của doc chưa có bản dịch: vẫn render (fallback vi) nhưng không cho index. */
+export function untranslatedRobots(locale: LocaleCode, hasEnglish: boolean) {
+  return untranslatedRobotsMeta(locale, hasEnglish, isStaging())
 }

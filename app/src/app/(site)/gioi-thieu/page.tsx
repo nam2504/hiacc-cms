@@ -7,8 +7,8 @@ import { GroupSummary } from '@/components/pages/GroupSummary'
 import { Section } from '@/components/ui/Section'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { createTranslator } from '@/lib/i18n'
-import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
-import { getPageBySlug, getSettings, siteDisplayName } from '@/lib/site'
+import { localeAlternates, localePath, ogImages, ogLocale, untranslatedRobots } from '@/lib/seo'
+import { getPageBySlug, getSettings, hasEnglishVersionOf, siteDisplayName } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
 import { getRequestLocale } from '@/lib/requestLocale'
 
@@ -48,7 +48,11 @@ const SLUG = 'gioi-thieu'
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale()
   const tr = createTranslator(locale)
-  const [page, settings] = await Promise.all([getPageBySlug(SLUG, locale), getSettings(locale)])
+  const [page, settings, hasEnglish] = await Promise.all([
+    getPageBySlug(SLUG, locale),
+    getSettings(locale),
+    hasEnglishVersionOf('pages', 'slug', SLUG),
+  ])
   if (!page) return {}
 
   const title = page.seo?.title || page.title
@@ -58,7 +62,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: localeAlternates(`/${SLUG}`, locale),
+    alternates: localeAlternates(`/${SLUG}`, locale, hasEnglish),
+    ...untranslatedRobots(locale, hasEnglish),
     openGraph: {
       type: 'website',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.

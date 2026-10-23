@@ -12,8 +12,9 @@ import {
   localePath,
   ogImages,
   ogLocale,
+  untranslatedRobots,
 } from '@/lib/seo'
-import { getPostBySlug, getSettings, siteDisplayName } from '@/lib/site'
+import { getPostBySlug, getSettings, hasEnglishVersionOf, siteDisplayName } from '@/lib/site'
 import type { Category } from '@/payload-types'
 import { getRequestLocale } from '@/lib/requestLocale'
 
@@ -32,7 +33,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { slug } = await params
   // Thiếu `locale` ở đây thì getPostBySlug rơi về DEFAULT_LOCALE: trang /en đọc
   // bản tiếng Việt dù bản dịch EN đã có trong CMS (khách báo 09/09).
-  const [post, settings] = await Promise.all([getPostBySlug(slug, locale), getSettings(locale)])
+  const [post, settings, hasEnglish] = await Promise.all([
+    getPostBySlug(slug, locale),
+    getSettings(locale),
+    hasEnglishVersionOf('posts', 'slug', slug),
+  ])
   if (!post) return { title: t('error.notFound.title') }
 
   const base = seoMetadata(post.seo, post.title, post.excerpt)
@@ -42,7 +47,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
   return {
     ...base,
-    alternates: localeAlternates(path, locale),
+    alternates: localeAlternates(path, locale, hasEnglish),
+    ...untranslatedRobots(locale, hasEnglish),
     openGraph: {
       type: 'article',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.

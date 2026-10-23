@@ -11,6 +11,11 @@ import { DEFAULT_LOCALE, type LocaleCode } from './locales'
 import { createTranslator } from './i18n'
 import { TENANT } from '@/config/tenant'
 import { logger } from './observability/logger'
+import {
+  PRIMARY_FIELDS,
+  hasEnglishVersion,
+  type AvailabilityCollection,
+} from './localeAvailability'
 import type { Branch, Category, Config, Page, Post, Setting } from '@/payload-types'
 
 /**
@@ -310,3 +315,82 @@ export async function getAllPageSlugs(
     return (res.docs as Page[]).map((doc) => ({ slug: doc.slug, updatedAt: doc.updatedAt }))
   })
 }
+
+const availabilitySelect = (collection: AvailabilityCollection) =>
+  Object.fromEntries([...PRIMARY_FIELDS[collection], 'slug'].map((f) => [f, true]))
+
+type AvailabilityDoc = Record<string, unknown> & { id: string | number; slug?: string }
+
+/**
+ * Doc đã có bản en thật chưa (bản en đọc với fallbackLocale:false, so với bản vi).
+ * `ref` là id (service-nodes) hoặc slug (posts/pages/categories). Lỗi dò → true:
+ * giữ hành vi cũ chứ không làm hỏng trang.
+ */
+export const hasEnglishVersionOf = cache(
+  async (collection: AvailabilityCollection, by: 'id' | 'slug', ref: string): Promise<boolean> => {
+    try {
+      const payload = await getPayloadClient()
+      const load = async (locale: LocaleCode) => {
+        const res = await payload.find({
+          collection,
+          locale: asPayloadLocale(locale),
+          fallbackLocale: false,
+          where: { [by]: { equals: ref } },
+          limit: 1,
+          depth: 0,
+          select: availabilitySelect(collection),
+        } as Parameters<typeof payload.find>[0])
+        return (res.docs[0] as unknown as AvailabilityDoc | undefined) ?? null
+      }
+      const [vi, en] = await Promise.all([load('vi'), load('en')])
+      return hasEnglishVersion(vi, en, PRIMARY_FIELDS[collection])
+    } catch (error) {
+      logger.error('[site] hasEnglishVersionOf không dò được bản en, coi như có:', error, {
+        collection,
+        ref,
+      })
+      return true
+    }
+  },
+)
+
+export type EnglishKeys = Record<AvailabilityCollection, Set<string>>
+
+/**
+ * Khoá (id cho service-nodes, slug cho các collection còn lại) của mọi doc đã có bản en,
+ * cho sitemap: 2 lượt find mỗi collection thay vì gọi từng doc. Lỗi → null (coi như mọi doc đều có).
+ */
+export const getEnglishKeys = cache(async (): Promise<EnglishKeys | null> => {
+  try {
+    const payload = await getPayloadClient()
+    const out = {} as EnglishKeys
+    for (const collection of Object.keys(PRIMARY_FIELDS) as AvailabilityCollection[]) {
+      const keyOf = (d: AvailabilityDoc) => String(collection === 'service-nodes' ? d.id : d.slug)
+      const load = async (locale: LocaleCode) => {
+        const res = await payload.find({
+          collection,
+          locale: asPayloadLocale(locale),
+          fallbackLocale: false,
+          ...(collection === 'posts' || collection === 'pages'
+            ? { where: { _status: { equals: 'published' } } }
+            : {}),
+          limit: 1000,
+          depth: 0,
+          select: availabilitySelect(collection),
+        } as Parameters<typeof payload.find>[0])
+        return res.docs as unknown as AvailabilityDoc[]
+      }
+      const [viDocs, enDocs] = await Promise.all([load('vi'), load('en')])
+      const enByKey = new Map(enDocs.map((d) => [keyOf(d), d]))
+      out[collection] = new Set(
+        viDocs
+          .filter((vi) => hasEnglishVersion(vi, enByKey.get(keyOf(vi)), PRIMARY_FIELDS[collection]))
+          .map(keyOf),
+      )
+    }
+    return out
+  } catch (error) {
+    logger.error('[site] getEnglishKeys không dò được bản en, coi như mọi doc đều có:', error)
+    return null
+  }
+})

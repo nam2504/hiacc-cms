@@ -8,12 +8,13 @@ import { QuickQuoteCard } from '@/components/services/QuickQuoteCard'
 import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { Container } from '@/components/ui/Container'
 import { createTranslator } from '@/lib/i18n'
-import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
+import { localeAlternates, localePath, ogImages, ogLocale, untranslatedRobots } from '@/lib/seo'
+import { serviceNodeKeys } from '@/lib/localeAvailability'
 import { localizedHref } from '@/lib/nav'
 import { findByPath, getServiceTree, getPricingRowsByNodeId, type TreeNode, type PricingRow } from '@/lib/serviceTree'
 import { DEFAULT_LOCALE, type LocaleCode } from '@/lib/locales'
 import { getSettings, mediaUrl, siteDisplayName, toPayloadLocale } from '@/lib/site'
-import { getPayloadClient } from '@/lib/site'
+import { getPayloadClient, hasEnglishVersionOf } from '@/lib/site'
 import { logger } from '@/lib/observability/logger'
 import type { ServiceNode } from '@/payload-types'
 import styles from './page.module.css'
@@ -74,6 +75,14 @@ const getNodeDetail = cache(async (id: string, locale: LocaleCode): Promise<Serv
   }
 })
 
+/** Trang nhóm hiển thị luôn hạng mục đầu tiên nên cả hai doc đều phải có bản en. */
+async function nodeHasEnglish(node: TreeNode): Promise<boolean> {
+  const results = await Promise.all(
+    serviceNodeKeys(node).map((id) => hasEnglishVersionOf('service-nodes', 'id', id)),
+  )
+  return results.every(Boolean)
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -85,7 +94,11 @@ export async function generateMetadata({
   const match = findByPath(tree, slug)
   if (!match) return {}
 
-  const [detail, settings] = await Promise.all([getNodeDetail(match.node.id, locale), getSettings(locale)])
+  const [detail, settings, hasEnglish] = await Promise.all([
+    getNodeDetail(match.node.id, locale),
+    getSettings(locale),
+    nodeHasEnglish(match.node),
+  ])
   const title = detail?.seo?.title || match.node.title
   const description = detail?.seo?.description || match.node.summary || undefined
   const images = ogImages(detail?.seo?.image, settings?.logo)
@@ -93,7 +106,8 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: localeAlternates(match.node.path, locale),
+    alternates: localeAlternates(match.node.path, locale, hasEnglish),
+    ...untranslatedRobots(locale, hasEnglish),
     openGraph: {
       type: 'website',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.

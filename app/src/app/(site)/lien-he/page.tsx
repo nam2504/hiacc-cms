@@ -8,8 +8,8 @@ import { PageBody } from '@/components/pages/PageBody'
 import { PageHero } from '@/components/pages/PageHero'
 import { Section } from '@/components/ui/Section'
 import { createTranslator } from '@/lib/i18n'
-import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
-import { getBranches, getPageBySlug, getSettings, siteDisplayName } from '@/lib/site'
+import { localeAlternates, localePath, ogImages, ogLocale, untranslatedRobots } from '@/lib/seo'
+import { getBranches, getPageBySlug, getSettings, hasEnglishVersionOf, siteDisplayName } from '@/lib/site'
 import { getServiceTree } from '@/lib/serviceTree'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
@@ -56,7 +56,11 @@ export async function generateMetadata(): Promise<Metadata> {
   const tr = createTranslator(locale)
   // Khác các trang khác: KHÔNG return {} khi thiếu bản ghi `pages` — trang này vẫn
   // render bằng hotline + chi nhánh, nên metadata cũng phải đứng được với page = null.
-  const [page, settings] = await Promise.all([getPageBySlug(SLUG, locale), getSettings(locale)])
+  const [page, settings, hasEnglish] = await Promise.all([
+    getPageBySlug(SLUG, locale),
+    getSettings(locale),
+    hasEnglishVersionOf('pages', 'slug', SLUG),
+  ])
 
   const title = page?.seo?.title || page?.title || tr('nav.contact')
   const description = page?.seo?.description || undefined
@@ -65,7 +69,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: localeAlternates(`/${SLUG}`, locale),
+    alternates: localeAlternates(`/${SLUG}`, locale, hasEnglish),
+    ...untranslatedRobots(locale, hasEnglish),
     openGraph: {
       type: 'website',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.

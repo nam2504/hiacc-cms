@@ -1,11 +1,13 @@
 import type { MetadataRoute } from 'next'
 import { absoluteUrl, hreflangLanguages, localePath } from '@/lib/seo'
+import { allTranslated, declaredLocales, serviceNodeKeys } from '@/lib/localeAvailability'
 import { ENABLED_LOCALES } from '@/lib/locales'
 import { isStaging } from '@/lib/staging'
 import {
   getAllPageSlugs,
   getAllPostSlugs,
   getCategories,
+  getEnglishKeys,
 } from '@/lib/site'
 import { flatten, getServiceTree } from '@/lib/serviceTree'
 
@@ -60,21 +62,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    */
   if (isStaging()) return []
 
-  const [tree, categories, posts, pages] = await Promise.all([
+  const [tree, categories, posts, pages, englishKeys] = await Promise.all([
     getServiceTree(),
     getCategories(),
     getAllPostSlugs(),
     getAllPageSlugs(),
+    getEnglishKeys(),
   ])
 
   const now = new Date()
 
-  const entries: MetadataRoute.Sitemap = [
+  // Dò bản en lỗi (null) → coi mọi doc đều có, giữ hành vi cũ của sitemap.
+  const slugHasEn = (collection: 'posts' | 'pages' | 'categories', slug: string) =>
+    englishKeys === null || englishKeys[collection].has(slug)
+  const nodeHasEn = (node: { id: string; children: readonly { id: string }[] }) =>
+    englishKeys === null || allTranslated(serviceNodeKeys(node), englishKeys['service-nodes'])
+
+  const entries: (MetadataRoute.Sitemap[number] & { hasEnglish: boolean })[] = [
     ...STATIC_PATHS.map(({ path, priority }) => ({
       url: absoluteUrl(path),
       lastModified: now,
       changeFrequency: 'weekly' as const,
       priority,
+      // Chỉ gioi-thieu / lien-he gắn doc `pages`; các trang khung còn lại giữ cả hai ngôn ngữ.
+      hasEnglish: PAGES_WITH_OWN_ROUTE.has(path.slice(1)) ? slugHasEn('pages', path.slice(1)) : true,
     })),
 
     /**
@@ -90,6 +101,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       // Nhóm cấp cao nhất quan trọng hơn hạng mục con.
       priority: node.path.split('/').length === 2 ? 0.9 : 0.8,
+      hasEnglish: nodeHasEn(node),
     })),
 
     ...categories.map((category) => ({
@@ -97,6 +109,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(category.updatedAt),
       changeFrequency: 'weekly' as const,
       priority: 0.6,
+      hasEnglish: slugHasEn('categories', category.slug),
     })),
 
     ...posts.map((post) => ({
@@ -104,6 +117,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(post.updatedAt),
       changeFrequency: 'monthly' as const,
       priority: 0.6,
+      hasEnglish: slugHasEn('posts', post.slug),
     })),
 
     ...pages
@@ -113,6 +127,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified: new Date(page.updatedAt),
         changeFrequency: 'monthly' as const,
         priority: 0.5,
+        hasEnglish: slugHasEn('pages', page.slug),
       })),
   ]
 
@@ -127,10 +142,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * `alternates.languages` nói cho Google biết các URL này là bản dịch của nhau
    * chứ không phải nội dung trùng lặp.
    */
-  return entries.flatMap((entry) => {
+  return entries.flatMap(({ hasEnglish, ...entry }) => {
     const path = entry.url.replace(absoluteUrl('/'), '/').replace(/^\/+/, '/')
-    const languages = hreflangLanguages(path)
-    return ENABLED_LOCALES.map((code) => ({
+    const languages = hreflangLanguages(path, hasEnglish)
+    return declaredLocales(ENABLED_LOCALES, hasEnglish).map((code) => ({
       ...entry,
       url: absoluteUrl(localePath(path, code)),
       alternates: { languages },

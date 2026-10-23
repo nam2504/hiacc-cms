@@ -10,8 +10,14 @@ import { JsonLd, breadcrumbJsonLd } from '@/components/seo/JsonLd'
 import { createTranslator } from '@/lib/i18n'
 import { DEFAULT_LOCALE } from '@/lib/locales'
 import { localizedHref } from '@/lib/nav'
-import { localeAlternates, localePath, ogImages, ogLocale } from '@/lib/seo'
-import { getCategoryBySlug, getPosts, getSettings, siteDisplayName } from '@/lib/site'
+import { localeAlternates, localePath, ogImages, ogLocale, untranslatedRobots } from '@/lib/seo'
+import {
+  getCategoryBySlug,
+  getPosts,
+  getSettings,
+  hasEnglishVersionOf,
+  siteDisplayName,
+} from '@/lib/site'
 import styles from './page.module.css'
 import { getRequestLocale } from '@/lib/requestLocale'
 
@@ -30,7 +36,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const locale = await getRequestLocale()
   const t = createTranslator(locale)
   const { slug } = await params
-  const [category, settings] = await Promise.all([getCategoryBySlug(slug), getSettings(locale)])
+  const [category, settings, hasEnglish] = await Promise.all([
+    getCategoryBySlug(slug, locale),
+    getSettings(locale),
+    hasEnglishVersionOf('categories', 'slug', slug),
+  ])
   if (!category) return { title: t('error.notFound.title') }
 
   const base = seoMetadata(category.seo, category.name, category.description)
@@ -40,7 +50,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     ...base,
     // Canonical trỏ trang 1: `?page=` là biến thể phân trang, không phải URL riêng.
-    alternates: localeAlternates(path, locale),
+    alternates: localeAlternates(path, locale, hasEnglish),
+    ...untranslatedRobots(locale, hasEnglish),
     openGraph: {
       type: 'website',
       // Theo ngôn ngữ, cùng lý do với canonical ở `alternates` ngay trên.
